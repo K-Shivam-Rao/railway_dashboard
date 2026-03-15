@@ -1,0 +1,37 @@
+station,platform,gate_id,train,status,door_state,sensor_temp,sensor_vib,people,eta
+Berlin Hauptbahnhof,A,G01,ICE 574,approaching,closing,24.5,0.2,47,2
+Berlin Hauptbahnhof,A,G02,S7,arrived,open,26.1,0.8,28,0
+Berlin Hauptbahnhof,A,G03,RE 3312,departed,closed,23.8,0.1,12,0
+Berlin Hauptbahnhof,A,G04,,clear,closed,23.5,0.0,0,0
+Berlin Hauptbahnhof,B,G01,ICE 891,approaching,closing,25.0,0.3,3,8
+Berlin Hauptbahnhof,B,G02,,clear,closed,23.9,0.0,0,0
+Berlin Hauptbahnhof,B,G03,S5,departed,closed,24.1,0.1,5,0
+Munchen Hauptbahnhof,A,G01,ICE 102,approaching,closing,24.2,0.2,33,3
+Munchen Hauptbahnhof,A,G02,RE 5,arrived,open,27.5,1.2,15,0
+Munchen Hauptbahnhof,A,G03,S3,arrived,jammed,48.2,5.5,40,0
+Munchen Hauptbahnhof,B,G01,ICE 202,approaching,closing,24.0,0.2,5,10
+Munchen Hauptbahnhof,B,G02,,clear,closed,23.6,0.0,0,0
+Munchen Hauptbahnhof,B,G03,RE 12,departed,closed,24.3,0.1,8,0
+Hamburg Hauptbahnhof,A,G01,ICE 700,departed,closed,23.9,0.1,55,0
+Hamburg Hauptbahnhof,A,G02,RE 220,approaching,closing,25.5,0.4,40,5
+Hamburg Hauptbahnhof,A,G03,,clear,closed,23.4,0.0,0,0
+Hamburg Hauptbahnhof,B,G01,S1,arrived,open,26.0,0.9,20,0
+Hamburg Hauptbahnhof,B,G02,,clear,closed,23.4,0.0,0,0
+Frankfurt (Main) Hbf,A,G01,ICE 11,approaching,closing,24.8,0.3,60,4
+Frankfurt (Main) Hbf,A,G02,RE 40,arrived,open,26.8,1.1,15,0
+Frankfurt (Main) Hbf,B,G01,ICE 88,departed,closed,24.0,0.1,22,0
+Frankfurt (Main) Hbf,B,G02,S8,approaching,closing,25.2,0.3,30,6
+Frankfurt (Main) Hbf,B,G03,RE 10,approaching,closing,24.5,0.2,8,12
+Koln Hauptbahnhof,A,G01,ICE 921,approaching,closing,24.1,0.2,45,3
+Koln Hauptbahnhof,A,G02,S12,departed,closed,23.7,0.1,10,0
+Koln Hauptbahnhof,B,G01,ICE 15,approaching,closing,25.1,0.3,25,9
+Koln Hauptbahnhof,B,G02,RE 90,approaching,closing,24.9,0.3,18,7
+Stuttgart Hauptbahnhof,A,G01,ICE 55,approaching,closing,24.3,0.2,38,5
+Stuttgart Hauptbahnhof,A,G02,S6,arrived,open,26.5,0.7,22,0
+Stuttgart Hauptbahnhof,A,G03,,clear,closed,23.5,0.0,0,0
+Stuttgart Hauptbahnhof,B,G01,RE 44,departed,closed,23.8,0.1,9,0
+Stuttgart Hauptbahnhof,B,G02,ICE 310,approaching,jammed,47.8,4.9,30,6
+Leipzig Hauptbahnhof,A,G01,ICE 19,approaching,closing,24.6,0.2,50,3
+Leipzig Hauptbahnhof,A,G02,S11,arrived,open,26.2,0.6,35,0
+Leipzig Hauptbahnhof,B,G01,ICE 77,departed,closed,24.0,0.1,14,0
+Leipzig Hauptbahnhof,B,G02,,clear,closed,23.7,0.0,0,0
