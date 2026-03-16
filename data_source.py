@@ -8,7 +8,20 @@ from datetime import datetime, timedelta
 # ─────────────────────────────────────────────
 
 def load_data():
-    return pd.read_csv("stations.csv")
+    """Load station data from CSV with error handling."""
+    try:
+        df = pd.read_csv("stations.csv")
+        # Validate required columns
+        required_columns = {'station', 'gate_id', 'door_state', 'sensor_temp',
+                           'sensor_vib', 'people', 'platform'}
+        missing = required_columns - set(df.columns)
+        if missing:
+            raise ValueError(f"Missing required columns in stations.csv: {missing}")
+        return df
+    except FileNotFoundError:
+        raise FileNotFoundError("stations.csv not found. Please ensure the data file exists.")
+    except pd.errors.EmptyDataError:
+        raise ValueError("stations.csv is empty or contains no data.")
 
 
 def transform_data(df):
@@ -73,18 +86,17 @@ def get_metrics(df, station_name):
 
 def get_psd_analytics(station_name):
     """Deterministic hourly chart data for door cycles and temperature."""
-    seed = sum(ord(c) for c in station_name)
-    np.random.seed(seed)
+    rng = np.random.RandomState(seed=sum(ord(c) for c in station_name))
 
     hours = ["06:00", "07:00", "08:00", "09:00", "10:00", "12:00",
              "14:00", "16:00", "17:00", "18:00", "20:00", "22:00"]
-    flow = np.random.randint(150, 900, size=len(hours))
+    flow = rng.randint(150, 900, size=len(hours))
     # Rush-hour spike
-    flow[2] = np.random.randint(700, 900)
-    flow[4] = np.random.randint(650, 850)
-    flow[10] = np.random.randint(600, 850)
+    flow[2] = rng.randint(700, 900)
+    flow[4] = rng.randint(650, 850)
+    flow[10] = rng.randint(600, 850)
 
-    temp = np.linspace(22, 34, len(hours)) + np.random.normal(0, 1, len(hours))
+    temp = np.linspace(22, 34, len(hours)) + rng.normal(0, 1, len(hours))
 
     return (
         pd.DataFrame({"Hour": hours, "Door Cycles": flow}),
@@ -140,16 +152,14 @@ def get_network_summary(df):
 
 def get_maintenance_forecast(station_name):
     """Simulate a 7-day risk forecast for the selected station."""
-    seed = sum(ord(c) for c in station_name) + 42
-    np.random.seed(seed)
+    rng = np.random.RandomState(seed=sum(ord(c) for c in station_name) + 42)
 
     today = datetime.today()
     days = [(today + timedelta(days=i)).strftime("%b %d") for i in range(7)]
 
     # Randomized but station-consistent risk forecast
-    base_risk = np.random.randint(10, 40)
-    risks = np.clip(base_risk + np.random.normal(0,
-                    8, 7).cumsum(), 5, 95).round(1)
+    base_risk = rng.randint(10, 40)
+    risks = np.clip(base_risk + rng.normal(0, 8, 7).cumsum(), 5, 95).round(1)
 
     return pd.DataFrame({"Date": days, "Predicted Risk %": risks})
 
@@ -160,18 +170,17 @@ def get_maintenance_forecast(station_name):
 
 def get_passenger_heatmap(station_name):
     """7-day x 12-hour passenger flow matrix."""
-    seed = sum(ord(c) for c in station_name) + 99
-    np.random.seed(seed)
+    rng = np.random.RandomState(seed=sum(ord(c) for c in station_name) + 99)
 
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     hours = ["06", "07", "08", "09", "10", "12",
              "14", "16", "17", "18", "20", "22"]
 
-    matrix = np.random.randint(50, 800, size=(len(days), len(hours)))
+    matrix = rng.randint(50, 800, size=(len(days), len(hours)))
     # Add rush hour peaks Mon-Fri
     for d in range(5):
-        matrix[d][2] = np.random.randint(650, 900)   # 08:00
-        matrix[d][9] = np.random.randint(600, 850)   # 18:00
+        matrix[d][2] = rng.randint(650, 900)   # 08:00
+        matrix[d][9] = rng.randint(600, 850)   # 18:00
     # Lower weekends
     for d in [5, 6]:
         matrix[d] = (matrix[d] * 0.5).astype(int)
@@ -217,7 +226,6 @@ def get_incident_log(df):
 # ─────────────────────────────────────────────
 # LEADERSHIP DATA
 # ─────────────────────────────────────────────
-
 def get_leadership_data():
     return [
         {
@@ -238,7 +246,7 @@ def get_leadership_data():
             "name": "Kona Shivam Rao",
             "role": "CTO",
             "desc": "Systems Engineering, Automation, and Rail Technology Development",
-            "img": "https://ui-avatars.com/api/?name=Kona+Shivam&background=0e4d92&color=fff",
+            "img": "https://ui-avatars.com/api/?name=Kona+Shivam+Rao&background=0e4d92&color=fff",
             "linkedin": "#"
         },
         {
