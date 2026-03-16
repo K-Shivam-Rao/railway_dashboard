@@ -1268,40 +1268,40 @@ elif active_tab == 'forecast':
     st.markdown(f'<div class="section-heading">Predictive Analytics — {current_station}</div>',
                 unsafe_allow_html=True)
 
-    left, right = st.columns([3, 2])
+    # FIRST ROW: 7-Day Forecast (full width)
+    forecast_df = get_maintenance_forecast(current_station)
+    fig_fc = go.Figure()
+    fig_fc.add_trace(go.Scatter(
+        x=forecast_df["Date"], y=forecast_df["Predicted Risk %"],
+        mode='lines+markers',
+        line=dict(color='#f59e0b', width=2.5, shape='spline'),
+        marker=dict(size=7, color='#f59e0b'),
+        fill='tozeroy',
+        fillcolor='rgba(245,158,11,0.08)',
+        name="Risk %"
+    ))
+    fig_fc.add_hrect(y0=70, y1=100, fillcolor="rgba(239,68,68,0.08)",
+                     line_width=0, annotation_text="Critical Zone",
+                     annotation_font_color="#ef4444")
+    fig_fc.add_hrect(y0=30, y1=70, fillcolor="rgba(245,158,11,0.05)",
+                     line_width=0, annotation_text="Watch Zone",
+                     annotation_font_color="#f59e0b")
+    fig_fc.update_layout(
+        title=dict(text="7-Day Maintenance Risk Forecast",
+                   font=dict(size=13, color="#7ab3d4"), x=0),
+        height=280, margin=dict(l=0, r=0, b=0, t=36),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
+        yaxis=dict(gridcolor='#111d35', range=[0, 100], title="Risk %"),
+        xaxis=dict(gridcolor='#111d35'),
+        showlegend=False
+    )
+    st.plotly_chart(fig_fc, use_container_width=True)
 
-    with left:
-        # 7-day risk forecast
-        forecast_df = get_maintenance_forecast(current_station)
-        fig_fc = go.Figure()
-        fig_fc.add_trace(go.Scatter(
-            x=forecast_df["Date"], y=forecast_df["Predicted Risk %"],
-            mode='lines+markers',
-            line=dict(color='#f59e0b', width=2.5, shape='spline'),
-            marker=dict(size=7, color='#f59e0b'),
-            fill='tozeroy',
-            fillcolor='rgba(245,158,11,0.08)',
-            name="Risk %"
-        ))
-        fig_fc.add_hrect(y0=70, y1=100, fillcolor="rgba(239,68,68,0.08)",
-                         line_width=0, annotation_text="Critical Zone",
-                         annotation_font_color="#ef4444")
-        fig_fc.add_hrect(y0=30, y1=70, fillcolor="rgba(245,158,11,0.05)",
-                         line_width=0, annotation_text="Watch Zone",
-                         annotation_font_color="#f59e0b")
-        fig_fc.update_layout(
-            title=dict(text="7-Day Maintenance Risk Forecast",
-                       font=dict(size=13, color="#7ab3d4"), x=0),
-            height=280, margin=dict(l=0, r=0, b=0, t=36),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-            yaxis=dict(gridcolor='#111d35', range=[0, 100], title="Risk %"),
-            xaxis=dict(gridcolor='#111d35'),
-            showlegend=False
-        )
-        st.plotly_chart(fig_fc, use_container_width=True)
+    # SECOND ROW: Heatmap and Network Sync Health side by side
+    col_heat, col_sync = st.columns([2, 1])
 
-        # Passenger heatmap
+    with col_heat:
         st.markdown('<div class="section-heading">Weekly Passenger Flow Heatmap</div>',
                     unsafe_allow_html=True)
         heatmap_df = get_passenger_heatmap(current_station)
@@ -1312,7 +1312,7 @@ elif active_tab == 'forecast':
             labels=dict(x="Hour", y="Day", color="Passengers"),
         )
         fig_heat.update_layout(
-            height=260,
+            height=280,
             margin=dict(l=0, r=0, b=0, t=10),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -1320,40 +1320,19 @@ elif active_tab == 'forecast':
             coloraxis_colorbar=dict(
                 title=dict(
                     text="Passengers",
-                    font=dict(color="#4a6fa5")  # ✅ Correct
+                    font=dict(color="#4a6fa5")
                 ),
                 tickfont=dict(color="#4a6fa5")
             )
         )
-    st.plotly_chart(fig_heat, use_container_width=True)
+        st.plotly_chart(fig_heat, use_container_width=True)
 
-    with right:
-        # Gate-level risk scores
-        st.markdown(
-            '<div class="section-heading">Gate Risk Scores</div>', unsafe_allow_html=True)
-        station_data = df[df["station"] == current_station].sort_values(
-            "risk_score", ascending=False)
-        fig_risk = px.bar(
-            station_data,
-            x='risk_score', y='gate_id', orientation='h',
-            color='risk_score',
-            color_continuous_scale=['#10b981', '#f59e0b', '#ef4444'],
-            range_color=[0, 100],
-            labels={'risk_score': 'Risk Score', 'gate_id': 'Gate'}
-        )
-        fig_risk.update_layout(
-            height=280, margin=dict(l=0, r=0, b=0, t=10),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-            yaxis=dict(gridcolor='#111d35'), xaxis=dict(gridcolor='#111d35', range=[0, 100]),
-            coloraxis_showscale=False
-        )
-        st.plotly_chart(fig_risk, use_container_width=True)
-
+    with col_sync:
         # Sync score gauge
         st.markdown(
             '<div class="section-heading">Network Sync Health</div>', unsafe_allow_html=True)
         net_sync = int(df["sync_score"].mean())
+        avg_sync = int(df[df["station"] == current_station]["sync_score"].mean()) if not df[df["station"] == current_station].empty else 0
         fig_gauge = go.Figure(go.Indicator(
             mode="gauge+number+delta",
             value=avg_sync,
@@ -1378,11 +1357,33 @@ elif active_tab == 'forecast':
             number={'suffix': '%', 'font': {'color': '#e2e8f0', 'size': 30}},
         ))
         fig_gauge.update_layout(
-            height=250, margin=dict(l=20, r=20, b=10, t=30),
+            height=280, margin=dict(l=20, r=20, b=10, t=30),
             paper_bgcolor='rgba(0,0,0,0)',
             font=dict(color="#4a6fa5", family="IBM Plex Mono")
         )
         st.plotly_chart(fig_gauge, use_container_width=True)
+
+    # THIRD ROW: Gate Risk Scores (full width)
+    st.markdown(
+        '<div class="section-heading">Gate Risk Scores</div>', unsafe_allow_html=True)
+    station_data = df[df["station"] == current_station].sort_values(
+        "risk_score", ascending=False)
+    fig_risk = px.bar(
+        station_data,
+        x='risk_score', y='gate_id', orientation='h',
+        color='risk_score',
+        color_continuous_scale=['#10b981', '#f59e0b', '#ef4444'],
+        range_color=[0, 100],
+        labels={'risk_score': 'Risk Score', 'gate_id': 'Gate'}
+    )
+    fig_risk.update_layout(
+        height=280, margin=dict(l=0, r=0, b=0, t=10),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
+        yaxis=dict(gridcolor='#111d35'), xaxis=dict(gridcolor='#111d35', range=[0, 100]),
+        coloraxis_showscale=False
+    )
+    st.plotly_chart(fig_risk, use_container_width=True)
 
 
 # ═══════════════════════════════════════════════════
