@@ -1418,8 +1418,6 @@ elif active_tab == 'forecast':
 elif active_tab == 'financial':
     from data_source import get_financial_model_data
 
-    df_base, df_churn = get_financial_model_data()
-
     PLOTLY_DARK = dict(
         plot_bgcolor='#0a1221',
         paper_bgcolor='#0a1221',
@@ -1436,10 +1434,101 @@ elif active_tab == 'financial':
             d.update(layout_extra)
         return d
 
+    # ── PARAMETER INPUTS ─────────────────────────────────────────────────────
+    st.markdown('<div class="section-heading">⚙️ Model Parameters</div>', unsafe_allow_html=True)
+    
+    with st.expander("Configure SaaS Model Parameters", expanded=True):
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**📊 Customer Parameters**")
+            starting_customers = st.number_input(
+                "Starting Customers", 
+                min_value=1, max_value=1000, 
+                value=50, step=5,
+                help="Initial number of customers at start of simulation"
+            )
+            monthly_growth_rate = st.slider(
+                "Monthly Growth Rate (%)", 
+                min_value=1, max_value=50, 
+                value=20, step=1,
+                help="Monthly customer growth rate as percentage"
+            ) / 100.0
+            churn_rate = st.slider(
+                "Monthly Churn Rate (%)", 
+                min_value=1, max_value=30, 
+                value=5, step=1,
+                help="Monthly customer churn rate as percentage"
+            ) / 100.0
+        
+        with col2:
+            st.markdown("**💰 Pricing & Revenue**")
+            price_per_customer = st.number_input(
+                "Price per Customer ($/month)", 
+                min_value=1, max_value=10000, 
+                value=100, step=10,
+                help="Average monthly revenue per customer"
+            )
+            cac_simplified = st.number_input(
+                "Customer Acquisition Cost ($)", 
+                min_value=0, max_value=10000, 
+                value=150, step=10,
+                help="Cost to acquire one new customer"
+            )
+            high_churn_multiplier = st.slider(
+                "High Churn Multiplier (x)", 
+                min_value=1.0, max_value=5.0, 
+                value=2.0, step=0.5,
+                help="Multiplier for high churn scenario vs base churn"
+            )
+        
+        with col3:
+            st.markdown("**📋 Cost Parameters**")
+            fixed_costs = st.number_input(
+                "Fixed Costs ($/month)", 
+                min_value=0, max_value=100000, 
+                value=5000, step=500,
+                help="Monthly fixed operating costs"
+            )
+            variable_cost_per_customer = st.number_input(
+                "Variable Cost per Customer ($)", 
+                min_value=0, max_value=1000, 
+                value=10, step=5,
+                help="Variable cost per customer"
+            )
+            simulation_months = st.slider(
+                "Simulation Period (months)", 
+                min_value=12, max_value=60, 
+                value=24, step=6,
+                help="Number of months to simulate"
+            )
+    
+    # Calculate high churn rate
+    churn_rate_high = churn_rate * high_churn_multiplier
+    
+    # Re-run simulation with new parameters
+    df_base, df_churn = get_financial_model_data(
+        months=simulation_months,
+        starting_customers=starting_customers,
+        monthly_growth_rate=monthly_growth_rate,
+        churn_rate=churn_rate,
+        price_per_customer=price_per_customer,
+        fixed_costs=fixed_costs,
+        variable_cost_per_customer=variable_cost_per_customer,
+        cac_simplified=cac_simplified,
+        churn_rate_high=churn_rate_high
+    )
+    
     st.markdown('<div class="section-heading">📊 Scenario Selector</div>', unsafe_allow_html=True)
+    
+    scenario_labels = [
+        f"Base Case ({churn_rate*100:.0f}% Churn)", 
+        f"High Churn ({churn_rate_high*100:.0f}% Churn)", 
+        "Side-by-Side Comparison"
+    ]
     scenario = st.radio(
         "Choose scenario",
-        ["Base Case (5% Churn)", "High Churn (10% Churn)", "Side-by-Side Comparison"],
+        scenario_labels,
         horizontal=True,
         label_visibility="collapsed"
     )

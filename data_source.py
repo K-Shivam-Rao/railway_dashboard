@@ -370,17 +370,46 @@ def _run_saas_simulation(starting_customers, monthly_growth_rate, churn_rate,
     return pd.DataFrame(data)
 
 
-def get_financial_model_data(months=24):
-    """Returns (df_base, df_high_churn) DataFrames for the Financial Model tab."""
+def get_financial_model_data(months=24, starting_customers=50, monthly_growth_rate=0.20, 
+                             churn_rate=0.05, price_per_customer=100, fixed_costs=5000,
+                             variable_cost_per_customer=10, cac_simplified=150,
+                             churn_rate_high=None):
+    """
+    Returns (df_base, df_high_churn) DataFrames for the Financial Model tab.
+    
+    Args:
+        months: Simulation period (default 24)
+        starting_customers: Initial customer count (default 50)
+        monthly_growth_rate: Monthly growth rate as decimal (default 0.20 = 20%)
+        churn_rate: Monthly churn rate as decimal (default 0.05 = 5%)
+        price_per_customer: Average MRR per customer (default $100)
+        fixed_costs: Monthly fixed costs (default $5,000)
+        variable_cost_per_customer: Variable cost per customer (default $10)
+        cac_simplified: Customer Acquisition Cost (default $150)
+        churn_rate_high: High churn scenario rate (default 2x churn_rate)
+    """
+    if churn_rate_high is None:
+        churn_rate_high = churn_rate * 2  # Default: high churn is 2x base churn
+    
     df_base = _run_saas_simulation(
-        starting_customers=50, monthly_growth_rate=0.20, churn_rate=0.05,
-        price_per_customer=100, fixed_costs=5000,
-        variable_cost_per_customer=10, cac_simplified=150, months=months
+        starting_customers=starting_customers, 
+        monthly_growth_rate=monthly_growth_rate, 
+        churn_rate=churn_rate,
+        price_per_customer=price_per_customer, 
+        fixed_costs=fixed_costs,
+        variable_cost_per_customer=variable_cost_per_customer, 
+        cac_simplified=cac_simplified, 
+        months=months
     )
     df_churn = _run_saas_simulation(
-        starting_customers=50, monthly_growth_rate=0.20, churn_rate=0.10,
-        price_per_customer=100, fixed_costs=5000,
-        variable_cost_per_customer=10, cac_simplified=150, months=months
+        starting_customers=starting_customers, 
+        monthly_growth_rate=monthly_growth_rate, 
+        churn_rate=churn_rate_high,
+        price_per_customer=price_per_customer, 
+        fixed_costs=fixed_costs,
+        variable_cost_per_customer=variable_cost_per_customer, 
+        cac_simplified=cac_simplified, 
+        months=months
     )
     return df_base, df_churn
 
