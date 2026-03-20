@@ -223,9 +223,167 @@ def get_incident_log(df):
     return pd.DataFrame(incidents).sort_values("Time", ascending=False) if incidents else pd.DataFrame()
 
 
+
 # ─────────────────────────────────────────────
-# LEADERSHIP DATA
+# FINANCIAL MODEL (from app.py simulation)
 # ─────────────────────────────────────────────
+
+def _run_saas_simulation(starting_customers, monthly_growth_rate, churn_rate,
+                          price_per_customer, fixed_costs, variable_cost_per_customer,
+                          cac_simplified=150, months=24):
+    """
+    Self-contained SaaS financial simulation.
+    Returns a DataFrame with all metrics (mirrors app.py logic).
+    """
+    basic_pct, pro_pct, enterprise_pct = 0.50, 0.35, 0.15
+    basic_price, pro_price, enterprise_price = 49, 99, 299
+
+    salary = {"Engineering": 8500, "Sales": 6000,
+              "Marketing": 5500, "CS": 4500, "G&A": 5000}
+    hc = {"Engineering": 5, "Sales": 3, "Marketing": 2, "CS": 2, "G&A": 2}
+
+    current_customers = starting_customers
+    cumulative_cash   = -(current_customers * cac_simplified)
+    prev_mrr          = None
+    data              = []
+
+    for month in range(1, months + 1):
+        new_customers      = int(current_customers * monthly_growth_rate)
+        churned_customers  = int(current_customers * churn_rate)
+        expansion_customers = int(current_customers * 0.02)
+        expansion_mrr      = expansion_customers * (price_per_customer * 0.20)
+
+        total_customers = current_customers + new_customers - churned_customers
+
+        basic_cust      = int(total_customers * basic_pct)
+        pro_cust        = int(total_customers * pro_pct)
+        enterprise_cust = total_customers - basic_cust - pro_cust
+
+        mrr         = (basic_cust * basic_price + pro_cust * pro_price
+                       + enterprise_cust * enterprise_price)
+        new_mrr     = new_customers * price_per_customer
+        churn_mrr   = churned_customers * price_per_customer
+        net_new_mrr = new_mrr - churn_mrr + expansion_mrr
+        arr         = mrr * 12
+        mom_growth  = ((mrr - prev_mrr) / prev_mrr * 100) if prev_mrr else 0
+
+        churn_pct          = (churned_customers / current_customers * 100
+                               if current_customers > 0 else 0)
+        contribution_margin = price_per_customer - variable_cost_per_customer
+        ltv                 = (contribution_margin / churn_rate
+                                if churn_rate > 0 else 0)
+        ltv_cac_ratio       = ltv / cac_simplified if cac_simplified > 0 else 0
+
+        cac_payback_basic      = cac_simplified / max(basic_price      - variable_cost_per_customer, 1)
+        cac_payback_pro        = cac_simplified / max(pro_price        - variable_cost_per_customer, 1)
+        cac_payback_enterprise = cac_simplified / max(enterprise_price - variable_cost_per_customer, 1)
+
+        total_cac_spent = new_customers * cac_simplified
+
+        for dept, threshold in [("Engineering", 30), ("Sales", 20),
+                                 ("Marketing", 25), ("CS", 35), ("G&A", 50)]:
+            if total_customers // threshold > (current_customers // threshold):
+                hc[dept] += 1
+
+        salary_eng       = hc["Engineering"] * salary["Engineering"]
+        salary_sales     = hc["Sales"]       * salary["Sales"]
+        salary_marketing = hc["Marketing"]   * salary["Marketing"]
+        salary_cs        = hc["CS"]          * salary["CS"]
+        salary_ga        = hc["G&A"]         * salary["G&A"]
+        total_salaries   = salary_eng + salary_sales + salary_marketing + salary_cs + salary_ga
+
+        cogs     = total_customers * variable_cost_per_customer
+        rd_cost  = salary_eng
+        sm_cost  = salary_sales + salary_marketing + total_cac_spent
+        ga_cost  = salary_ga + fixed_costs
+        cs_cost  = salary_cs
+        total_costs = cogs + rd_cost + sm_cost + ga_cost + cs_cost
+
+        gross_profit     = mrr - cogs
+        gross_margin_pct = (gross_profit / mrr * 100) if mrr > 0 else 0
+        ebit             = mrr - total_costs
+        sm_efficiency    = net_new_mrr / sm_cost if sm_cost > 0 else 0
+        profit_loss      = mrr - total_costs
+        cumulative_cash += profit_loss
+
+        new_enterprise      = max(1, int(new_customers * enterprise_pct))
+        lost_enterprise     = max(0, int(churned_customers * enterprise_pct))
+        upgrade_enterprise  = max(0, int(expansion_customers * 0.3))
+
+        data.append({
+            "Month": month,
+            "Start_Customers": current_customers,
+            "New_Customers": new_customers,
+            "Churned_Customers": churned_customers,
+            "Total_Customers": total_customers,
+            "Basic_Customers": basic_cust,
+            "Pro_Customers": pro_cust,
+            "Enterprise_Customers": enterprise_cust,
+            "New_MRR": round(new_mrr, 2),
+            "Churn_MRR": round(-churn_mrr, 2),
+            "Expansion_MRR": round(expansion_mrr, 2),
+            "Net_New_MRR": round(net_new_mrr, 2),
+            "MRR": round(mrr, 2),
+            "ARR": round(arr, 2),
+            "MoM_Growth_%": round(mom_growth, 2),
+            "Churn_Rate_%": round(churn_pct, 2),
+            "LTV": round(ltv, 2),
+            "CAC": cac_simplified,
+            "LTV_CAC_Ratio": round(ltv_cac_ratio, 2),
+            "CAC_Payback_Basic": round(cac_payback_basic, 2),
+            "CAC_Payback_Pro": round(cac_payback_pro, 2),
+            "CAC_Payback_Enterprise": round(cac_payback_enterprise, 2),
+            "Contribution_Margin_$": round(contribution_margin, 2),
+            "Total_Revenue": round(mrr, 2),
+            "Gross_Profit": round(gross_profit, 2),
+            "Gross_Margin_%": round(gross_margin_pct, 2),
+            "COGS": round(cogs, 2),
+            "RD_Cost": round(rd_cost, 2),
+            "SM_Cost": round(sm_cost, 2),
+            "GA_Cost": round(ga_cost, 2),
+            "CS_Cost": round(cs_cost, 2),
+            "Total_Costs": round(total_costs, 2),
+            "EBIT": round(ebit, 2),
+            "Profit_Loss": round(profit_loss, 2),
+            "Cumulative_Cash": round(cumulative_cash, 2),
+            "SM_Efficiency": round(sm_efficiency, 4),
+            "HC_Engineering": hc["Engineering"],
+            "HC_Sales": hc["Sales"],
+            "HC_Marketing": hc["Marketing"],
+            "HC_CS": hc["CS"],
+            "HC_GA": hc["G&A"],
+            "Total_Headcount": sum(hc.values()),
+            "Salary_Engineering": salary_eng,
+            "Salary_Sales": salary_sales,
+            "Salary_Marketing": salary_marketing,
+            "Salary_CS": salary_cs,
+            "Salary_GA": salary_ga,
+            "Total_Salaries": total_salaries,
+            "New_Enterprise_Wins": new_enterprise,
+            "Enterprise_Upgrades": upgrade_enterprise,
+            "Lost_Enterprise": lost_enterprise,
+        })
+
+        prev_mrr          = mrr
+        current_customers = total_customers
+
+    return pd.DataFrame(data)
+
+
+def get_financial_model_data(months=24):
+    """Returns (df_base, df_high_churn) DataFrames for the Financial Model tab."""
+    df_base = _run_saas_simulation(
+        starting_customers=50, monthly_growth_rate=0.20, churn_rate=0.05,
+        price_per_customer=100, fixed_costs=5000,
+        variable_cost_per_customer=10, cac_simplified=150, months=months
+    )
+    df_churn = _run_saas_simulation(
+        starting_customers=50, monthly_growth_rate=0.20, churn_rate=0.10,
+        price_per_customer=100, fixed_costs=5000,
+        variable_cost_per_customer=10, cac_simplified=150, months=months
+    )
+    return df_base, df_churn
+
 def get_leadership_data():
     return [
         {
