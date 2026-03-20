@@ -11,7 +11,7 @@ from data_source import (
     get_psd_analytics, get_leadership_data,
     get_network_summary, get_maintenance_forecast,
     get_passenger_heatmap, get_incident_log,
-    get_tech_stack
+    get_tech_stack, get_financial_model_data
 )
 
 # ═══════════════════════════════════════════════════
@@ -367,6 +367,7 @@ with st.sidebar:
         'network': '🌐 Network Overview',
         'incidents': '🚨 Incident Log',
         'forecast': '📈 Predictive Analytics',
+        'financial': '💹 Financial Model',
         'company': '🏢 Company & Team',
     }
     for key, label in tabs.items():
@@ -397,6 +398,9 @@ if active_tab in ['ops', 'forecast', 'incidents']:
 elif active_tab == 'network':
     display_title = "Network Overview"
     display_sub = "ALL STATIONS // LIVE STATUS"
+elif active_tab == 'financial':
+    display_title = "Financial Model"
+    display_sub = "SAAS REVENUE SIMULATION // BAHNSETU FINANCIAL INTELLIGENCE"
 else:
     display_title = "SicherGleis Pro"
     display_sub = "BAHNSETU COMPANY PROFILE"
@@ -1060,29 +1064,51 @@ if active_tab == 'ops':
     st.markdown('<div class="section-heading">Detailed Sensor Logs</div>',
                 unsafe_allow_html=True)
 
+    def color_temp(val):
+        """Color-code temperature cells without matplotlib."""
+        if val > 45:
+            return 'background-color: #7f1d1d; color: #fca5a5; font-weight:700'
+        elif val > 35:
+            return 'background-color: #78350f; color: #fcd34d; font-weight:600'
+        elif val > 28:
+            return 'background-color: #1c3a1c; color: #86efac'
+        return ''
+
+    def color_risk(val):
+        """Color-code risk score cells without matplotlib."""
+        if val >= 70:
+            return 'background-color: #7f1d1d; color: #fca5a5; font-weight:700'
+        elif val >= 40:
+            return 'background-color: #78350f; color: #fcd34d; font-weight:600'
+        elif val >= 20:
+            return 'background-color: #1c3a1c; color: #86efac'
+        return ''
+
     def color_status(val):
+        """Color-code maintenance status cells."""
         colors = {
             'CRITICAL': 'color: #ef4444; font-weight:700',
-            'WARNING': 'color: #f59e0b; font-weight:600',
-            'MONITOR': 'color: #60a5fa',
-            'OPTIMAL': 'color: #10b981',
+            'WARNING':  'color: #f59e0b; font-weight:600',
+            'MONITOR':  'color: #60a5fa',
+            'OPTIMAL':  'color: #10b981',
         }
         return colors.get(val, '')
 
     display_cols = ['platform', 'gate_id', 'train', 'door_state',
-                    'sensor_temp', 'sensor_vib', 'sync_score', 'risk_score', 'maintenance_status', 'people']
+                    'sensor_temp', 'sensor_vib', 'sync_score',
+                    'risk_score', 'maintenance_status', 'people']
     styled = (
         station_data[display_cols]
         .sort_values(['platform', 'gate_id'])
         .style
-        .background_gradient(subset=['sensor_temp'], cmap='Reds')
-        .background_gradient(subset=['risk_score'], cmap='YlOrRd')
-        .applymap(color_status, subset=['maintenance_status'])
+        .map(color_temp,   subset=['sensor_temp'])
+        .map(color_risk,   subset=['risk_score'])
+        .map(color_status, subset=['maintenance_status'])
         .format({
             'sensor_temp': "{:.1f}°C",
-            'sensor_vib': "{:.2f} mm/s",
-            'sync_score': "{}%",
-            'risk_score': "{}/100",
+            'sensor_vib':  "{:.2f} mm/s",
+            'sync_score':  "{}%",
+            'risk_score':  "{}/100",
         })
     )
     st.dataframe(styled, use_container_width=True, hide_index=True)
@@ -1389,6 +1415,260 @@ elif active_tab == 'forecast':
 # ═══════════════════════════════════════════════════
 # ── TAB: COMPANY & TEAM ───────────────────────────
 # ═══════════════════════════════════════════════════
+elif active_tab == 'financial':
+    from data_source import get_financial_model_data
+
+    df_base, df_churn = get_financial_model_data()
+
+    PLOTLY_DARK = dict(
+        plot_bgcolor='#0a1221',
+        paper_bgcolor='#0a1221',
+        font=dict(color='#7ab3d4', family='IBM Plex Mono', size=11),
+        xaxis=dict(gridcolor='#1a2d50', zeroline=False),
+        yaxis=dict(gridcolor='#1a2d50', zeroline=False),
+        legend=dict(bgcolor='rgba(0,0,0,0)', font=dict(size=10)),
+        margin=dict(l=50, r=20, t=40, b=40),
+    )
+
+    def fin_fig(layout_extra=None):
+        d = dict(**PLOTLY_DARK)
+        if layout_extra:
+            d.update(layout_extra)
+        return d
+
+    st.markdown('<div class="section-heading">📊 Scenario Selector</div>', unsafe_allow_html=True)
+    scenario = st.radio(
+        "Choose scenario",
+        ["Base Case (5% Churn)", "High Churn (10% Churn)", "Side-by-Side Comparison"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+    df = df_base if "Base" in scenario else (df_churn if "High" in scenario else df_base)
+    months = df["Month"]
+
+    # ── KPI Summary Cards ──────────────────────────────────────────────────
+    st.markdown('<div class="section-heading">💰 Key Financial Metrics</div>', unsafe_allow_html=True)
+    final = df.iloc[-1]
+    k1, k2, k3, k4, k5 = st.columns(5)
+    kpi_items = [
+        (k1, "FINAL MRR",       f"${final['MRR']:,.0f}",              "metric-card green"),
+        (k2, "FINAL ARR",       f"${final['ARR']:,.0f}",              "metric-card"),
+        (k3, "TOTAL CUSTOMERS", f"{int(final['Total_Customers'])}",   "metric-card"),
+        (k4, "GROSS MARGIN",    f"{final['Gross_Margin_%']:.1f}%",    "metric-card green"),
+        (k5, "LTV : CAC",       f"{final['LTV_CAC_Ratio']:.1f}x",    "metric-card"),
+    ]
+    for col, title, val, cls in kpi_items:
+        with col:
+            st.markdown(f"""<div class="{cls}">
+                <div class="metric-title">{title}</div>
+                <div class="metric-value" style="font-size:1.4rem">{val}</div>
+            </div>""", unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── ROW 1: MRR Movements + MRR Growth ─────────────────────────────────
+    st.markdown('<div class="section-heading">📈 Revenue Movements</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+
+    with c1:
+        fig = go.Figure()
+        fig.add_bar(x=months, y=df["New_MRR"],       name="New MRR",       marker_color="#2ecc71", opacity=0.85)
+        fig.add_bar(x=months, y=df["Expansion_MRR"], name="Expansion MRR", marker_color="#a9dfbf", opacity=0.85)
+        fig.add_bar(x=months, y=df["Churn_MRR"],     name="Churn MRR",     marker_color="#e74c3c", opacity=0.85)
+        fig.add_scatter(x=months, y=df["Net_New_MRR"], name="Net New MRR",
+                        mode="lines+markers", line=dict(color="#00b4d8", width=2),
+                        marker=dict(size=5))
+        fig.update_layout(barmode="relative", title="MRR Movements", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        fig.add_bar(x=months, y=df["Net_New_MRR"], name="Net New MRR",
+                    marker_color="#27ae60", opacity=0.8, secondary_y=False)
+        fig.add_scatter(x=months, y=df["MoM_Growth_%"], name="MoM Growth %",
+                        mode="lines+markers", line=dict(color="#2980b9", width=2),
+                        marker=dict(size=5), secondary_y=True)
+        fig.update_layout(title="MRR Growth & MoM %", **fin_fig())
+        fig.update_yaxes(gridcolor='#1a2d50', secondary_y=False)
+        fig.update_yaxes(gridcolor='#1a2d50', ticksuffix="%", secondary_y=True)
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── ROW 2: Customer Growth + Enterprise Wins ───────────────────────────
+    st.markdown('<div class="section-heading">👥 Customer Analytics</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+
+    with c1:
+        fig = go.Figure()
+        fig.add_scatter(x=months, y=df["Total_Customers"], name="Total Customers",
+                        mode="lines+markers", line=dict(color="#00b4d8", width=2.5),
+                        marker=dict(size=5), fill="tozeroy",
+                        fillcolor="rgba(0,180,216,0.08)")
+        fig.add_bar(x=months, y=df["New_Customers"], name="New Customers",
+                    marker_color="#2ecc71", opacity=0.4)
+        fig.update_layout(title="Customer Growth", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+        fig = go.Figure()
+        fig.add_bar(x=months, y=df["New_Enterprise_Wins"],  name="New Enterprise",    marker_color="#2ecc71", opacity=0.85)
+        fig.add_bar(x=months, y=df["Enterprise_Upgrades"],  name="Upgrades from Pro", marker_color="#a9cce3", opacity=0.85)
+        fig.add_bar(x=months, y=-df["Lost_Enterprise"],     name="Lost",              marker_color="#e74c3c", opacity=0.85)
+        fig.update_layout(barmode="relative", title="Enterprise Customer Wins/Losses", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── ROW 3: Revenue/Costs/EBIT + Gross Margin ──────────────────────────
+    st.markdown('<div class="section-heading">📉 Profitability</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+
+    with c1:
+        fig = go.Figure()
+        for col_name, color, name in [
+            ("COGS",    "#f0b27a", "CoGS"),
+            ("RD_Cost", "#a9dfbf", "R&D"),
+            ("SM_Cost", "#aed6f1", "S&M"),
+            ("GA_Cost", "#d2b4de", "G&A"),
+            ("CS_Cost", "#f9e79f", "CS"),
+        ]:
+            fig.add_scatter(x=months, y=df[col_name], name=name,
+                            stackgroup="costs", fillcolor=color,
+                            line=dict(color=color, width=0.5), mode="lines")
+        fig.add_scatter(x=months, y=df["Total_Revenue"], name="Revenue",
+                        mode="lines", line=dict(color="#27ae60", width=2.5))
+        fig.add_scatter(x=months, y=df["EBIT"], name="EBIT",
+                        mode="lines", line=dict(color="#2980b9", width=2, dash="dash"))
+        fig.update_layout(title="Revenues, Costs & EBIT", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+        fig = go.Figure()
+        fig.add_scatter(x=months, y=df["Gross_Margin_%"], name="Gross Margin %",
+                        mode="lines+markers", line=dict(color="#2980b9", width=2.5),
+                        fill="tozeroy", fillcolor="rgba(41,128,185,0.1)",
+                        marker=dict(size=4))
+        fig.update_layout(title="Gross Profit Margin", yaxis_ticksuffix="%",
+                          yaxis_range=[0, 100], **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── ROW 4: Cost Breakdown + Salaries ──────────────────────────────────
+    st.markdown('<div class="section-heading">🏗️ Cost Structure</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+
+    with c1:
+        fig = go.Figure()
+        cost_layers = [
+            ("COGS",    "#5dade2", "CoGS"),
+            ("RD_Cost", "#a9cce3", "R&D"),
+            ("SM_Cost", "#f9e79f", "S&M"),
+            ("GA_Cost", "#f0b27a", "G&A"),
+            ("CS_Cost", "#d2b4de", "CS"),
+        ]
+        for col_name, color, name in cost_layers:
+            fig.add_scatter(x=months, y=df[col_name], name=name,
+                            stackgroup="costs", fillcolor=color,
+                            line=dict(color=color, width=0.5), mode="lines")
+        fig.update_layout(title="Monthly Costs by P&L Category", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+        fig = go.Figure()
+        sal_layers = [
+            ("Salary_GA",          "#5dade2", "G&A"),
+            ("Salary_Engineering", "#f0b27a", "Engineering"),
+            ("Salary_Marketing",   "#a9dfbf", "Marketing"),
+            ("Salary_Sales",       "#f9e79f", "Sales"),
+            ("Salary_CS",          "#d2b4de", "CS"),
+        ]
+        for col_name, color, name in sal_layers:
+            fig.add_scatter(x=months, y=df[col_name], name=name,
+                            stackgroup="sal", fillcolor=color,
+                            line=dict(color=color, width=0.5), mode="lines")
+        fig.update_layout(title="Monthly Salaries by Department", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── ROW 5: Headcount + S&M Efficiency ─────────────────────────────────
+    st.markdown('<div class="section-heading">🧑‍💼 Team & Efficiency</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+
+    with c1:
+        fig = go.Figure()
+        hc_layers = [
+            ("HC_GA",          "#5dade2", "G&A"),
+            ("HC_Engineering", "#f0b27a", "Engineering"),
+            ("HC_Marketing",   "#a9dfbf", "Marketing"),
+            ("HC_Sales",       "#f9e79f", "Sales"),
+            ("HC_CS",          "#d2b4de", "CS"),
+        ]
+        for col_name, color, name in hc_layers:
+            fig.add_scatter(x=months, y=df[col_name], name=name,
+                            stackgroup="hc", fillcolor=color,
+                            line=dict(color=color, width=0.5), mode="lines")
+        fig.update_layout(title="Headcount by Department", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+        fig = go.Figure()
+        fig.add_scatter(x=months, y=df["SM_Efficiency"], name="S&M Efficiency",
+                        mode="lines+markers", line=dict(color="#2980b9", width=2.5),
+                        fill="tozeroy", fillcolor="rgba(41,128,185,0.08)",
+                        marker=dict(size=4))
+        fig.add_hline(y=1.0, line_color="#e74c3c", line_dash="dash",
+                      annotation_text="1.0x break-even",
+                      annotation_font_color="#e74c3c")
+        fig.update_layout(title="Sales & Marketing Efficiency", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── ROW 6: CAC Payback + LTV:CAC ──────────────────────────────────────
+    st.markdown('<div class="section-heading">🎯 Unit Economics</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+
+    with c1:
+        fig = go.Figure()
+        fig.add_scatter(x=months, y=df["CAC_Payback_Basic"],      name="Basic",
+                        mode="lines+markers", line=dict(color="#8e44ad", width=2), marker=dict(size=4))
+        fig.add_scatter(x=months, y=df["CAC_Payback_Pro"],        name="Pro",
+                        mode="lines+markers", line=dict(color="#2980b9", width=2), marker=dict(size=4))
+        fig.add_scatter(x=months, y=df["CAC_Payback_Enterprise"], name="Enterprise",
+                        mode="lines+markers", line=dict(color="#27ae60", width=2), marker=dict(size=4))
+        fig.update_layout(title="CAC Payback Time by Pricing Plan",
+                          yaxis_title="Months to Payback", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+        fig = go.Figure()
+        fig.add_scatter(x=months, y=df["LTV_CAC_Ratio"], name="LTV:CAC",
+                        mode="lines+markers", line=dict(color="#e67e22", width=2.5),
+                        marker=dict(size=4))
+        fig.add_hline(y=3.0, line_color="#27ae60", line_dash="dash",
+                      annotation_text="3x benchmark",
+                      annotation_font_color="#27ae60")
+        fig.update_layout(title="LTV / CAC Ratio", yaxis_title="LTV:CAC Ratio", **fin_fig())
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── Side-by-side comparison (only when that scenario selected) ─────────
+    if "Side-by-Side" in scenario:
+        st.markdown('<div class="section-heading">⚖️ Base vs High Churn Comparison</div>', unsafe_allow_html=True)
+        compare_pairs = [
+            ("MRR",             "MRR ($)",           "MRR Growth"),
+            ("Total_Customers", "Customers",          "Total Customers"),
+            ("Cumulative_Cash", "Cumulative Cash ($)","Cumulative Cash"),
+            ("Gross_Margin_%",  "Gross Margin %",     "Gross Margin"),
+            ("SM_Efficiency",   "Efficiency",         "S&M Efficiency"),
+            ("EBIT",            "EBIT ($)",           "EBIT"),
+        ]
+        for i in range(0, len(compare_pairs), 2):
+            cols = st.columns(2)
+            for j, (col_name, ylabel, title) in enumerate(compare_pairs[i:i+2]):
+                with cols[j]:
+                    fig = go.Figure()
+                    fig.add_scatter(x=df_base["Month"], y=df_base[col_name],
+                                    name="Base (5% churn)", mode="lines+markers",
+                                    line=dict(color="#2980b9", width=2), marker=dict(size=4))
+                    fig.add_scatter(x=df_churn["Month"], y=df_churn[col_name],
+                                    name="High Churn (10%)", mode="lines+markers",
+                                    line=dict(color="#e74c3c", width=2, dash="dash"), marker=dict(size=4))
+                    fig.update_layout(title=title, yaxis_title=ylabel, **fin_fig())
+                    st.plotly_chart(fig, use_container_width=True)
+
 elif active_tab == 'company':
     # ── Modern Blue Minimalist CSS ──
     st.markdown("""
