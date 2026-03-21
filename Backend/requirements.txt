@@ -3,3 +3,5 @@ matplotlib==3.9.2
 numpy==1.26.4
 streamlit>=1.28.0
 plotly>=5.18.0
+reportlab==4.2.5
+kaleido==1.2.0
