@@ -1,12 +1,15 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import functools
+import streamlit as st
 
 
 # ─────────────────────────────────────────────
 # DATA LOADING & TRANSFORMATION
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=60, show_spinner=False)
 def load_data():
     """Load station data from CSV with error handling."""
     try:
@@ -26,41 +29,29 @@ def load_data():
 
 def transform_data(df):
     """Apply derived columns: sync score, maintenance status, risk level."""
-
-    def calculate_sync_score(row):
-        base = 100
-        if pd.isna(row['sensor_temp']):
-            return base
-        penalty = (row['sensor_temp'] - 25) * 0.5 + (row['sensor_vib'] * 2)
-        return max(0, int(base - penalty))
-
-    def get_maintenance_status(row):
-        if row['door_state'] == 'jammed':
-            return 'CRITICAL'
-        if row['sensor_temp'] > 45:
-            return 'WARNING'
-        if row['sync_score'] < 85:
-            return 'MONITOR'
-        return 'OPTIMAL'
-
-    def get_risk_score(row):
-        """0-100 composite risk score for predictive maintenance."""
-        risk = 0
-        if row['door_state'] == 'jammed':
-            risk += 60
-        if row['sensor_temp'] > 45:
-            risk += 25
-        elif row['sensor_temp'] > 35:
-            risk += 10
-        if row['sensor_vib'] > 3:
-            risk += 15
-        elif row['sensor_vib'] > 1.5:
-            risk += 5
-        return min(100, risk)
-
-    df['sync_score'] = df.apply(calculate_sync_score, axis=1)
-    df['maintenance_status'] = df.apply(get_maintenance_status, axis=1)
-    df['risk_score'] = df.apply(get_risk_score, axis=1)
+    # Vectorized sync score calculation: 100 - (temp-25)*0.5 - vib*2, clamped to [0, 100]
+    temp = df['sensor_temp'].fillna(25)
+    vib = df['sensor_vib'].fillna(0)
+    df['sync_score'] = np.clip(100 - (temp - 25) * 0.5 - vib * 2, 0, 100).astype(int)
+    
+    # Vectorized maintenance status using numpy select
+    conditions = [
+        df['door_state'] == 'jammed',
+        df['sensor_temp'] > 45,
+        df['sync_score'] < 85
+    ]
+    choices = ['CRITICAL', 'WARNING', 'MONITOR']
+    df['maintenance_status'] = np.select(conditions, choices, default='OPTIMAL')
+    
+    # Vectorized risk score
+    risk = np.zeros(len(df), dtype=int)
+    risk += np.where(df['door_state'] == 'jammed', 60, 0)
+    risk += np.where(df['sensor_temp'] > 45, 25, 0)
+    risk += np.where((df['sensor_temp'] > 35) & (df['sensor_temp'] <= 45), 10, 0)
+    risk += np.where(df['sensor_vib'] > 3, 15, 0)
+    risk += np.where((df['sensor_vib'] > 1.5) & (df['sensor_vib'] <= 3), 5, 0)
+    df['risk_score'] = np.clip(risk, 0, 100)
+    
     return df
 
 
@@ -68,6 +59,7 @@ def transform_data(df):
 # STATION METRICS
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=60, show_spinner=False)
 def get_metrics(df, station_name):
     station_df = df[df["station"] == station_name]
     gates_total = len(station_df)
@@ -84,6 +76,7 @@ def get_metrics(df, station_name):
 # ANALYTICS: PER-STATION CHARTS
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_psd_analytics(station_name):
     """Deterministic hourly chart data for door cycles and temperature."""
     rng = np.random.RandomState(seed=sum(ord(c) for c in station_name))
@@ -108,6 +101,7 @@ def get_psd_analytics(station_name):
 # ANALYTICS: NETWORK-WIDE
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=60, show_spinner=False)
 def get_network_summary(df):
     """Aggregate stats across all stations."""
     total_gates = len(df)
@@ -150,6 +144,7 @@ def get_network_summary(df):
 # ANALYTICS: PREDICTIVE MAINTENANCE TIMELINE
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_maintenance_forecast(station_name):
     """Simulate a 7-day risk forecast for the selected station."""
     rng = np.random.RandomState(seed=sum(ord(c) for c in station_name) + 42)
@@ -168,6 +163,7 @@ def get_maintenance_forecast(station_name):
 # ANALYTICS: PASSENGER FLOW HEATMAP DATA
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_passenger_heatmap(station_name):
     """7-day x 12-hour passenger flow matrix."""
     rng = np.random.RandomState(seed=sum(ord(c) for c in station_name) + 99)
@@ -192,6 +188,7 @@ def get_passenger_heatmap(station_name):
 # INCIDENT LOG
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=60, show_spinner=False)
 def get_incident_log(df):
     """Generate incident records from critical/warning gates."""
     incidents = []
@@ -370,7 +367,8 @@ def _run_saas_simulation(starting_customers, monthly_growth_rate, churn_rate,
     return pd.DataFrame(data)
 
 
-def get_financial_model_data(months=24, starting_customers=50, monthly_growth_rate=0.20, 
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_financial_model_data(months=24, starting_customers=50, monthly_growth_rate=0.20,
                              churn_rate=0.05, price_per_customer=100, fixed_costs=5000,
                              variable_cost_per_customer=10, cac_simplified=150,
                              churn_rate_high=None):
@@ -392,27 +390,28 @@ def get_financial_model_data(months=24, starting_customers=50, monthly_growth_ra
         churn_rate_high = churn_rate * 2  # Default: high churn is 2x base churn
     
     df_base = _run_saas_simulation(
-        starting_customers=starting_customers, 
-        monthly_growth_rate=monthly_growth_rate, 
+        starting_customers=starting_customers,
+        monthly_growth_rate=monthly_growth_rate,
         churn_rate=churn_rate,
-        price_per_customer=price_per_customer, 
+        price_per_customer=price_per_customer,
         fixed_costs=fixed_costs,
-        variable_cost_per_customer=variable_cost_per_customer, 
-        cac_simplified=cac_simplified, 
+        variable_cost_per_customer=variable_cost_per_customer,
+        cac_simplified=cac_simplified,
         months=months
     )
     df_churn = _run_saas_simulation(
-        starting_customers=starting_customers, 
-        monthly_growth_rate=monthly_growth_rate, 
+        starting_customers=starting_customers,
+        monthly_growth_rate=monthly_growth_rate,
         churn_rate=churn_rate_high,
-        price_per_customer=price_per_customer, 
+        price_per_customer=price_per_customer,
         fixed_costs=fixed_costs,
-        variable_cost_per_customer=variable_cost_per_customer, 
-        cac_simplified=cac_simplified, 
+        variable_cost_per_customer=variable_cost_per_customer,
+        cac_simplified=cac_simplified,
         months=months
     )
     return df_base, df_churn
 
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_leadership_data():
     return [
         {
@@ -457,6 +456,7 @@ def get_leadership_data():
 # TECHNOLOGY STACK DATA
 # ─────────────────────────────────────────────
 
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_tech_stack():
     return [
         {"layer": "Sensing", "tech": "IoT Sensors",

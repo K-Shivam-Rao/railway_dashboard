@@ -6,6 +6,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from datetime import datetime
 from data_source import (
     load_data, transform_data, get_metrics,
     get_psd_analytics, get_leadership_data,
@@ -13,6 +14,37 @@ from data_source import (
     get_passenger_heatmap, get_incident_log,
     get_tech_stack, get_financial_model_data
 )
+
+# Cache for expensive computations
+@st.cache_data(ttl=60, show_spinner=False)
+def get_station_data_cached(station_name, df):
+    """Cache station-specific data to avoid repeated filtering."""
+    return df[df["station"] == station_name].copy()
+
+@st.cache_data(ttl=60, show_spinner=False)
+def get_psd_analytics_cached(station_name):
+    """Cached wrapper for PSD analytics."""
+    return get_psd_analytics(station_name)
+
+@st.cache_data(ttl=60, show_spinner=False)
+def get_network_summary_cached(df):
+    """Cached wrapper for network summary."""
+    return get_network_summary(df)
+
+@st.cache_data(ttl=60, show_spinner=False)
+def get_incident_log_cached(df):
+    """Cached wrapper for incident log."""
+    return get_incident_log(df)
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_maintenance_forecast_cached(station_name):
+    """Cached wrapper for maintenance forecast."""
+    return get_maintenance_forecast(station_name)
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_passenger_heatmap_cached(station_name):
+    """Cached wrapper for passenger heatmap."""
+    return get_passenger_heatmap(station_name)
 
 # ═══════════════════════════════════════════════════
 # PAGE CONFIG
@@ -33,308 +65,718 @@ if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 'ops'
 
 # ═══════════════════════════════════════════════════
-# CSS — CORPORATE DARK RAIL AESTHETIC
+# CSS — PREMIUM DARK RAIL DASHBOARD
 # ═══════════════════════════════════════════════════
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    /* ── Root Variables ── */
+    :root {
+        --bg-primary: #0a0e17;
+        --bg-secondary: #0f1419;
+        --bg-card: #111827;
+        --bg-card-hover: #1a2332;
+        --border-color: #1e293b;
+        --border-glow: #334155;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --accent-blue: #3b82f6;
+        --accent-cyan: #06b6d4;
+        --accent-teal: #14b8a6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #14b8a6 100%);
+        --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+        --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+        --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
     /* ── Base ── */
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-        background: #0a0f1e !important;
-        color: #e2e8f0;
-        font-family: 'Space Grotesk', sans-serif;
+        background: var(--bg-primary) !important;
+        color: var(--text-primary);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        letter-spacing: -0.01em;
     }
+
     [data-testid="stSidebar"] {
-        background: #080c18 !important;
-        border-right: 1px solid #1e2d4d;
+        background: var(--bg-secondary) !important;
+        border-right: 1px solid var(--border-color);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+    [data-testid="stSidebar"]::after {
+        content: '';
+        position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+        background: linear-gradient(180deg, transparent 0%, var(--bg-secondary) 100%);
+        pointer-events: none;
+        z-index: 10;
     }
 
     /* ── Sidebar Brand Header ── */
     .sidebar-brand {
-        background: linear-gradient(135deg, #0d47a1 0%, #1565c0 60%, #0288d1 100%);
-        padding: 28px 20px 22px;
-        margin: -20px -20px 24px -20px;
-        border-bottom: 3px solid #00b4d8;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        padding: 32px 24px 26px;
+        margin: -24px -24px 28px -24px;
+        border-bottom: 1px solid var(--border-color);
         position: relative;
         overflow: hidden;
+        backdrop-filter: blur(12px);
     }
     .sidebar-brand::before {
         content: '';
-        position: absolute; top: -30px; right: -30px;
-        width: 100px; height: 100px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.05);
+        position: absolute; top: -50%; right: -30%;
+        width: 200px; height: 200px;
+        background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+        animation: pulse-glow 8s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
     }
     .brand-title {
-        font-size: 1.35rem; font-weight: 700; letter-spacing: -0.3px;
-        color: #fff; display: flex; align-items: center; gap: 10px;
+        font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;
+        color: #fff; display: flex; align-items: center; gap: 12px;
+        position: relative; z-index: 1;
+        text-shadow: 0 0 20px rgba(59,130,246,0.3);
     }
     .brand-tagline {
-        font-size: 0.68rem; font-family: 'IBM Plex Mono', monospace;
-        color: rgba(255,255,255,0.65); margin-top: 6px; letter-spacing: 1.5px;
-        text-transform: uppercase;
+        font-size: 0.7rem; font-family: 'JetBrains Mono', monospace;
+        color: var(--text-secondary); margin-top: 8px; letter-spacing: 2px;
+        text-transform: uppercase; position: relative; z-index: 1;
     }
     .brand-badge {
-        display: inline-block; background: rgba(0,180,216,0.2);
-        border: 1px solid #00b4d8; color: #00b4d8;
-        font-size: 0.6rem; padding: 2px 8px; border-radius: 20px;
-        margin-top: 8px; font-family: 'IBM Plex Mono'; letter-spacing: 1px;
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        color: var(--success);
+        font-size: 0.65rem; padding: 4px 12px; border-radius: 999px;
+        margin-top: 12px; font-family: 'JetBrains Mono'; letter-spacing: 0.5px;
+        position: relative; z-index: 1;
+        animation: status-pulse 2s ease-in-out infinite;
+    }
+    @keyframes status-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
     }
 
     /* ── Sidebar Nav Labels ── */
     .nav-label {
-        font-size: 0.65rem; font-weight: 700; letter-spacing: 2px;
-        text-transform: uppercase; color: #4a6fa5; margin: 20px 0 8px 2px;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 2.5px;
+        text-transform: uppercase; color: var(--text-muted);
+        margin: 24px 0 10px 4px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .nav-label::before {
+        content: ''; width: 8px; height: 8px;
+        background: var(--accent-blue); border-radius: 50%;
+        box-shadow: 0 0 8px var(--accent-blue);
     }
     .nav-divider {
-        height: 1px; background: #1a2540; margin: 16px 0;
+        height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+        margin: 20px 0;
     }
     .sidebar-footer {
-        font-size: 0.68rem; color: #2d4070; text-align: center;
-        padding: 12px 0; font-family: 'IBM Plex Mono';
-        border-top: 1px solid #1a2540; margin-top: 16px;
+        font-size: 0.7rem; color: var(--text-muted); text-align: center;
+        padding: 16px 0; font-family: 'JetBrains Mono';
+        border-top: 1px solid var(--border-color);
+        margin-top: 20px;
+        opacity: 0.6;
     }
 
     /* ── Sidebar Buttons ── */
     [data-testid="stSidebar"] .stButton > button {
         width: 100%; border: 1px solid transparent;
-        background: transparent; color: #7a9cc4;
-        text-align: left; padding: 9px 14px;
-        border-radius: 6px; margin-bottom: 3px;
-        font-weight: 500; font-size: 0.88rem;
-        transition: all 0.18s ease;
+        background: transparent; color: var(--text-secondary);
+        text-align: left; padding: 11px 16px;
+        border-radius: 8px; margin-bottom: 4px;
+        font-weight: 500; font-size: 0.875rem;
+        transition: var(--transition);
+        display: flex; align-items: center; gap: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+    [data-testid="stSidebar"] .stButton > button::before {
+        content: ''; position: absolute; left: 0; top: 0;
+        width: 3px; height: 100%; background: var(--accent-blue);
+        transform: translateX(-100%); transition: var(--transition);
     }
     [data-testid="stSidebar"] .stButton > button:hover {
-        background: #111b35; border-color: #1e3a6e; color: #e2e8f0;
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.3);
+        color: var(--text-primary);
+        transform: translateX(4px);
+    }
+    [data-testid="stSidebar"] .stButton > button:hover::before {
+        transform: translateX(0);
+    }
+    [data-testid="stSidebar"] .stButton > button:active {
+        transform: translateX(2px);
+    }
+    .stButton > button[data-baseweb="button"][kind="secondary"] {
+        background: rgba(59, 130, 246, 0.1) !important;
+        border-color: rgba(59, 130, 246, 0.3) !important;
     }
 
     /* ── Main Header ── */
     .main-header {
-        background: linear-gradient(135deg, #0d1b3e 0%, #0a1628 100%);
-        border: 1px solid #1e2d4d;
-        border-radius: 14px; padding: 22px 28px;
-        margin-bottom: 22px;
-        display: flex; justify-content: space-between; align-items: center;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 28px 32px;
+        margin-bottom: 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+    .main-header::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: var(--gradient-primary);
+        animation: header-shine 3s ease-in-out infinite;
+    }
+    @keyframes header-shine {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
     }
     .station-title {
-        font-size: 1.7rem; font-weight: 700; color: #e2e8f0; margin: 0;
-        letter-spacing: -0.5px;
+        font-size: 1.875rem; font-weight: 800; color: #fff; margin: 0;
+        letter-spacing: -0.75px; line-height: 1.2;
+        text-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
     }
     .station-sub {
-        font-family: 'IBM Plex Mono'; font-size: 0.75rem;
-        color: #4a6fa5; margin-top: 4px; letter-spacing: 0.5px;
+        font-family: 'JetBrains Mono', monospace; font-size: 0.812rem;
+        color: var(--text-secondary); margin-top: 8px; letter-spacing: 1.5px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .station-sub::before {
+        content: '◈'; color: var(--accent-blue); font-size: 0.5rem;
     }
 
     /* ── Status Badge ── */
     .status-badge {
-        padding: 8px 20px; border-radius: 8px;
-        font-family: 'IBM Plex Mono'; font-size: 0.85rem;
-        font-weight: 600; letter-spacing: 1px;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 24px; border-radius: 999px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.875rem; font-weight: 600; letter-spacing: 1.5px;
+        transition: var(--transition);
+        border: 1px solid;
+        position: relative;
+        overflow: hidden;
+    }
+    .status-badge::before {
+        content: ''; position: absolute; top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: shimmer 2s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+        0%, 100% { left: -100%; }
+        50% { left: 100%; }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     .status-normal {
-        background: rgba(16, 185, 129, 0.12);
-        border: 1px solid rgba(16,185,129,0.4); color: #10b981;
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.5);
+        box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
     }
     .status-alert {
-        background: rgba(239, 68, 68, 0.12);
-        border: 1px solid rgba(239,68,68,0.4); color: #ef4444;
-        animation: blink-border 1.5s ease infinite;
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.5);
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+        animation: alert-pulse 1.5s ease-in-out infinite;
     }
-    @keyframes blink-border {
-        0%, 100% { border-color: rgba(239,68,68,0.4); }
-        50% { border-color: rgba(239,68,68,0.9); }
+    @keyframes alert-pulse {
+        0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+        50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
+    }
+    .status-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        display: inline-block; position: relative;
+    }
+    .status-normal .status-dot { background: var(--success); }
+    .status-alert .status-dot { background: var(--danger); animation: blink-dot 1s ease-in-out infinite; }
+    @keyframes blink-dot {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
     }
 
     /* ── Metric Cards ── */
     .metric-card {
-        background: #0d1b3e;
-        border: 1px solid #1e2d4d;
-        border-radius: 12px; padding: 18px 20px;
-        position: relative; overflow: hidden;
-        transition: border-color 0.2s;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+        box-shadow: var(--shadow-md);
+        cursor: default;
+        isolation: isolate;
     }
-    .metric-card:hover { border-color: #2d4f8a; }
+    .metric-card::after {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.03), transparent 60%);
+        pointer-events: none;
+    }
+    .metric-card:hover {
+        border-color: var(--accent-blue);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg), 0 8px 32px rgba(59, 130, 246, 0.15);
+    }
     .metric-card::before {
         content: ''; position: absolute;
         top: 0; left: 0; right: 0; height: 3px;
-        background: linear-gradient(90deg, #0288d1, #00b4d8);
+        background: var(--gradient-primary);
+        transition: var(--transition);
     }
-    .metric-card.alert::before { background: linear-gradient(90deg, #ef4444, #f97316); }
-    .metric-card.warn::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-    .metric-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .metric-card.alert::before {
+        background: var(--gradient-danger);
+        box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+    }
+    .metric-card.warn::before {
+        background: var(--gradient-warning);
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+    }
+    .metric-card.green::before {
+        background: var(--gradient-success);
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+    }
     .metric-title {
-        font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px;
-        text-transform: uppercase; color: #4a6fa5; margin-bottom: 10px;
+        font-size: 0.6875rem; font-weight: 700;
+        letter-spacing: 2px; line-height: 1;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+        display: flex; align-items: center; gap: 8px;
     }
     .metric-value {
-        font-family: 'IBM Plex Mono'; font-size: 2rem;
-        font-weight: 600; color: #e2e8f0; line-height: 1;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2.125rem; font-weight: 700;
+        color: var(--text-primary); line-height: 1.1;
+        margin-bottom: 8px;
+        text-shadow: 0 0 24px rgba(255, 255, 255, 0.1);
     }
     .metric-sub {
-        font-size: 0.72rem; color: #4a6fa5;
-        margin-top: 6px; font-family: 'IBM Plex Mono';
+        font-size: 0.75rem; color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.5px;
+        display: flex; align-items: center; gap: 6px;
+        opacity: 0.8;
     }
 
     /* ── Section Headings ── */
     .section-heading {
-        font-size: 1rem; font-weight: 700; color: #7ab3d4;
-        letter-spacing: 0.5px; margin-bottom: 14px;
-        display: flex; align-items: center; gap: 8px;
+        font-size: 1.25rem; font-weight: 700; color: var(--text-primary);
+        letter-spacing: -0.025em; margin-bottom: 24px;
+        display: flex; align-items: center; gap: 12px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-color);
+        position: relative;
+        text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
     }
-    .section-heading::after {
-        content: ''; flex: 1; height: 1px; background: #1a2d50;
+    .section-heading::before {
+        content: ''; position: absolute; bottom: -1px; left: 0;
+        width: 80px; height: 3px; background: var(--gradient-primary);
+        border-radius: 2px;
     }
 
     /* ── PSD Gate Visualization ── */
     .psd-container {
-        background: #0d1b3e; border: 1px solid #1e2d4d;
-        border-radius: 12px; padding: 18px; margin-bottom: 16px;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-radius: 14px; padding: 28px; margin-bottom: 20px;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+    .psd-container::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at top left, rgba(6, 182, 212, 0.03), transparent 50%);
+        pointer-events: none;
     }
     .platform-label {
-        font-family: 'IBM Plex Mono'; font-size: 0.78rem;
-        color: #4a6fa5; margin-bottom: 14px; font-weight: 600;
-        text-transform: uppercase; letter-spacing: 1px;
-        display: flex; justify-content: space-between;
+        font-family: 'JetBrains Mono', monospace; font-size: 0.812rem;
+        color: var(--text-secondary); margin-bottom: 18px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        display: flex; justify-content: space-between; align-items: center;
+        padding-bottom: 12px; border-bottom: 1px solid var(--border-color);
     }
     .gate-row {
-        display: flex; gap: 8px; align-items: flex-end;
-        height: 110px; background: #060c1a;
-        border-radius: 8px; padding: 12px 14px;
+        display: flex; gap: 6px; align-items: flex-end;
+        height: 125px; background: linear-gradient(180deg, #0a0e17 0%, #111827 100%);
+        border-radius: 10px; padding: 14px 16px;
         position: relative; overflow: hidden;
+        border: 1px solid var(--border-color);
     }
     .gate-row::before {
         content: 'PLATFORM EDGE';
-        position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
-        font-family: 'IBM Plex Mono'; font-size: 0.58rem;
-        color: #1e3060; letter-spacing: 2px;
+        position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+        font-family: 'JetBrains Mono'; font-size: 0.5rem;
+        color: var(--text-muted); letter-spacing: 2px;
+        opacity: 0.3;
     }
     .gate-row::after {
         content: ''; position: absolute;
-        bottom: 14px; left: 0; right: 0; height: 2px;
-        background: repeating-linear-gradient(90deg, #1e3060 0px, #1e3060 8px, transparent 8px, transparent 16px);
+        bottom: 16px; left: 0; right: 0; height: 2px;
+        background: repeating-linear-gradient(90deg, var(--border-color) 0px, var(--border-color) 10px, transparent 10px, transparent 18px);
+        opacity: 0.5;
     }
     .gate {
         flex: 1; border-radius: 4px 4px 0 0; position: relative;
-        max-width: 55px; cursor: pointer;
-        transition: all 0.4s ease;
+        max-width: 60px; cursor: pointer;
+        transition: var(--transition);
     }
+    .gate:hover { filter: brightness(1.2); }
     .gate-panel { position: absolute; top: 8%; left: 12%; width: 76%; height: 55%; border-radius: 2px; }
     .gate-id-label {
-        position: absolute; bottom: -20px; left: 50%;
+        position: absolute; bottom: -18px; left: 50%;
         transform: translateX(-50%);
-        font-size: 0.58rem; font-family: 'IBM Plex Mono'; color: #2d4f8a;
-        white-space: nowrap;
+        font-size: 0.5rem; font-family: 'JetBrains Mono'; color: var(--text-muted);
+        white-space: nowrap; opacity: 0.7;
     }
-    .gate.closed { background: #1565c0; }
-    .gate.closed .gate-panel { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); }
-    .gate.open { height: 28% !important; opacity: 0.55; }
-    .gate.open .gate-panel { background: #10b981; }
-    .gate.jammed { background: #b91c1c; animation: gate-pulse 1s ease infinite; }
+    .gate.closed { background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%); }
+    .gate.closed .gate-panel { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); }
+    .gate.open { height: 32% !important; opacity: 0.7; }
+    .gate.open .gate-panel { background: var(--success); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
+    .gate.jammed { background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%); animation: jam-pulse 1.2s ease-in-out infinite; }
     .gate.jammed .gate-panel { background: #fca5a5; }
-    .gate.closing { background: #0288d1; opacity: 0.8; }
-    .gate.closing .gate-panel { background: rgba(0, 180, 216, 0.3); }
-    @keyframes gate-pulse {
-        0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
-        70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
-        100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    .gate.closing { background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%); opacity: 0.75; }
+    .gate.closing .gate-panel { background: rgba(6, 182, 212, 0.4); }
+    @keyframes jam-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
     }
     .gate-legend {
-        display: flex; gap: 18px; margin-top: 24px;
-        font-size: 0.75rem; color: #4a6fa5; flex-wrap: wrap;
+        display: flex; gap: 20px; margin-top: 24px;
+        font-size: 0.75rem; color: var(--text-muted); flex-wrap: wrap;
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-item {
+        display: flex; align-items: center; gap: 6px;
+        padding: 4px 10px; background: rgba(255,255,255,0.03);
+        border-radius: 6px; border: 1px solid var(--border-color);
+    }
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
     /* ── Data Table ── */
     [data-testid="stDataFrame"] {
-        border: 1px solid #1e2d4d !important;
-        border-radius: 10px !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: var(--shadow-md);
+    }
+    [data-testid="stDataFrame"] table {
+        background: transparent !important;
+    }
+    [data-testid="stDataFrame"] th {
+        background: rgba(59, 130, 246, 0.1) !important;
+        color: var(--text-secondary) !important;
+        font-weight: 600 !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        font-size: 0.75rem !important;
+        text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    [data-testid="stDataFrame"] td {
+        border-bottom: 1px solid rgba(30, 41, 59, 0.5) !important;
+        color: var(--text-primary) !important;
+        font-size: 0.875rem !important;
+    }
+    [data-testid="stDataFrame"] tr:hover {
+        background: rgba(59, 130, 246, 0.05) !important;
     }
 
     /* ── Incident Table ── */
     .incident-row {
-        background: #0d1b3e; border: 1px solid #1e2d4d;
-        border-radius: 8px; padding: 12px 16px;
-        margin-bottom: 8px; display: flex; gap: 16px; align-items: center;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border: 1px solid var(--border-color);
+        border-radius: 10px; padding: 16px 20px;
+        margin-bottom: 10px; display: flex; gap: 16px; align-items: center;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
     }
-    .incident-row.critical { border-left: 3px solid #ef4444; }
-    .incident-row.warning { border-left: 3px solid #f59e0b; }
+    .incident-row:hover {
+        transform: translateX(4px);
+        border-color: var(--accent-blue);
+        box-shadow: var(--shadow-md);
+    }
+    .incident-row.critical { border-left: 3px solid var(--danger); }
+    .incident-row.warning { border-left: 3px solid var(--warning); }
 
     /* ── Team Cards ── */
     .team-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 16px;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
     }
     .team-card {
-        background: #0d1b3e; border: 1px solid #1e2d4d;
-        border-radius: 12px; padding: 20px;
-        display: flex; gap: 16px; align-items: flex-start;
-        transition: border-color 0.2s, transform 0.2s;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-radius: 14px; padding: 28px;
+        display: flex; gap: 20px; align-items: flex-start;
+        transition: var(--transition);
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
     }
-    .team-card:hover { border-color: #2d4f8a; transform: translateY(-2px); }
+    .team-card::after {
+        content: '';
+        position: absolute; top: 0; right: 0; width: 60px; height: 60px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+        pointer-events: none;
+    }
+    .team-card:hover {
+        border-color: var(--accent-blue);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg), 0 0 32px rgba(59, 130, 246, 0.2);
+    }
     .team-avatar img {
-        width: 56px; height: 56px; border-radius: 50%;
-        border: 2px solid #0288d1; object-fit: cover;
+        width: 66px; height: 66px; border-radius: 12px;
+        border: 2px solid var(--accent-blue); object-fit: cover;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 16px rgba(59, 130, 246, 0.2);
     }
-    .team-role { color: #00b4d8; font-size: 0.78rem; font-weight: 600; margin: 3px 0 6px; }
-    .team-name { color: #e2e8f0; font-weight: 700; font-size: 0.95rem; }
-    .team-desc { color: #4a6fa5; font-size: 0.74rem; line-height: 1.45; }
+    .team-role {
+        color: var(--accent-blue); font-size: 0.75rem; font-weight: 600;
+        margin: 2px 0 8px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .team-name { color: var(--text-primary); font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .team-desc { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; }
 
     /* ── Tech Stack Table ── */
     .tech-row {
-        background: #0d1b3e; border: 1px solid #1e2d4d;
-        border-radius: 8px; padding: 14px 18px; margin-bottom: 8px;
-        display: grid; grid-template-columns: 90px 150px 1fr; gap: 12px;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+        border: 1px solid var(--border-color);
+        border-radius: 10px; padding: 16px 20px; margin-bottom: 10px;
+        display: grid; grid-template-columns: 100px 160px 1fr; gap: 16px;
         align-items: center;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+    .tech-row:hover {
+        border-color: var(--accent-cyan);
+        box-shadow: var(--shadow-md);
+        transform: translateX(4px);
     }
     .tech-layer {
-        font-family: 'IBM Plex Mono'; font-size: 0.68rem;
-        color: #4a6fa5; text-transform: uppercase; letter-spacing: 1px;
+        font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem;
+        color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 1.5px;
+        font-weight: 600;
     }
-    .tech-name { font-weight: 700; color: #00b4d8; font-size: 0.88rem; }
-    .tech-detail { color: #7a9cc4; font-size: 0.82rem; }
+    .tech-name { font-weight: 700; color: var(--text-primary); font-size: 0.9375rem; }
+    .tech-detail { color: var(--text-secondary); font-size: 0.875rem; }
 
     /* ── Info/Success Boxes ── */
     [data-testid="stInfo"], [data-testid="stSuccess"] {
-        background: #0d1b3e !important;
-        border-color: #1e2d4d !important;
-        color: #7ab3d4 !important;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+        border-color: var(--accent-blue) !important;
+        color: var(--text-primary) !important;
         border-radius: 10px !important;
+        box-shadow: var(--shadow-md);
+        padding: 16px 20px !important;
+    }
+    [data-testid="stSuccess"] {
+        border-color: var(--success) !important;
     }
 
     /* ── Expander ── */
     [data-testid="stExpander"] {
-        background: #0d1b3e !important;
-        border: 1px solid #1e2d4d !important;
-        border-radius: 10px !important;
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+    }
+    [data-testid="stExpander"]:hover {
+        border-color: var(--accent-blue);
+        box-shadow: var(--shadow-lg);
+    }
+    .streamlit-expanderHeader {
+        font-weight: 600 !important; font-size: 1rem !important;
+        color: var(--accent-cyan) !important;
+        padding: 16px 20px !important;
+        background: transparent !important;
+    }
+    .streamlit-expanderHeader:hover {
+        background: rgba(59, 130, 246, 0.05) !important;
     }
 
     /* ── Plotly chart backgrounds ── */
     .js-plotly-plot .plotly .bg { fill: transparent !important; }
 
     /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #060c1a; }
-    ::-webkit-scrollbar-thumb { background: #1e3060; border-radius: 3px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-    /* ── Tab system ── */
-    .tab-bar {
-        display: flex; gap: 6px; margin-bottom: 20px;
-        border-bottom: 1px solid #1e2d4d; padding-bottom: 12px;
+    /* ── Tabs ── */
+    [data-testid="stTabs"] {
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+    }
+    [data-testid="stTab"] {
+        color: var(--text-muted) !important;
+        font-weight: 600 !important;
+        padding: 8px 16px !important;
+        border-radius: 8px 8px 0 0 !important;
+        transition: var(--transition) !important;
+        border: 1px solid transparent !important;
+        border-bottom: none !important;
+    }
+    [data-testid="stTab"][aria-selected="true"] {
+        background: var(--accent-blue) !important;
+        color: white !important;
+        border-color: var(--accent-blue) !important;
+    }
+    [data-testid="stTab"]:hover {
+        color: var(--text-primary) !important;
+        background: rgba(59, 130, 246, 0.1) !important;
     }
 
     /* ── Hide default streamlit chrome ── */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
-    [data-testid="stToolbar"] { display: none; }
+    [data-testid="stHeader"] { display: none !important; }
+    [data-testid="stToolbar"] { display: none !important; }
+    [data-testid="stSidebarHeader"] { display: none !important; }
+
+    /* ── Divider ── */
+    .custom-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+        margin: 32px 0;
+        opacity: 0.7;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        .station-title { font-size: 1.5rem !important; }
+        .metric-value { font-size: 1.75rem !important; }
+        .section-heading { font-size: 1rem !important; }
+        .metric-card { padding: 18px !important; }
+        .main-header { padding: 20px 24px !important; }
+    }
+
+    /* ── Animation for page load ── */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .animate-fade-in:nth-child(1) { animation-delay: 0.05s; }
+    .animate-fade-in:nth-child(2) { animation-delay: 0.1s; }
+    .animate-fade-in:nth-child(3) { animation-delay: 0.15s; }
+    .animate-fade-in:nth-child(4) { animation-delay: 0.2s; }
+    .animate-fade-in:nth-child(5) { animation-delay: 0.25s; }
+
+    /* ── Loading spinner custom ── */
+    .stSpinner > div {
+        border-color: var(--accent-blue) !important;
+    }
+
+    /* ── Smooth scroll ── */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* ── Form Elements ── */
+    [data-testid="stNumberInput"] input,
+    [data-testid="stSlider"] input {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        color: var(--text-primary) !important;
+        transition: var(--transition);
+    }
+    [data-testid="stNumberInput"] input:focus,
+    [data-testid="stSlider"] input:focus {
+        border-color: var(--accent-blue) !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    [data-testid="stSlider"] [data-baseweb="slider"] {
+        margin: 12px 0;
+    }
+    .stSlider [data-baseweb="range-face"] {
+        background: var(--accent-blue) !important;
+    }
+
+    /* ── Radio buttons ── */
+    [data-testid="stRadio"] [data-baseweb="radio"] {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+    }
+    [data-testid="stRadio"] [data-baseweb="radio"][aria-checked="true"] {
+        background: var(--accent-blue) !important;
+        border-color: var(--accent-blue) !important;
+    }
+
+    /* ── Custom Container ── */
+    .content-container {
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        margin: 16px 0;
+        box-shadow: var(--shadow-md);
+    }
+    .content-container:hover {
+        border-color: var(--accent-blue);
+    }
+
+    /* ── Select boxes ── */
+    [data-testid="stSelectbox"] > div > div {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        color: var(--text-primary) !important;
+    }
+    [data-testid="stSelectbox"] [aria-selected="true"] {
+        background: var(--accent-blue) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════
-# DATA
+# DATA LOADING WITH SESSION STATE CACHE
 # ═══════════════════════════════════════════════════
-df = transform_data(load_data())
+# Use session state to persist transformed data across reruns
+if 'transformed_df' not in st.session_state:
+    with st.spinner("Loading and processing data..."):
+        raw_df = load_data()
+        st.session_state.transformed_df = transform_data(raw_df)
+        st.session_state.data_load_time = datetime.now()
+
+df = st.session_state.transformed_df
 stations = sorted(df["station"].unique())
 
 # ═══════════════════════════════════════════════════
@@ -343,18 +785,48 @@ stations = sorted(df["station"].unique())
 with st.sidebar:
     st.markdown("""
     <div class="sidebar-brand">
-        <div class="brand-title">🛡️ SicherGleis</div>
-        <div class="brand-tagline">BahnSetu // Pro System</div>
-        <div class="brand-badge">● SYSTEM ONLINE</div>
+        <div class="brand-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+            </svg>
+            SicherGleis
+        </div>
+        <div class="brand-tagline">BahnSetu Pro</div>
+        <div class="brand-badge">
+            <span class="status-dot"></span> SYSTEM ONLINE
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
+    # Data refresh controls
+    col_refresh, col_status = st.columns([1, 2])
+    with col_refresh:
+        if st.button("🔄", help="Refresh Data", key="refresh_btn"):
+            # Clear caches and force reload
+            st.cache_data.clear()
+            if 'transformed_df' in st.session_state:
+                del st.session_state.transformed_df
+            st.rerun()
+    with col_status:
+        if 'data_load_time' in st.session_state:
+            load_time = st.session_state.data_load_time
+            time_str = load_time.strftime("%H:%M:%S")
+            st.markdown(f"<small style='color:#4a6fa5;font-family:IBM Plex Mono'>Last: {time_str}</small>",
+                       unsafe_allow_html=True)
+
     st.markdown('<div class="nav-label">Stations</div>',
                 unsafe_allow_html=True)
+
     for s in stations:
         is_active = s == st.session_state.current_station
-        label = f"{'▶' if is_active else '○'} {s}"
-        if st.button(label, key=f"nav_{s}"):
+        if st.button(
+            label=s,
+            key=f"nav_{s}",
+            type="secondary" if is_active else "primary",
+            use_container_width=True
+        ):
             st.session_state.current_station = s
             st.session_state.active_tab = 'ops'
             st.rerun()
@@ -371,12 +843,18 @@ with st.sidebar:
         'company': '🏢 Company & Team',
     }
     for key, label in tabs.items():
-        if st.button(label, key=f"tab_{key}"):
+        is_active = st.session_state.active_tab == key
+        if st.button(
+            label=label,
+            key=f"tab_{key}",
+            type="secondary" if is_active else "primary",
+            use_container_width=True
+        ):
             st.session_state.active_tab = key
             st.rerun()
 
     st.markdown('<div class="nav-divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-footer">Powered by German Precision<br>& Indian Innovation<br><br>BahnSetu GmbH © 2025</div>',
+    st.markdown('<div class="sidebar-footer">⚡ Powered by German Precision & Indian Innovation<hr style="margin: 12px 0; border: none; border-top: 1px solid #1e293b; opacity: 0.3;">BahnSetu GmbH © 2025</div>',
                 unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════
@@ -411,7 +889,9 @@ st.markdown(f"""
         <div class="station-title">{display_title}</div>
         <div class="station-sub">{display_sub}</div>
     </div>
-    <div class="status-badge {badge_cls}">⬤&nbsp; {sys_status}</div>
+    <div class="status-badge {badge_cls}">
+        <span class="status-dot"></span> {sys_status}
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -419,23 +899,29 @@ st.markdown(f"""
 # ═══════════════════════════════════════════════════
 # TRAIN ANIMATION HTML BUILDER
 # ═══════════════════════════════════════════════════
+@st.cache_data(ttl=60, show_spinner=False)
 def build_train_animation(station_name, station_df):
     """Build a complete self-contained HTML/JS animation for the PSD platform simulation."""
-
+    # Pre-compute platform data efficiently
     platforms_data = []
-    for platform in sorted(station_df['platform'].unique()):
-        plat_df = station_df[station_df['platform'] == platform]
+    station_df = station_df.copy()
+    
+    # Group by platform once
+    grouped = station_df.groupby('platform')
+    
+    for platform, plat_df in sorted(grouped, key=lambda x: x[0]):
         gates = []
-        for _, row in plat_df.iterrows():
+        # Use itertuples for faster iteration
+        for row in plat_df.itertuples(index=False):
             gates.append({
-                "id":     row['gate_id'],
-                "state":  row['door_state'],
-                "train":  str(row['train']) if pd.notna(row['train']) and row['train'] else "",
-                "temp":   float(row['sensor_temp']),
-                "vib":    float(row['sensor_vib']),
-                "risk":   int(row['risk_score']),
-                "status": row['maintenance_status'],
-                "people": int(row['people']),
+                "id":     row.gate_id,
+                "state":  row.door_state,
+                "train":  str(row.train) if pd.notna(row.train) and row.train else "",
+                "temp":   float(row.sensor_temp),
+                "vib":    float(row.sensor_vib),
+                "risk":   int(row.risk_score),
+                "status": row.maintenance_status,
+                "people": int(row.people),
             })
         train_name = next((g["train"] for g in gates if g["train"]),
                           f"ICE {abs(hash(platform)) % 900 + 100}")
@@ -979,6 +1465,7 @@ PLATFORMS.forEach((pdata,idx)=>{
 if active_tab == 'ops':
 
     # ── KPI Row ──
+    st.markdown('<div class="animate-fade-in">', unsafe_allow_html=True)
     c1, c2, c3, c4, c5 = st.columns(5)
     kpis = [
         (c1, "PSD Gates", f"{gates_active}/{gates_total}",
@@ -1001,25 +1488,29 @@ if active_tab == 'ops':
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
     # ── Main Split ──
     left, right = st.columns([3, 2])
 
     with left:
-        st.markdown('<div class="section-heading">🚆 Live Platform Simulation — Train & PSD Animation</div>',
+        st.markdown('<div class="section-heading animate-fade-in">🚆 Live Platform Simulation</div>',
                     unsafe_allow_html=True)
 
-        station_data = df[df["station"] == current_station]
+        # Use cached station data
+        station_data = get_station_data_cached(current_station, df)
         num_platforms = station_data['platform'].nunique()
         anim_html = build_train_animation(current_station, station_data)
         anim_height = num_platforms * 295 + 60
         components.html(anim_html, height=anim_height, scrolling=False)
 
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+
     with right:
         st.markdown(
-            '<div class="section-heading">Sensor Analytics</div>', unsafe_allow_html=True)
-        cycles_df, temp_df = get_psd_analytics(current_station)
+            '<div class="section-heading animate-fade-in">Sensor Analytics</div>', unsafe_allow_html=True)
+        cycles_df, temp_df = get_psd_analytics_cached(current_station)
 
         # Temperature Chart
         fig_temp = go.Figure()
@@ -1036,32 +1527,68 @@ if active_tab == 'ops':
                            annotation_text="Warning Threshold", annotation_font_color="#f97316")
         fig_temp.update_layout(
             title=dict(text="Gate Temperature (°C)",
-                       font=dict(size=12, color="#7ab3d4"), x=0),
-            height=220, margin=dict(l=0, r=0, b=0, t=34),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-            yaxis=dict(gridcolor='#111d35', zeroline=False),
-            xaxis=dict(gridcolor='#111d35', showticklabels=True),
+                       font=dict(size=13, color="#94a3b8", family="Inter"), x=0),
+            height=250, margin=dict(l=0, r=0, b=40, t=50),
+            paper_bgcolor='rgba(10, 14, 23, 0)',
+            plot_bgcolor='rgba(10, 14, 23, 0)',
+            font=dict(color="#64748b", family="Inter", size=11),
+            yaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.6)',
+                zeroline=False,
+                tickfont=dict(size=10, color="#94a3b8")
+            ),
+            xaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.6)',
+                tickfont=dict(size=10, color="#94a3b8")
+            ),
             showlegend=False,
+            hovermode='x unified',
+            hoverlabel=dict(
+                bgcolor='rgba(17, 24, 39, 0.95)',
+                bordercolor='#3b82f6',
+                font_color='#f1f5f9',
+                font_size=11
+            )
         )
         st.plotly_chart(fig_temp, use_container_width=True)
 
         # Door Cycles Chart
         fig_cycles = px.bar(cycles_df, x="Hour", y="Door Cycles",
                             title="Door Operation Cycles / Hour")
-        fig_cycles.update_traces(marker_color='#0288d1', marker_line_width=0)
+        fig_cycles.update_traces(
+            marker_color='#3b82f6',
+            marker_line_width=0,
+            hovertemplate='<b>Hour</b>: %{x}<br><b>Cycles</b>: %{y}<extra></extra>'
+        )
         fig_cycles.update_layout(
-            height=220, margin=dict(l=0, r=0, b=0, t=34),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-            title=dict(font=dict(size=12, color="#7ab3d4"), x=0),
-            yaxis=dict(gridcolor='#111d35', zeroline=False),
-            xaxis=dict(gridcolor='#111d35'),
+            height=250, margin=dict(l=0, r=0, b=40, t=50),
+            paper_bgcolor='rgba(10, 14, 23, 0)',
+            plot_bgcolor='rgba(10, 14, 23, 0)',
+            font=dict(color="#64748b", family="Inter", size=11),
+            title=dict(font=dict(size=13, color="#94a3b8", family="Inter"), x=0),
+            yaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.6)',
+                zeroline=False,
+                tickfont=dict(size=10, color="#94a3b8")
+            ),
+            xaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.6)',
+                tickfont=dict(size=10, color="#94a3b8")
+            ),
+            hovermode='x unified',
+            hoverlabel=dict(
+                bgcolor='rgba(17, 24, 39, 0.95)',
+                bordercolor='#3b82f6',
+                font_color='#f1f5f9',
+                font_size=11
+            )
         )
         st.plotly_chart(fig_cycles, use_container_width=True)
 
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+
     # ── Sensor Logs ──
-    st.markdown('<div class="section-heading">Detailed Sensor Logs</div>',
+    st.markdown('<div class="section-heading animate-fade-in">Detailed Sensor Logs</div>',
                 unsafe_allow_html=True)
 
     def color_temp(val):
@@ -1118,7 +1645,7 @@ if active_tab == 'ops':
 # ── TAB: NETWORK OVERVIEW ─────────────────────────
 # ═══════════════════════════════════════════════════
 elif active_tab == 'network':
-    net = get_network_summary(df)
+    net = get_network_summary_cached(df)
 
     # ── Network KPIs ──
     c1, c2, c3, c4 = st.columns(4)
@@ -1154,37 +1681,59 @@ elif active_tab == 'network':
     with left:
         st.markdown(
             '<div class="section-heading">Station Performance Matrix</div>', unsafe_allow_html=True)
-        st.dataframe(
-            net['station_summary'].style
-            .background_gradient(subset=['Avg Sync %'], cmap='Blues')
-            .background_gradient(subset=['Avg Risk'], cmap='YlOrRd')
-            .format({'Avg Sync %': "{}%", 'Avg Risk': "{}/100", 'Passengers': "{:,}"}),
-            use_container_width=True, hide_index=True
+        styled_net = (
+            net['station_summary']
+            .style
+            .background_gradient(subset=['Avg Sync %'], cmap='Blues', vmin=0, vmax=100)
+            .background_gradient(subset=['Avg Risk'], cmap='RdYlGn_r', vmin=0, vmax=100)
+            .format({'Avg Sync %': "{}%", 'Avg Risk': "{:.1f}/100", 'Passengers': "{:,}"})
         )
+        st.dataframe(styled_net, use_container_width=True, hide_index=True)
 
         st.markdown(
             '<div class="section-heading">Passengers by Station</div>', unsafe_allow_html=True)
         fig_pass = px.bar(
             net['station_summary'].sort_values('Passengers', ascending=True),
             x='Passengers', y='Station', orientation='h',
-            color='Avg Risk', color_continuous_scale=['#10b981', '#f59e0b', '#ef4444'],
+            color='Avg Risk',
+            color_continuous_scale=['#10b981', '#f59e0b', '#ef4444'],
+            range_color=[0, 100],
             title=""
         )
         fig_pass.update_layout(
-            height=280,
-            margin=dict(l=0, r=0, b=0, t=10),
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-            yaxis=dict(gridcolor='#111d35'),
-            xaxis=dict(gridcolor='#111d35'),
+            height=300,
+            margin=dict(l=0, r=0, b=20, t=20),
+            paper_bgcolor='rgba(10, 14, 23, 0)',
+            plot_bgcolor='rgba(10, 14, 23, 0)',
+            font=dict(color="#94a3b8", family="Inter", size=11),
+            yaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.5)',
+                tickfont=dict(size=10)
+            ),
+            xaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.5)',
+                tickfont=dict(size=10)
+            ),
             coloraxis_colorbar=dict(
                 title=dict(
-                    text="Risk",
-                    font=dict(color="#4a6fa5")  # title font now goes here
+                    text="Risk Score",
+                    font=dict(color="#94a3b8", size=11)
                 ),
-                tickfont=dict(color="#4a6fa5")
+                tickfont=dict(color="#94a3b8", size=10),
+                thickness=8,
+                len=0.8
+            ),
+            hovermode='y unified',
+            hoverlabel=dict(
+                bgcolor='rgba(17, 24, 39, 0.95)',
+                bordercolor='#3b82f6',
+                font_color='#f1f5f9',
+                font_size=11
             )
+        )
+        fig_pass.update_traces(
+            hovertemplate='<b>Station</b>: %{y}<br><b>Passengers</b>: %{x:,}<br><b>Avg Risk</b>: %{customdata[0]:.1f}/100<extra></extra>',
+            customdata=net['station_summary'][['Avg Risk']].values
         )
 
         st.plotly_chart(fig_pass, use_container_width=True)
@@ -1197,16 +1746,44 @@ elif active_tab == 'network':
             'WARNING': '#f59e0b', 'CRITICAL': '#ef4444'
         }
         fig_pie = px.pie(
-            net['status_dist'], names='maintenance_status', values='Count',
-            color='maintenance_status', color_discrete_map=color_map,
-            hole=0.5
+            net['status_dist'],
+            names='maintenance_status',
+            values='Count',
+            color='maintenance_status',
+            color_discrete_map=color_map,
+            hole=0.55
         )
         fig_pie.update_layout(
-            height=280, margin=dict(l=0, r=0, b=0, t=10),
-            paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=10),
-            legend=dict(font=dict(color="#7ab3d4")),
-            showlegend=True
+            height=300, margin=dict(l=20, r=20, b=40, t=20),
+            paper_bgcolor='rgba(10, 14, 23, 0)',
+            font=dict(color="#94a3b8", family="Inter", size=11),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.15,
+                xanchor="center",
+                x=0.5,
+                font=dict(color="#94a3b8", size=10),
+                bgcolor='rgba(17, 24, 39, 0.6)',
+                bordercolor='#1e293b',
+                borderwidth=1
+            ),
+            showlegend=True,
+            hoverlabel=dict(
+                bgcolor='rgba(17, 24, 39, 0.95)',
+                bordercolor='#3b82f6',
+                font_color='#f1f5f9',
+                font_size=11
+            )
+        )
+        fig_pie.update_traces(
+            textposition='inside',
+            textinfo='percent+label',
+            textfont_size=10,
+            textfont_color='#f1f5f9',
+            marker_line_color='rgba(30, 41, 59, 0.5)',
+            marker_line_width=1,
+            hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
         )
         st.plotly_chart(fig_pie, use_container_width=True)
 
@@ -1215,15 +1792,42 @@ elif active_tab == 'network':
         door_color = {'closed': '#1565c0', 'open': '#10b981',
                       'jammed': '#ef4444', 'closing': '#0288d1'}
         fig_door = px.bar(
-            net['door_dist'], x='door_state', y='Count',
-            color='door_state', color_discrete_map=door_color
+            net['door_dist'],
+            x='door_state',
+            y='Count',
+            color='door_state',
+            color_discrete_map=door_color,
+            category_orders={'door_state': ['closed', 'open', 'closing', 'jammed']}
         )
         fig_door.update_layout(
-            height=220, margin=dict(l=0, r=0, b=0, t=10),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-            yaxis=dict(gridcolor='#111d35'), xaxis=dict(gridcolor='#111d35'),
-            showlegend=False
+            height=250,
+            margin=dict(l=0, r=0, b=40, t=20),
+            paper_bgcolor='rgba(10, 14, 23, 0)',
+            plot_bgcolor='rgba(10, 14, 23, 0)',
+            font=dict(color="#94a3b8", family="Inter", size=11),
+            yaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.6)',
+                tickfont=dict(size=10),
+                title=''
+            ),
+            xaxis=dict(
+                gridcolor='rgba(30, 41, 59, 0.6)',
+                tickfont=dict(size=10),
+                title='',
+                categoryorder='array',
+                categoryarray=['closed', 'open', 'closing', 'jammed']
+            ),
+            showlegend=False,
+            hovermode='x unified',
+            hoverlabel=dict(
+                bgcolor='rgba(17, 24, 39, 0.95)',
+                bordercolor='#3b82f6',
+                font_color='#f1f5f9',
+                font_size=11
+            )
+        )
+        fig_door.update_traces(
+            hovertemplate='<b>State</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>'
         )
         st.plotly_chart(fig_door, use_container_width=True)
 
@@ -1232,7 +1836,7 @@ elif active_tab == 'network':
 # ── TAB: INCIDENT LOG ─────────────────────────────
 # ═══════════════════════════════════════════════════
 elif active_tab == 'incidents':
-    incidents = get_incident_log(df)
+    incidents = get_incident_log_cached(df)
 
     st.markdown('<div class="section-heading">Active Incidents — All Stations</div>',
                 unsafe_allow_html=True)
@@ -1295,7 +1899,7 @@ elif active_tab == 'forecast':
                 unsafe_allow_html=True)
 
     # FIRST ROW: 7-Day Forecast (full width)
-    forecast_df = get_maintenance_forecast(current_station)
+    forecast_df = get_maintenance_forecast_cached(current_station)
     fig_fc = go.Figure()
     fig_fc.add_trace(go.Scatter(
         x=forecast_df["Date"], y=forecast_df["Predicted Risk %"],
@@ -1314,13 +1918,34 @@ elif active_tab == 'forecast':
                      annotation_font_color="#f59e0b")
     fig_fc.update_layout(
         title=dict(text="7-Day Maintenance Risk Forecast",
-                   font=dict(size=13, color="#7ab3d4"), x=0),
-        height=280, margin=dict(l=0, r=0, b=0, t=36),
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-        yaxis=dict(gridcolor='#111d35', range=[0, 100], title="Risk %"),
-        xaxis=dict(gridcolor='#111d35'),
-        showlegend=False
+                   font=dict(size=14, color="#94a3b8", family="Inter"), x=0),
+        height=300, margin=dict(l=0, r=0, b=50, t=60),
+        paper_bgcolor='rgba(10, 14, 23, 0)',
+        plot_bgcolor='rgba(10, 14, 23, 0)',
+        font=dict(color="#64748b", family="Inter", size=11),
+        yaxis=dict(
+            gridcolor='rgba(30, 41, 59, 0.6)',
+            range=[0, 100],
+            title='Risk %',
+            tickfont=dict(size=10, color="#94a3b8"),
+            titlefont=dict(size=12, color="#94a3b8")
+        ),
+        xaxis=dict(
+            gridcolor='rgba(30, 41, 59, 0.6)',
+            tickfont=dict(size=10, color="#94a3b8")
+        ),
+        showlegend=False,
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor='rgba(17, 24, 39, 0.95)',
+            bordercolor='#f59e0b',
+            font_color='#f1f5f9',
+            font_size=11
+        )
+    )
+    fig_fc.update_traces(
+        hovertemplate='<b>Date</b>: %{x|%Y-%m-%d}<br><b>Predicted Risk</b>: %{y:.1f}%<extra></extra>',
+        line_width=2.5
     )
     st.plotly_chart(fig_fc, use_container_width=True)
 
@@ -1330,7 +1955,7 @@ elif active_tab == 'forecast':
     with col_heat:
         st.markdown('<div class="section-heading">Weekly Passenger Flow Heatmap</div>',
                     unsafe_allow_html=True)
-        heatmap_df = get_passenger_heatmap(current_station)
+        heatmap_df = get_passenger_heatmap_cached(current_station)
         fig_heat = px.imshow(
             heatmap_df, aspect="auto",
             color_continuous_scale=["#060c1a",
@@ -1338,17 +1963,36 @@ elif active_tab == 'forecast':
             labels=dict(x="Hour", y="Day", color="Passengers"),
         )
         fig_heat.update_layout(
-            height=280,
-            margin=dict(l=0, r=0, b=0, t=10),
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
+            height=320,
+            margin=dict(l=60, r=20, b=50, t=20),
+            paper_bgcolor='rgba(10, 14, 23, 0)',
+            plot_bgcolor='rgba(10, 14, 23, 0)',
+            font=dict(color="#94a3b8", family="Inter", size=11),
+            xaxis=dict(
+                side='bottom',
+                tickfont=dict(size=10, color="#94a3b8"),
+                title='Hour of Day',
+                titlefont=dict(size=12, color="#94a3b8")
+            ),
+            yaxis=dict(
+                tickfont=dict(size=10, color="#94a3b8"),
+                title='Day of Week',
+                titlefont=dict(size=12, color="#94a3b8")
+            ),
             coloraxis_colorbar=dict(
                 title=dict(
                     text="Passengers",
-                    font=dict(color="#4a6fa5")
+                    font=dict(color="#94a3b8", size=12)
                 ),
-                tickfont=dict(color="#4a6fa5")
+                tickfont=dict(color="#94a3b8", size=10),
+                thickness=10,
+                len=0.8
+            ),
+            hoverlabel=dict(
+                bgcolor='rgba(17, 24, 39, 0.95)',
+                bordercolor='#06b6d4',
+                font_color='#f1f5f9',
+                font_size=11
             )
         )
         st.plotly_chart(fig_heat, use_container_width=True)
@@ -1358,7 +2002,8 @@ elif active_tab == 'forecast':
         st.markdown(
             '<div class="section-heading">Network Sync Health</div>', unsafe_allow_html=True)
         net_sync = int(df["sync_score"].mean())
-        avg_sync = int(df[df["station"] == current_station]["sync_score"].mean()) if not df[df["station"] == current_station].empty else 0
+        station_data_sync = get_station_data_cached(current_station, df)
+        avg_sync = int(station_data_sync["sync_score"].mean()) if not station_data_sync.empty else 0
         fig_gauge = go.Figure(go.Indicator(
             mode="gauge+number+delta",
             value=avg_sync,
@@ -1383,16 +2028,17 @@ elif active_tab == 'forecast':
             number={'suffix': '%', 'font': {'color': '#e2e8f0', 'size': 30}},
         ))
         fig_gauge.update_layout(
-            height=280, margin=dict(l=20, r=20, b=10, t=30),
-            paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(color="#4a6fa5", family="IBM Plex Mono")
+            height=320,
+            margin=dict(l=40, r=40, b=40, t=50),
+            paper_bgcolor='rgba(10, 14, 23, 0)',
+            font=dict(color="#94a3b8", family="Inter", size=11)
         )
         st.plotly_chart(fig_gauge, use_container_width=True)
 
     # THIRD ROW: Gate Risk Scores (full width)
     st.markdown(
         '<div class="section-heading">Gate Risk Scores</div>', unsafe_allow_html=True)
-    station_data = df[df["station"] == current_station].sort_values(
+    station_data = get_station_data_cached(current_station, df).sort_values(
         "risk_score", ascending=False)
     fig_risk = px.bar(
         station_data,
@@ -1403,11 +2049,34 @@ elif active_tab == 'forecast':
         labels={'risk_score': 'Risk Score', 'gate_id': 'Gate'}
     )
     fig_risk.update_layout(
-        height=280, margin=dict(l=0, r=0, b=0, t=10),
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color="#4a6fa5", family="IBM Plex Mono", size=9),
-        yaxis=dict(gridcolor='#111d35'), xaxis=dict(gridcolor='#111d35', range=[0, 100]),
-        coloraxis_showscale=False
+        height=300,
+        margin=dict(l=10, r=10, b=40, t=20),
+        paper_bgcolor='rgba(10, 14, 23, 0)',
+        plot_bgcolor='rgba(10, 14, 23, 0)',
+        font=dict(color="#94a3b8", family="Inter", size=11),
+        yaxis=dict(
+            gridcolor='rgba(30, 41, 59, 0.6)',
+            tickfont=dict(size=10, color="#94a3b8"),
+            title=''
+        ),
+        xaxis=dict(
+            gridcolor='rgba(30, 41, 59, 0.6)',
+            tickfont=dict(size=10, color="#94a3b8"),
+            title='Risk Score',
+            range=[0, 100]
+        ),
+        coloraxis_showscale=False,
+        hovermode='y unified',
+        hoverlabel=dict(
+            bgcolor='rgba(17, 24, 39, 0.95)',
+            bordercolor='#ef4444',
+            font_color='#f1f5f9',
+            font_size=11
+        )
+    )
+    fig_risk.update_traces(
+        hovertemplate='<b>Gate</b>: %{y}<br><b>Risk Score</b>: %{x:.1f}/100<extra></extra>',
+        marker_line_width=0
     )
     st.plotly_chart(fig_risk, use_container_width=True)
 
@@ -1419,13 +2088,25 @@ elif active_tab == 'financial':
     from data_source import get_financial_model_data
 
     PLOTLY_DARK = dict(
-        plot_bgcolor='#0a1221',
-        paper_bgcolor='#0a1221',
-        font=dict(color='#7ab3d4', family='IBM Plex Mono', size=11),
-        xaxis=dict(gridcolor='#1a2d50', zeroline=False),
-        yaxis=dict(gridcolor='#1a2d50', zeroline=False),
-        legend=dict(bgcolor='rgba(0,0,0,0)', font=dict(size=10)),
-        margin=dict(l=50, r=20, t=40, b=40),
+        plot_bgcolor='rgba(10, 14, 23, 0)',
+        paper_bgcolor='rgba(10, 14, 23, 0)',
+        font=dict(color='#94a3b8', family='Inter', size=11),
+        xaxis=dict(gridcolor='rgba(30, 41, 59, 0.6)', zeroline=False),
+        yaxis=dict(gridcolor='rgba(30, 41, 59, 0.6)', zeroline=False),
+        legend=dict(
+            bgcolor='rgba(17, 24, 39, 0.8)',
+            bordercolor='#1e293b',
+            borderwidth=1,
+            font=dict(size=10, color='#94a3b8')
+        ),
+        margin=dict(l=40, r=20, t=50, b=40),
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor='rgba(17, 24, 39, 0.95)',
+            bordercolor='#3b82f6',
+            font_color='#f1f5f9',
+            font_size=11
+        )
     )
 
     def fin_fig(layout_extra=None):
