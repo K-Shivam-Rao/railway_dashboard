@@ -839,76 +839,304 @@ st.markdown("""
         opacity: 1;
     }
 
-    /* Status Indicator in Sidebar */
+    /* ── System Status Indicator (Sidebar) - Wide Lifeline Style ── */
     .system-status-indicator {
-        display: inline-flex;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
-        gap: 8px;
-        padding: 6px 12px;
-        border-radius: 999px;
+        gap: 16px;
+        padding: 14px 20px;
+        border-radius: 16px;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 20px;
-        transition: all 0.3s ease;
-    }
-    .system-status-indicator.status-normal {
-        background: rgba(16, 185, 129, 0.1);
-        border-color: rgba(16, 185, 129, 0.3);
-    }
-    .system-status-indicator.status-normal .status-dot-large {
-        background: var(--success);
-        animation: pulse-dot-normal 2s ease-in-out infinite;
-    }
-    .system-status-indicator.status-normal .status-text {
-        color: var(--success);
-    }
-    .system-status-indicator.status-warning {
-        background: rgba(245, 158, 11, 0.1);
-        border-color: rgba(245, 158, 11, 0.3);
-    }
-    .system-status-indicator.status-warning .status-dot-large {
-        background: #f59e0b;
-        animation: pulse-dot-warning 2s ease-in-out infinite;
-    }
-    .system-status-indicator.status-warning .status-text {
-        color: #f59e0b;
-    }
-    .system-status-indicator.status-alert {
-        background: rgba(239, 68, 68, 0.1);
-        border-color: rgba(239, 68, 68, 0.3);
-    }
-    .system-status-indicator.status-alert .status-dot-large {
-        background: var(--danger);
-        animation: pulse-dot-alert 1.5s ease-in-out infinite;
-    }
-    .system-status-indicator.status-alert .status-text {
-        color: var(--danger);
-    }
-    .status-dot-large {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
+        margin: 0 12px 20px 12px;
+        transition: var(--transition);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         position: relative;
+        overflow: hidden;
+        min-height: 52px;
     }
-    @keyframes pulse-dot-normal {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-        50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+
+    /* Lifeline flowing background animation */
+    .system-status-indicator::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255,255,255,0.06) 25%,
+            rgba(255,255,255,0.1) 50%,
+            rgba(255,255,255,0.06) 75%,
+            transparent 100%
+        );
+        background-size: 200% 100%;
+        animation: lifeline-flow 3s ease-in-out infinite;
+        z-index: 0;
+        pointer-events: none;
     }
-    @keyframes pulse-dot-warning {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-        50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+
+    @keyframes lifeline-flow {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
     }
-    @keyframes pulse-dot-alert {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-        50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+
+    /* Additional pulse wave effect */
+    .system-status-indicator::after {
+        content: '';
+        position: absolute;
+        top: 0; left: -50%;
+        width: 100%; height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.08),
+            transparent
+        );
+        animation: lifeline-wave 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        z-index: 0;
     }
+
+    @keyframes lifeline-wave {
+        0%, 100% { left: -50%; }
+        50% { left: 100%; }
+    }
+
+    /* Icon container */
+    .system-status-indicator .status-icon-section {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .system-status-indicator .status-icon-large {
+        width: 28px;
+        height: 28px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .system-status-indicator .status-icon-large svg {
+        width: 24px;
+        height: 24px;
+        filter: drop-shadow(0 0 6px currentColor);
+        position: relative;
+        z-index: 3;
+    }
+
+    /* Expanding ring animation (larger) */
+    .status-ring-pulse {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        opacity: 0;
+        animation: ring-expand 2s ease-out infinite;
+    }
+
+    @keyframes ring-expand {
+        0% {
+            transform: translate(-50%, -50%) scale(0.6);
+            opacity: 0.7;
+        }
+        80% {
+            opacity: 0.1;
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(2.5);
+            opacity: 0;
+        }
+    }
+
+    /* Status text - centered */
+    .system-status-indicator .status-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .system-status-indicator .status-label-main {
+        font-size: 0.875rem;
+        font-weight: 700;
+        font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .system-status-indicator .status-label-sub {
+        font-size: 0.65rem;
+        font-weight: 500;
+        font-family: 'Inter', sans-serif;
+        letter-spacing: 0.5px;
+        opacity: 0.7;
+        margin-top: 2px;
+    }
+
+    /* Variations */
+    .system-status-indicator.status-normal {
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.12) 0%,
+            rgba(16, 185, 129, 0.05) 100%
+        );
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
+    }
+
+    .system-status-indicator.status-normal .status-label-main {
+        color: #34d399;
+        text-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+    }
+
+    .system-status-indicator.status-normal .status-ring-pulse {
+        color: #34d399;
+        animation-delay: 0s;
+    }
+
+    .status-normal .status-icon-large svg {
+        color: #34d399;
+    }
+
+    .system-status-indicator.status-warning {
+        background: linear-gradient(
+            135deg,
+            rgba(245, 158, 11, 0.12) 0%,
+            rgba(245, 158, 11, 0.05) 100%
+        );
+        border-color: rgba(245, 158, 11, 0.4);
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
+    }
+
+    .system-status-indicator.status-warning .status-label-main {
+        color: #fbbf24;
+        text-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+    }
+
+    .system-status-indicator.status-warning .status-ring-pulse {
+        color: #fbbf24;
+        animation-delay: 0.7s;
+    }
+
+    .status-warning .status-icon-large svg {
+        color: #fbbf24;
+    }
+
+    .system-status-indicator.status-alert {
+        background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.14) 0%,
+            rgba(239, 68, 68, 0.06) 100%
+        );
+        border-color: rgba(239, 68, 68, 0.45);
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.12);
+    }
+
+    .system-status-indicator.status-alert .status-label-main {
+        color: #f87171;
+        text-shadow: 0 0 12px rgba(248, 113, 113, 0.5);
+    }
+
+    .system-status-indicator.status-alert .status-ring-pulse {
+        color: #f87171;
+        animation-delay: 0s;
+        animation-duration: 1.8s;
+    }
+
+    .status-alert .status-icon-large svg {
+        color: #f87171;
+    }
+
+    .system-status-indicator.status-normal {
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.12) 0%,
+            rgba(16, 185, 129, 0.05) 100%
+        );
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 0 2px 12px rgba(16, 185, 129, 0.1);
+    }
+
+    .system-status-indicator.status-normal .status-text {
+        color: #34d399;
+        text-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+    }
+
+    .system-status-indicator.status-normal .status-dot-ring {
+        color: #34d399;
+        animation-delay: 0s;
+    }
+
+    .system-status-indicator.status-warning {
+        background: linear-gradient(
+            135deg,
+            rgba(245, 158, 11, 0.12) 0%,
+            rgba(245, 158, 11, 0.05) 100%
+        );
+        border-color: rgba(245, 158, 11, 0.4);
+        box-shadow: 0 2px 12px rgba(245, 158, 11, 0.1);
+    }
+
+    .system-status-indicator.status-warning .status-text {
+        color: #fbbf24;
+        text-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+    }
+
+    .system-status-indicator.status-warning .status-dot-ring {
+        color: #fbbf24;
+        animation-delay: 0.7s;
+    }
+
+    .system-status-indicator.status-alert {
+        background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.14) 0%,
+            rgba(239, 68, 68, 0.06) 100%
+        );
+        border-color: rgba(239, 68, 68, 0.45);
+        box-shadow: 0 2px 12px rgba(239, 68, 68, 0.12);
+        animation: sidebar-alert-glow 1.8s ease-in-out infinite;
+    }
+
+    .system-status-indicator.status-alert .status-text {
+        color: #f87171;
+        text-shadow: 0 0 8px rgba(248, 113, 113, 0.4);
+    }
+
+    .system-status-indicator.status-alert .status-dot-ring {
+        color: #f87171;
+        animation-delay: 0s;
+    }
+
+    @keyframes sidebar-alert-glow {
+        0%, 100% {
+            box-shadow: 0 2px 12px rgba(239, 68, 68, 0.12);
+        }
+        50% {
+            box-shadow: 0 3px 16px rgba(239, 68, 68, 0.22);
+        }
+    }
+
     .status-text {
         font-size: 0.75rem;
-        font-weight: 600;
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 0.5px;
+        font-weight: 700;
+        font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+        letter-spacing: 1px;
         text-transform: uppercase;
+        position: relative;
+        z-index: 1;
     }
 
     /* Section Enhancements */
@@ -1049,70 +1277,226 @@ st.markdown("""
         content: '◈'; color: var(--accent-blue); font-size: 0.5rem;
     }
 
-    /* ── Status Badge ── */
+    /* ── Status Badge (Modern Premium) ── */
     .status-badge {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 10px 24px; border-radius: 999px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.875rem; font-weight: 600; letter-spacing: 1.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 28px;
+        border-radius: 999px;
+        font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+        font-size: 0.875rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
         transition: var(--transition);
-        border: 1px solid;
+        border: 1.5px solid;
         position: relative;
         overflow: hidden;
+        isolation: isolate;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        cursor: default;
     }
+
+    .status-label {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Glass overlay with gradient shimmer */
     .status-badge::before {
-        content: ''; position: absolute; top: 0; left: -100%;
-        width: 100%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        animation: shimmer 2s ease-in-out infinite;
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(
+            135deg,
+            rgba(255,255,255,0.08) 0%,
+            rgba(255,255,255,0.02) 40%,
+            rgba(255,255,255,0.08) 100%
+        );
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: -1;
+        transition: var(--transition);
     }
-    @keyframes shimmer {
+
+    .status-badge::after {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.15),
+            transparent
+        );
+        animation: status-shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes status-shimmer {
         0%, 100% { left: -100%; }
         50% { left: 100%; }
     }
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
+
+    /* Status Icon Container */
+    .status-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        position: relative;
     }
+
+    .status-icon svg {
+        width: 18px;
+        height: 18px;
+        position: relative;
+        z-index: 2;
+        filter: drop-shadow(0 0 4px currentColor);
+    }
+
+    /* Animated ring pulse effect */
+    .status-icon-ring {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        opacity: 0;
+        animation: ring-pulse 2s ease-out infinite;
+    }
+
+    @keyframes ring-pulse {
+        0% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.8;
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 0;
+        }
+    }
+
+    /* Status Variations */
     .status-normal {
-        background: rgba(16, 185, 129, 0.15);
-        border-color: rgba(16, 185, 129, 0.5);
-        box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.18) 0%,
+            rgba(16, 185, 129, 0.08) 100%
+        );
+        border-color: rgba(16, 185, 129, 0.6);
+        color: #34d399;
+        box-shadow:
+            0 4px 24px rgba(16, 185, 129, 0.18),
+            inset 0 1px 0 rgba(255,255,255,0.1),
+            0 0 0 1px rgba(16, 185, 129, 0.1) inset;
     }
-    .status-alert {
-        background: rgba(239, 68, 68, 0.15);
-        border-color: rgba(239, 68, 68, 0.5);
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
-        animation: alert-pulse 1.5s ease-in-out infinite;
+
+    .status-normal:hover {
+        background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.25) 0%,
+            rgba(16, 185, 129, 0.12) 100%
+        );
+        border-color: rgba(16, 185, 129, 0.8);
+        box-shadow:
+            0 6px 32px rgba(16, 185, 129, 0.28),
+            inset 0 1px 0 rgba(255,255,255,0.15),
+            0 0 0 1px rgba(16, 185, 129, 0.15) inset;
+        transform: translateY(-1px) scale(1.02);
     }
+
+    .status-normal .status-icon-ring {
+        color: #34d399;
+        animation-delay: 0s;
+    }
+
     .status-warning {
-        background: rgba(245, 158, 11, 0.15);
-        border-color: rgba(245, 158, 11, 0.5);
-        box-shadow: 0 0 24px rgba(245, 158, 11, 0.25);
-        animation: warning-pulse 2s ease-in-out infinite;
+        background: linear-gradient(
+            135deg,
+            rgba(245, 158, 11, 0.18) 0%,
+            rgba(245, 158, 11, 0.08) 100%
+        );
+        border-color: rgba(245, 158, 11, 0.6);
+        color: #fbbf24;
+        box-shadow:
+            0 4px 24px rgba(245, 158, 11, 0.18),
+            inset 0 1px 0 rgba(255,255,255,0.1),
+            0 0 0 1px rgba(245, 158, 11, 0.1) inset;
     }
-    @keyframes alert-pulse {
-        0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
-        50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
+
+    .status-warning:hover {
+        background: linear-gradient(
+            135deg,
+            rgba(245, 158, 11, 0.25) 0%,
+            rgba(245, 158, 11, 0.12) 100%
+        );
+        border-color: rgba(245, 158, 11, 0.8);
+        box-shadow:
+            0 6px 32px rgba(245, 158, 11, 0.28),
+            inset 0 1px 0 rgba(255,255,255,0.15),
+            0 0 0 1px rgba(245, 158, 11, 0.15) inset;
+        transform: translateY(-1px) scale(1.02);
     }
-    @keyframes warning-pulse {
-        0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
-        50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.35); }
+
+    .status-warning .status-icon-ring {
+        color: #fbbf24;
+        animation-delay: 0.6s;
     }
-    .status-dot {
-        width: 8px; height: 8px; border-radius: 50%;
-        display: inline-block; position: relative;
+
+    .status-alert {
+        background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.2) 0%,
+            rgba(239, 68, 68, 0.08) 100%
+        );
+        border-color: rgba(239, 68, 68, 0.65);
+        color: #f87171;
+        box-shadow:
+            0 4px 24px rgba(239, 68, 68, 0.22),
+            inset 0 1px 0 rgba(255,255,255,0.1),
+            0 0 0 1px rgba(239, 68, 68, 0.12) inset;
+        animation: alert-glow 2s ease-in-out infinite;
     }
-    .status-normal .status-dot { background: var(--success); }
-    .status-warning .status-dot { background: #f59e0b; animation: warning-blink 2s ease-in-out infinite; }
-    .status-alert .status-dot { background: var(--danger); animation: blink-dot 1s ease-in-out infinite; }
-    @keyframes blink-dot {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
+
+    .status-alert:hover {
+        background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.28) 0%,
+            rgba(239, 68, 68, 0.14) 100%
+        );
+        border-color: rgba(239, 68, 68, 0.9);
+        box-shadow:
+            0 6px 32px rgba(239, 68, 68, 0.35),
+            inset 0 1px 0 rgba(255,255,255,0.15),
+            0 0 0 1px rgba(239, 68, 68, 0.18) inset;
+        transform: translateY(-1px) scale(1.02);
+        animation: none;
     }
-    @keyframes warning-blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+
+    .status-alert .status-icon-ring {
+        color: #f87171;
+        animation-delay: 0s;
+    }
+
+    @keyframes alert-glow {
+        0%, 100% {
+            box-shadow:
+                0 4px 24px rgba(239, 68, 68, 0.22),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                0 0 0 1px rgba(239, 68, 68, 0.12) inset;
+        }
+        50% {
+            box-shadow:
+                0 6px 32px rgba(239, 68, 68, 0.35),
+                inset 0 1px 0 rgba(255,255,255,0.15),
+                0 0 0 1px rgba(239, 68, 68, 0.2) inset;
+        }
     }
 
     /* ── Metric Cards ── */
@@ -1636,11 +2020,32 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # ── System Status Indicator ──
+    # ── System Status Indicator (Sidebar) with Icons ──
+    sidebar_icons = {
+        "NORMAL": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+        "WARNING": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+        "ALERT": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+    }
+
+    # Subtitle based on status
+    status_subtitle = {
+        "NORMAL": "All systems operational",
+        "WARNING": "Attention required",
+        "ALERT": "Immediate attention needed"
+    }
+
     st.markdown(f"""
     <div class="system-status-indicator status-{sys_status.lower()}">
-        <div class="status-dot-large"></div>
-        <div class="status-text">{sys_status}</div>
+        <div class="status-icon-section">
+            <div class="status-ring-pulse"></div>
+            <div class="status-icon-large">
+                {sidebar_icons[sys_status]}
+            </div>
+        </div>
+        <div class="status-content">
+            <div class="status-label-main">{sys_status}</div>
+            <div class="status-label-sub">{status_subtitle[sys_status]}</div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1723,6 +2128,15 @@ else:
     display_title = "SicherGleis Pro"
     display_sub = "BAHNSETU COMPANY PROFILE"
 
+# Define status icons (SVG strings without extra whitespace)
+status_icons = {
+    "NORMAL": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+    "WARNING": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+    "ALERT": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+}
+
+icon_html = f'<div class="status-icon">{status_icons[sys_status]}<div class="status-icon-ring"></div></div>'
+
 st.markdown(f"""
 <div class="main-header">
     <div>
@@ -1730,7 +2144,8 @@ st.markdown(f"""
         <div class="station-sub">{display_sub}</div>
     </div>
     <div class="status-badge {badge_cls}">
-        <span class="status-dot"></span> {sys_status}
+        {icon_html}
+        <span class="status-label">{sys_status}</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
