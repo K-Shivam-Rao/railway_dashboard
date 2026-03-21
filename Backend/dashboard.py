@@ -12,6 +12,15 @@ from io import BytesIO, StringIO
 import base64
 import sys
 import os
+from datetime import datetime
+
+# ReportLab imports for PDF generation
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak, HRFlowable
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from app import SaaSModelConfig, run_simulation, visualize_results, visualize_dashboard_1, visualize_dashboard_2, print_summary
@@ -167,10 +176,19 @@ st.markdown("""
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #060c1a; }
     ::-webkit-scrollbar-thumb { background: #1e3060; border-radius: 3px; }
-    
+
+    /* Hide Streamlit default UI elements */
+    [data-testid="stHeader"] {
+        display: none !important;
+    }
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
-    [data-testid="stToolbar"] { display: none; }
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
+    .stAppHeader {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -249,38 +267,49 @@ def create_matplotlib_chart(x, y_data, title, labels=None, colors_list=None):
     plt.close()
     return buf.getvalue()
 
-def create_pdf_buffer(
+def generate_complete_pdf_report(
     df_base, df_opt, df_pess, display_cols, scenario_name, starting_customers,
     monthly_growth_rate, churn_rate, price_per_customer, cac_simplified,
     fixed_costs, variable_cost, simulation_months, show_scenarios,
     fig_customers_bytes, fig_mrr_bytes, fig_cash_bytes, fig_ltv_bytes,
     final_sens, breakeven_opt, breakeven_base, breakeven_pess
 ):
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT
-    from io import BytesIO
-    
+    """Generate a complete PDF report with all sections including executive summary, charts, and detailed tables."""
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=0.5*inch, leftMargin=0.5*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    doc = SimpleDocTemplate(
+        buffer, pagesize=A4,
+        rightMargin=0.5*inch, leftMargin=0.5*inch,
+        topMargin=0.5*inch, bottomMargin=0.5*inch
+    )
     elements = []
     styles = getSampleStyleSheet()
-    
-    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=24, spaceAfter=20, alignment=TA_CENTER, textColor=colors.HexColor('#0d1b3e'))
-    heading_style = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=14, spaceAfter=10, spaceBefore=15, textColor=colors.HexColor('#2980b9'))
-    normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=10, spaceAfter=5)
-    
+
+    title_style = ParagraphStyle(
+        'Title', parent=styles['Heading1'],
+        fontSize=24, spaceAfter=20, alignment=TA_CENTER,
+        textColor=colors.HexColor('#0d1b3e')
+    )
+    heading_style = ParagraphStyle(
+        'Heading', parent=styles['Heading2'],
+        fontSize=14, spaceAfter=10, spaceBefore=15,
+        textColor=colors.HexColor('#2980b9')
+    )
+    normal_style = ParagraphStyle(
+        'Normal', parent=styles['Normal'],
+        fontSize=10, spaceAfter=5
+    )
+
     def format_breakeven(month):
         return f"Month {int(month)}" if pd.notna(month) else "Not achieved"
-    
+
     elements.append(Paragraph("SaaS Financial Simulation Report", title_style))
     elements.append(Spacer(1, 10))
-    elements.append(Paragraph(f"Scenario: {scenario_name}", ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=12, alignment=TA_CENTER, textColor=colors.grey)))
+    elements.append(Paragraph(
+        f"Scenario: {scenario_name}",
+        ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=12, alignment=TA_CENTER, textColor=colors.grey)
+    ))
     elements.append(Spacer(1, 20))
-    
+
     elements.append(Paragraph("Model Assumptions", heading_style))
     assumptions_data = [
         ["Parameter", "Value"],
@@ -306,7 +335,7 @@ def create_pdf_buffer(
     ]))
     elements.append(assumptions_table)
     elements.append(Spacer(1, 20))
-    
+
     if show_scenarios:
         elements.append(Paragraph("3-Way Scenario Comparison Summary", heading_style))
         final_opt = df_opt.iloc[-1]
@@ -335,7 +364,7 @@ def create_pdf_buffer(
         ]))
         elements.append(scenario_table)
         elements.append(PageBreak())
-    
+
     elements.append(Paragraph("Monthly Simulation Data - Base Case", heading_style))
     table_data = [["Month", "Customers", "MRR", "Costs", "P&L", "Cum. Cash"]]
     for _, row in df_base.iterrows():
@@ -347,7 +376,6 @@ def create_pdf_buffer(
             f"${row['Profit_Loss']:,.0f}",
             f"${row['Cumulative_Cash']:,.0f}"
         ])
-    
     monthly_table = Table(table_data, colWidths=[0.6*inch, 0.9*inch, 1*inch, 1*inch, 0.9*inch, 1.1*inch])
     monthly_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d1b3e')),
@@ -361,21 +389,279 @@ def create_pdf_buffer(
     ]))
     elements.append(monthly_table)
     elements.append(PageBreak())
-    
+
     elements.append(Paragraph("Charts", heading_style))
-    
-    for title, img_bytes in [("Customer Growth", fig_customers_bytes), ("MRR Growth", fig_mrr_bytes), 
-                              ("Cumulative Cash Flow", fig_cash_bytes), ("LTV/CAC Ratio", fig_ltv_bytes)]:
+    for title, img_bytes in [
+        ("Customer Growth", fig_customers_bytes),
+        ("MRR Growth", fig_mrr_bytes),
+        ("Cumulative Cash Flow", fig_cash_bytes),
+        ("LTV/CAC Ratio", fig_ltv_bytes)
+    ]:
         elements.append(Paragraph(title, normal_style))
         img_buffer = BytesIO(img_bytes)
         elements.append(Image(img_buffer, width=6*inch, height=3.4*inch))
         elements.append(Spacer(1, 15))
-    
-    elements.append(Paragraph("Generated by BahnSetu SaaS Financial Dashboard", ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)))
-    
+
+    elements.append(Paragraph(
+        "Generated by BahnSetu SaaS Financial Dashboard",
+        ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
+    ))
+
     doc.build(elements)
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def generate_charts_only_pdf_report(
+    df_base, scenario_name, simulation_months, starting_customers,
+    monthly_growth_rate, churn_rate, price_per_customer, cac_simplified,
+    fixed_costs, variable_cost, show_scenarios, df_opt=None, df_pess=None,
+    optimistic_growth=None, low_churn_rate=None, pessimistic_growth=None,
+    high_churn_rate=None, breakeven_base=None, breakeven_opt=None, breakeven_pess=None
+):
+    """Generate a PDF report containing only charts with captions."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Image as RLImage, Spacer, PageBreak, Table, TableStyle, HRFlowable
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+    from datetime import datetime
+
+    # Generate all charts (reuse existing chart generation)
+    bytes_list = [
+        create_matplotlib_chart(df_base["Month"], {"Optimistic": df_opt["Total_Customers"].values if show_scenarios else None, "Base": df_base["Total_Customers"].values, "Pessimistic": df_pess["Total_Customers"].values if show_scenarios else None}, "Customer Growth", colors_list=["#10b981", "#2980b9", "#e74c3c"] if show_scenarios else None),
+        create_matplotlib_chart(df_base["Month"], {"Optimistic": df_opt["MRR"].values if show_scenarios else None, "Base": df_base["MRR"].values, "Pessimistic": df_pess["MRR"].values if show_scenarios else None}, "MRR Growth", colors_list=["#10b981", "#2980b9", "#e74c3c"] if show_scenarios else None),
+        create_matplotlib_chart(df_base["Month"], {"Optimistic": df_opt["Cumulative_Cash"].values if show_scenarios else None, "Base": df_base["Cumulative_Cash"].values, "Pessimistic": df_pess["Cumulative_Cash"].values if show_scenarios else None}, "Cumulative Cash", colors_list=["#10b981", "#2980b9", "#e74c3c"] if show_scenarios else None),
+        create_matplotlib_chart(df_base["Month"], df_base["LTV_CAC_Ratio"].values, "LTV/CAC Ratio", None),
+    ]
+
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.5*inch, leftMargin=0.5*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    styles = getSampleStyleSheet()
+
+    DARK_BLUE = colors.HexColor('#1a237e')
+    MEDIUM_BLUE = colors.HexColor('#0277bd')
+    TEXT_DARK = colors.HexColor('#263238')
+    TEXT_BOLD = colors.HexColor('#1a237e')
+
+    title_s = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=24, spaceAfter=8, alignment=TA_CENTER, textColor=DARK_BLUE, fontName='Helvetica-Bold')
+    subtitle_s = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=12, spaceAfter=6, alignment=TA_CENTER, textColor=colors.HexColor('#546e7a'))
+    head_s = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=14, spaceAfter=12, spaceBefore=15, textColor=MEDIUM_BLUE, fontName='Helvetica-Bold')
+    caption_s = ParagraphStyle('Caption', parent=styles['Normal'], fontSize=9, spaceAfter=15, textColor=TEXT_DARK, alignment=TA_CENTER)
+    footer_s = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
+
+    final_base = df_base.iloc[-1]
+    breakeven_text = format_breakeven(breakeven_base) if breakeven_base is not None else "Not achieved"
+
+    elems = []
+    elems.append(HRFlowable(width="100%", thickness=3, color=colors.HexColor('#0d1b3e'), spaceAfter=15))
+    elems.append(Paragraph("Charts & Visual Analysis", title_s))
+    elems.append(Paragraph(f"<b>{scenario_name}</b>", subtitle_s))
+    elems.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')} | {simulation_months}-Month Forecast", subtitle_s))
+    elems.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#bdc3c7'), spaceBefore=10, spaceAfter=20))
+
+    elems.append(Paragraph("Key Highlights at a Glance", head_s))
+    highlights_data = [
+        ["📊 Metric", "💰 Value"],
+        ["Final MRR", f"${final_base['MRR']:,.0f}"],
+        ["Final Customers", f"{int(final_base['Total_Customers']):,}"],
+        ["LTV:CAC Ratio", f"{final_base['LTV_CAC_Ratio']:.2f}x"],
+        ["Break-even Point", breakeven_text],
+    ]
+    highlights_t = Table(highlights_data, colWidths=[1.8*inch, 1.5*inch])
+    highlights_t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), DARK_BLUE),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('LINEBELOW', (0, 0), (-1, 0), 2, MEDIUM_BLUE),
+        ('LINEBELOW', (0, -1), (-1, -1), 1.5, MEDIUM_BLUE),
+        ('LINEBEFORE', (1, 0), (1, -1), 1, colors.HexColor('#cfd8dc')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
+        ('FONTNAME', (1, 1), (1, -1), 'Helvetica-Bold'),
+        ('TEXTCOLOR', (1, 1), (1, -1), TEXT_BOLD),
+    ]))
+    elems.append(highlights_t)
+    elems.append(Spacer(1, 20))
+
+    chart_info = [
+        ("Customer Growth", bytes_list[0], f"Shows the trajectory of customer acquisition over {simulation_months} months. Net customer growth is {int(final_base['Total_Customers'] - starting_customers):,} customers."),
+        ("Monthly Recurring Revenue (MRR)", bytes_list[1], f"Revenue progression from ${df_base.iloc[0]['MRR']:,.0f} to ${final_base['MRR']:,.0f} - a {((final_base['MRR']/df_base.iloc[0]['MRR'])-1)*100:.0f}% increase."),
+        ("Cumulative Cash Position", bytes_list[2], f"Tracks cash flow. Break-even achieved at {breakeven_text}. Final cash position: ${final_base['Cumulative_Cash']:,.0f}."),
+        ("LTV:CAC Ratio Trend", bytes_list[3], f"Unit economics metric. Target is 3x. Final ratio: {final_base['LTV_CAC_Ratio']:.2f}x."),
+    ]
+
+    for title, img_bytes, caption in chart_info:
+        elems.append(Paragraph(title, head_s))
+        elems.append(RLImage(BytesIO(img_bytes), width=6.5*inch, height=3.5*inch))
+        elems.append(Paragraph(caption, caption_s))
+        elems.append(Spacer(1, 10))
+
+    elems.append(Spacer(1, 15))
+    elems.append(HRFlowable(width="100%", thickness=3, color=DARK_BLUE, spaceAfter=10))
+    elems.append(Paragraph("Generated by BahnSetu SaaS Financial Dashboard | Based on SaaS Financial Plan 2.0", footer_s))
+
+    doc.build(elems)
+    buf.seek(0)
+    return buf.getvalue()
+
+
+def generate_tables_only_pdf_report(df_base, scenario_name, simulation_months):
+    """Generate a PDF report containing only data tables."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER
+    from datetime import datetime
+
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.4*inch, leftMargin=0.4*inch, topMargin=0.4*inch, bottomMargin=0.4*inch)
+    styles = getSampleStyleSheet()
+
+    DARK_BLUE = colors.HexColor('#1a237e')
+    MEDIUM_BLUE = colors.HexColor('#0277bd')
+    BORDER = colors.HexColor('#90a4ae')
+    TEXT_DARK = colors.HexColor('#263238')
+    TEXT_BOLD = colors.HexColor('#1a237e')
+
+    title_s = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=24, spaceAfter=8, alignment=TA_CENTER, textColor=DARK_BLUE, fontName='Helvetica-Bold')
+    subtitle_s = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=12, spaceAfter=6, alignment=TA_CENTER, textColor=colors.HexColor('#546e7a'))
+    head_s = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=14, spaceAfter=12, spaceBefore=15, textColor=MEDIUM_BLUE, fontName='Helvetica-Bold')
+    footer_s = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
+
+    final_base = df_base.iloc[-1]
+
+    elems = []
+    elems.append(HRFlowable(width="100%", thickness=3, color=DARK_BLUE, spaceAfter=15))
+    elems.append(Paragraph("Data Tables Report", title_s))
+    elems.append(Paragraph(f"<b>{scenario_name}</b>", subtitle_s))
+    elems.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')} | {simulation_months}-Month Simulation", subtitle_s))
+    elems.append(HRFlowable(width="100%", thickness=1, color=BORDER, spaceBefore=10, spaceAfter=15))
+
+    elems.append(Paragraph("Monthly Financial Summary", head_s))
+    monthly_data = [["📅 Month", "👥 Customers", "➕ New", "➖ Churned", "💵 MRR", "💰 Revenue", "📊 Costs", "📈 P&L", "💳 Cash"]]
+    for _, row in df_base.iterrows():
+        monthly_data.append([
+            f"M{int(row['Month']):02d}",
+            f"{int(row['Total_Customers']):,}",
+            f"+{int(row['New_Customers'])}",
+            f"-{int(row['Churned_Customers'])}",
+            f"${row['MRR']:,.0f}",
+            f"${row['Total_Revenue']:,.0f}",
+            f"${row['Total_Costs']:,.0f}",
+            f"${row['Profit_Loss']:,.0f}",
+            f"${row['Cumulative_Cash']:,.0f}",
+        ])
+    monthly_t = Table(monthly_data, colWidths=[0.55*inch, 0.7*inch, 0.5*inch, 0.55*inch, 0.7*inch, 0.7*inch, 0.7*inch, 0.65*inch, 0.75*inch])
+    monthly_t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), DARK_BLUE),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 7),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 7),
+        ('TOPPADDING', (0, 0), (-1, -1), 7),
+        ('LINEBELOW', (0, 0), (-1, 0), 2, MEDIUM_BLUE),
+        ('LINEBELOW', (0, -1), (-1, -1), 1.5, MEDIUM_BLUE),
+        ('LINEBEFORE', (1, 0), (1, -1), 0.5, BORDER),
+        ('LINEBEFORE', (2, 0), (2, -1), 0.5, BORDER),
+        ('LINEBEFORE', (3, 0), (3, -1), 0.5, BORDER),
+        ('LINEBEFORE', (4, 0), (4, -1), 0.5, BORDER),
+        ('LINEBEFORE', (5, 0), (5, -1), 0.5, BORDER),
+        ('LINEBEFORE', (6, 0), (6, -1), 0.5, BORDER),
+        ('LINEBEFORE', (7, 0), (7, -1), 0.5, BORDER),
+        ('LINEBEFORE', (8, 0), (8, -1), 0.5, BORDER),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
+    ]))
+    elems.append(monthly_t)
+    elems.append(Spacer(1, 15))
+
+    elems.append(Paragraph("Key Metrics by Month", head_s))
+    metrics_data = [["📅 Month", "📊 Gross Margin", "💎 LTV:CAC", "⏱️ CAC Payback", "📈 MoM Growth"]]
+    for _, row in df_base.iterrows():
+        metrics_data.append([
+            f"M{int(row['Month']):02d}",
+            f"{row['Gross_Margin_%']:.1f}%",
+            f"{row['LTV_CAC_Ratio']:.2f}x",
+            f"{row.get('CAC_Payback_Pro', 0):.1f} mo",
+            f"{row['MoM_Growth_%']:.1f}%",
+        ])
+    metrics_t = Table(metrics_data, colWidths=[0.65*inch, 1.05*inch, 0.95*inch, 1.05*inch, 0.95*inch])
+    metrics_t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), MEDIUM_BLUE),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('LINEBELOW', (0, 0), (-1, 0), 2, DARK_BLUE),
+        ('LINEBELOW', (0, -1), (-1, -1), 1.5, DARK_BLUE),
+        ('LINEBEFORE', (1, 0), (1, -1), 0.5, BORDER),
+        ('LINEBEFORE', (2, 0), (2, -1), 0.5, BORDER),
+        ('LINEBEFORE', (3, 0), (3, -1), 0.5, BORDER),
+        ('LINEBEFORE', (4, 0), (4, -1), 0.5, BORDER),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
+    ]))
+    elems.append(metrics_t)
+
+    elems.append(Spacer(1, 15))
+
+    elems.append(Paragraph("Departmental Costs", head_s))
+    dept_data = [["📅 Month", "🏭 COGS", "🔬 R&D", "📣 Sales & Mktg", "📋 G&A", "🤝 Customer Success"]]
+    for _, row in df_base.iterrows():
+        dept_data.append([
+            f"M{int(row['Month']):02d}",
+            f"${row['COGS']:,.0f}",
+            f"${row['RD_Cost']:,.0f}",
+            f"${row['SM_Cost']:,.0f}",
+            f"${row['GA_Cost']:,.0f}",
+            f"${row['CS_Cost']:,.0f}",
+        ])
+    dept_t = Table(dept_data, colWidths=[0.55*inch, 0.85*inch, 0.85*inch, 0.95*inch, 0.85*inch, 1.0*inch])
+    dept_t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), TEXT_BOLD),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 7),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 7),
+        ('TOPPADDING', (0, 0), (-1, -1), 7),
+        ('LINEBELOW', (0, 0), (-1, 0), 2, MEDIUM_BLUE),
+        ('LINEBELOW', (0, -1), (-1, -1), 1.5, MEDIUM_BLUE),
+        ('LINEBEFORE', (1, 0), (1, -1), 0.5, BORDER),
+        ('LINEBEFORE', (2, 0), (2, -1), 0.5, BORDER),
+        ('LINEBEFORE', (3, 0), (3, -1), 0.5, BORDER),
+        ('LINEBEFORE', (4, 0), (4, -1), 0.5, BORDER),
+        ('LINEBEFORE', (5, 0), (5, -1), 0.5, BORDER),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
+    ]))
+    elems.append(dept_t)
+
+    elems.append(Spacer(1, 15))
+    elems.append(HRFlowable(width="100%", thickness=3, color=DARK_BLUE, spaceAfter=10))
+    elems.append(Paragraph("Generated by BahnSetu SaaS Financial Dashboard | Based on SaaS Financial Plan 2.0", footer_s))
+
+    doc.build(elems)
+    buf.seek(0)
+    return buf.getvalue()
+
+
+def format_breakeven(month):
+    """Helper function to format breakeven month display."""
+    if pd.notna(month):
+        return f"Month {int(month)}"
+    return "Not achieved"
 
 st.markdown('<div class="section-heading">⚙️ Model Configuration</div>', unsafe_allow_html=True)
 
@@ -1183,14 +1469,6 @@ with st.container():
     
     with pdf_cols[0]:
         with st.spinner("Generating Complete Report..."):
-            from reportlab.lib.pagesizes import A4
-            from reportlab.lib import colors
-            from reportlab.lib.units import inch
-            from reportlab.platypus import SimpleDocTemplate, Paragraph, Image as RLImage, Spacer, PageBreak, Table, TableStyle, HRFlowable
-            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-            from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
-            from datetime import datetime
-            
             buf = BytesIO()
             doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.5*inch, leftMargin=0.5*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
             styles = getSampleStyleSheet()
@@ -1322,7 +1600,7 @@ with st.container():
             elems.append(Paragraph("Charts & Visual Analysis", head_s))
             for chart_title, img_bytes in [("Customer Growth Over Time", bytes_list[0]), ("Monthly Recurring Revenue (MRR)", bytes_list[1]), ("Cumulative Cash Flow", bytes_list[2]), ("LTV:CAC Ratio Trend", bytes_list[3])]:
                 elems.append(Paragraph(chart_title, subhead_s))
-                elems.append(RLImage(BytesIO(img_bytes), width=6.5*inch, height=3.5*inch))
+                elems.append(Image(BytesIO(img_bytes), width=6.5*inch, height=3.5*inch))
                 elems.append(Spacer(1, 10))
             
             elems.append(PageBreak())
@@ -1541,14 +1819,6 @@ with st.container():
     
     with pdf_cols[1]:
         with st.spinner("Generating Charts Report..."):
-            from reportlab.lib.pagesizes import A4
-            from reportlab.lib import colors
-            from reportlab.lib.units import inch
-            from reportlab.platypus import SimpleDocTemplate, Paragraph, Image as RLImage, Spacer, PageBreak, Table, TableStyle, HRFlowable
-            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-            from reportlab.lib.enums import TA_CENTER
-            from datetime import datetime
-            
             buf = BytesIO()
             doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.5*inch, leftMargin=0.5*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
             styles = getSampleStyleSheet()
@@ -1618,7 +1888,7 @@ with st.container():
             
             for title, img_bytes, caption in chart_info:
                 elems.append(Paragraph(title, head_s))
-                elems.append(RLImage(BytesIO(img_bytes), width=6.5*inch, height=3.5*inch))
+                elems.append(Image(BytesIO(img_bytes), width=6.5*inch, height=3.5*inch))
                 elems.append(Paragraph(caption, caption_s))
                 elems.append(Spacer(1, 10))
             
@@ -1634,14 +1904,6 @@ with st.container():
     
     with pdf_cols[2]:
         with st.spinner("Generating Tables Report..."):
-            from reportlab.lib.pagesizes import A4
-            from reportlab.lib import colors
-            from reportlab.lib.units import inch
-            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, PageBreak
-            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-            from reportlab.lib.enums import TA_CENTER
-            from datetime import datetime
-            
             buf = BytesIO()
             doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.4*inch, leftMargin=0.4*inch, topMargin=0.4*inch, bottomMargin=0.4*inch)
             styles = getSampleStyleSheet()
