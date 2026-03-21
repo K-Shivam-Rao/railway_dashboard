@@ -2766,9 +2766,8 @@ elif active_tab == 'forecast':
         yaxis=dict(
             gridcolor='rgba(30, 41, 59, 0.6)',
             range=[0, 100],
-            title='Risk %',
+            title=dict(text='Risk %', font=dict(size=12, color="#94a3b8")),
             tickfont=dict(size=10, color="#94a3b8"),
-            titlefont=dict(size=12, color="#94a3b8")
         ),
         xaxis=dict(
             gridcolor='rgba(30, 41, 59, 0.6)',
@@ -2811,13 +2810,11 @@ elif active_tab == 'forecast':
             xaxis=dict(
                 side='bottom',
                 tickfont=dict(size=10, color="#94a3b8"),
-                title='Hour of Day',
-                titlefont=dict(size=12, color="#94a3b8")
+                title=dict(text='Hour of Day', font=dict(size=12, color="#94a3b8")),
             ),
             yaxis=dict(
                 tickfont=dict(size=10, color="#94a3b8"),
-                title='Day of Week',
-                titlefont=dict(size=12, color="#94a3b8")
+                title=dict(text='Day of Week', font=dict(size=12, color="#94a3b8")),
             ),
             coloraxis_colorbar=dict(
                 title=dict(
