@@ -1,37 +1,102 @@
-station,platform,gate_id,train,status,door_state,sensor_temp,sensor_vib,people,eta
-Berlin Hauptbahnhof,A,G01,ICE 574,approaching,closing,24.5,0.2,47,2
-Berlin Hauptbahnhof,A,G02,S7,arrived,open,26.1,0.8,28,0
-Berlin Hauptbahnhof,A,G03,RE 3312,departed,closed,23.8,0.1,12,0
-Berlin Hauptbahnhof,A,G04,,clear,closed,23.5,0.0,0,0
-Berlin Hauptbahnhof,B,G01,ICE 891,approaching,closing,25.0,0.3,3,8
-Berlin Hauptbahnhof,B,G02,,clear,closed,23.9,0.0,0,0
-Berlin Hauptbahnhof,B,G03,S5,departed,closed,24.1,0.1,5,0
-Munchen Hauptbahnhof,A,G01,ICE 102,approaching,closing,24.2,0.2,33,3
-Munchen Hauptbahnhof,A,G02,RE 5,arrived,open,27.5,1.2,15,0
-Munchen Hauptbahnhof,A,G03,S3,arrived,jammed,48.2,5.5,40,0
-Munchen Hauptbahnhof,B,G01,ICE 202,approaching,closing,24.0,0.2,5,10
-Munchen Hauptbahnhof,B,G02,,clear,closed,23.6,0.0,0,0
-Munchen Hauptbahnhof,B,G03,RE 12,departed,closed,24.3,0.1,8,0
-Hamburg Hauptbahnhof,A,G01,ICE 700,departed,closed,23.9,0.1,55,0
-Hamburg Hauptbahnhof,A,G02,RE 220,approaching,closing,25.5,0.4,40,5
-Hamburg Hauptbahnhof,A,G03,,clear,closed,23.4,0.0,0,0
-Hamburg Hauptbahnhof,B,G01,S1,arrived,open,26.0,0.9,20,0
-Hamburg Hauptbahnhof,B,G02,,clear,closed,23.4,0.0,0,0
-Frankfurt (Main) Hbf,A,G01,ICE 11,approaching,closing,24.8,0.3,60,4
-Frankfurt (Main) Hbf,A,G02,RE 40,arrived,open,26.8,1.1,15,0
-Frankfurt (Main) Hbf,B,G01,ICE 88,departed,closed,24.0,0.1,22,0
-Frankfurt (Main) Hbf,B,G02,S8,approaching,closing,25.2,0.3,30,6
-Frankfurt (Main) Hbf,B,G03,RE 10,approaching,closing,24.5,0.2,8,12
-Koln Hauptbahnhof,A,G01,ICE 921,approaching,closing,24.1,0.2,45,3
-Koln Hauptbahnhof,A,G02,S12,departed,closed,23.7,0.1,10,0
-Koln Hauptbahnhof,B,G01,ICE 15,approaching,closing,25.1,0.3,25,9
-Koln Hauptbahnhof,B,G02,RE 90,approaching,closing,24.9,0.3,18,7
-Stuttgart Hauptbahnhof,A,G01,ICE 55,approaching,closing,24.3,0.2,38,5
-Stuttgart Hauptbahnhof,A,G02,S6,arrived,open,26.5,0.7,22,0
-Stuttgart Hauptbahnhof,A,G03,,clear,closed,23.5,0.0,0,0
-Stuttgart Hauptbahnhof,B,G01,RE 44,departed,closed,23.8,0.1,9,0
-Stuttgart Hauptbahnhof,B,G02,ICE 310,approaching,jammed,47.8,4.9,30,6
-Leipzig Hauptbahnhof,A,G01,ICE 19,approaching,closing,24.6,0.2,50,3
-Leipzig Hauptbahnhof,A,G02,S11,arrived,open,26.2,0.6,35,0
-Leipzig Hauptbahnhof,B,G01,ICE 77,departed,closed,24.0,0.1,14,0
-Leipzig Hauptbahnhof,B,G02,,clear,closed,23.7,0.0,0,0
+station,platform,gate_id,train,train_type,operator,destination,status,door_state,sensor_temp,sensor_vib,people,capacity,occupancy_rate,eta,delay,platform_length,door_position,sync_score,maintenance_status,risk_score,signal_status,track_number,last_maintenance,power_consumption,humidity,door_motor_current,connection_line
+Berlin Hauptbahnhof,A,G01,ICE 574,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.5,0.2,47,800,5.9,2,0,420,middle,97,OPTIMAL,12,green,4,2024-03-15,45.2,58,1.8,U5
+Berlin Hauptbahnhof,A,G02,S7,S-Bahn,S-Bahn Berlin,Potsdam Hbf,arrived,open,26.1,0.8,28,320,8.8,0,2,380,left,91,MONITOR,28,green,1,2024-03-20,28.5,62,2.1,U5
+Berlin Hauptbahnhof,A,G03,RE 3312,Regional,DB Regio,Brandenburg(tip),departed,closed,23.8,0.1,12,200,6.0,0,0,360,right,100,OPTIMAL,5,green,3,2024-03-18,18.3,55,1.2,S3
+Berlin Hauptbahnhof,A,G04,,Intercity,DB Fernverkehr,Hamburg Hbf,clear,closed,23.5,0.0,0,400,0.0,0,0,420,middle,100,OPTIMAL,2,green,5,2024-03-19,12.7,50,0.9,U6
+Berlin Hauptbahnhof,B,G01,ICE 891,Higher Speed,DB Fernverkehr,Frankfurt(Main)Hbf,approaching,closing,25.0,0.3,3,800,0.4,8,2,420,left,94,OPTIMAL,15,green,4,2024-03-14,38.9,60,1.6,U5
+Berlin Hauptbahnhof,B,G02,,S-Bahn,S-Bahn Berlin,Spandau,clear,closed,23.9,0.0,0,320,0.0,0,0,380,right,100,OPTIMAL,0,green,2,2024-03-22,8.4,52,0.8,U7
+Berlin Hauptbahnhof,B,G03,S5,S-Bahn,S-Bahn Berlin,Strausberg Nord,departed,closed,24.1,0.1,5,320,1.6,0,3,380,middle,99,OPTIMAL,6,green,1,2024-03-21,15.2,54,1.0,U5
+Berlin Hauptbahnhof,B,G04,ICE 1125,Higher Speed,DB Fernverkehr,Köln Hbf,approaching,closing,25.4,0.4,12,800,1.5,4,-1,420,middle,92,MONITOR,18,yellow,6,2024-03-17,41.5,63,2.3,U6
+Munchen Hauptbahnhof,A,G01,ICE 102,Higher Speed,DB Fernverkehr,Hamburg Hbf,approaching,closing,24.2,0.2,33,800,4.1,3,0,420,left,98,OPTIMAL,10,green,3,2024-03-16,35.6,57,1.5,U5
+Munchen Hauptbahnhof,A,G02,RE 5,Regional,DB Regio,Augsburg Hbf,arrived,open,27.5,1.2,15,200,7.5,0,5,360,right,85,WARNING,33,yellow,2,2024-03-10,22.4,68,2.8,U4
+Munchen Hauptbahnhof,A,G03,S3,S-Bahn,S-Bahn München,Erding,arrived,jammed,48.2,5.5,40,320,12.5,0,0,380,middle,42,CRITICAL,76,red,1,2024-03-08,67.8,75,4.2,U2
+Munchen Hauptbahnhof,B,G01,ICE 202,Higher Speed,DB Fernverkehr,Berlin Hbf,approaching,closing,24.0,0.2,5,800,0.6,10,-2,420,left,99,OPTIMAL,8,green,4,2024-03-13,30.1,56,1.4,U5
+Munchen Hauptbahnhof,B,G02,,S-Bahn,S-Bahn München,Garching,clear,closed,23.6,0.0,0,320,0.0,0,0,380,right,100,OPTIMAL,0,green,5,2024-03-22,9.8,51,0.7,U3
+Munchen Hauptbahnhof,B,G03,RE 12,Regional,DB Regio,Landshut(Bay),departed,closed,24.3,0.1,8,200,4.0,0,8,360,middle,97,OPTIMAL,7,green,2,2024-03-19,17.2,55,1.1,U4
+Hamburg Hauptbahnhof,A,G01,ICE 700,Higher Speed,DB Fernverkehr,Köln Hbf,departed,closed,23.9,0.1,55,800,6.9,0,0,420,left,99,OPTIMAL,4,green,8,2024-03-17,32.5,58,1.3,U5
+Hamburg Hauptbahnhof,A,G02,RE 220,Regional,DB Regio,Bremen Hbf,approaching,closing,25.5,0.4,40,200,20.0,5,3,360,right,89,MONITOR,30,green,3,2024-03-11,26.8,62,2.4,U4
+Hamburg Hauptbahnhof,A,G03,,ICE,DB Fernverkehr,Berlin Hbf,clear,closed,23.4,0.0,0,800,0.0,0,0,420,middle,100,OPTIMAL,1,green,9,2024-03-21,14.3,53,0.8,U6
+Hamburg Hauptbahnhof,B,G01,S1,S-Bahn,S-Bahn Hamburg,Poppenbüttel,arrived,open,26.0,0.9,20,320,6.3,0,4,380,left,83,WARNING,36,green,1,2024-03-09,21.9,64,2.6,U3
+Hamburg Hauptbahnhof,B,G02,,S-Bahn,S-Bahn Hamburg,Neugraben,clear,closed,23.4,0.0,0,320,0.0,0,0,380,right,100,OPTIMAL,0,green,4,2024-03-22,7.2,50,0.6,U4
+Hamburg Hauptbahnhof,B,G03,ICE 75,Higher Speed,DB Fernverkehr,München Hbf,departed,closed,23.7,0.1,30,800,3.8,0,12,420,middle,98,OPTIMAL,5,green,10,2024-03-18,28.4,57,1.2,U5
+Frankfurt (Main) Hbf,A,G01,ICE 11,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.8,0.3,60,800,7.5,4,0,420,left,95,OPTIMAL,13,green,12,2024-03-16,39.8,59,1.7,U5
+Frankfurt (Main) Hbf,A,G02,RE 40,Regional,DB Regio,Mainz Hbf,arrived,open,26.8,1.1,15,200,7.5,0,2,360,right,84,WARNING,32,yellow,3,2024-03-14,24.1,65,2.7,U4
+Frankfurt (Main) Hbf,B,G01,ICE 88,Higher Speed,DB Fernverkehr,Hamburg Hbf,departed,closed,24.0,0.1,22,800,2.8,0,0,420,middle,100,OPTIMAL,3,green,11,2024-03-20,26.3,56,1.0,U5
+Frankfurt (Main) Hbf,B,G02,S8,S-Bahn,S-Bahn Frankfurt,Wiesbaden,approaching,closing,25.2,0.3,30,320,9.4,6,5,380,left,92,MONITOR,19,yellow,2,2024-03-17,19.8,61,1.9,U3
+Frankfurt (Main) Hbf,B,G03,RE 10,Regional,DB Regio,Koblenz Hbf,approaching,closing,24.5,0.2,8,200,4.0,12,-3,360,right,96,OPTIMAL,9,green,4,2024-03-19,15.6,58,1.3,U4
+Koln Hauptbahnhof,A,G01,ICE 921,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.1,0.2,45,800,5.6,3,0,420,left,97,OPTIMAL,11,green,13,2024-03-15,36.2,57,1.6,U5
+Koln Hauptbahnhof,A,G02,S12,S-Bahn,S-Bahn Köln,Bonn Hbf,departed,closed,23.7,0.1,10,320,3.1,0,0,380,right,100,OPTIMAL,4,green,1,2024-03-21,13.5,54,1.1,U1
+Koln Hauptbahnhof,B,G01,ICE 15,Higher Speed,DB Fernverkehr,Berlin Hbf,approaching,closing,25.1,0.3,25,800,3.1,9,5,420,middle,93,MONITOR,16,green,14,2024-03-12,33.4,60,1.8,U5
+Koln Hauptbahnhof,B,G02,RE 90,Regional,DB Regio,Aachen Hbf,approaching,closing,24.9,0.3,18,200,9.0,7,-1,360,right,94,OPTIMAL,14,green,2,2024-03-18,20.1,59,1.5,U4
+Koln Hauptbahnhof,B,G03,,ICE,DB Fernverkehr,Frankfurt(Main)Hbf,clear,closed,23.6,0.0,0,800,0.0,0,0,420,middle,100,OPTIMAL,1,green,15,2024-03-22,11.3,52,0.8,U6
+Stuttgart Hauptbahnhof,A,G01,ICE 55,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.3,0.2,38,800,4.8,5,0,420,left,97,OPTIMAL,9,green,7,2024-03-14,34.5,57,1.5,U5
+Stuttgart Hauptbahnhof,A,G02,S6,S-Bahn,S-Bahn Stuttgart,Weil der Stadt,arrived,open,26.5,0.7,22,320,6.9,0,8,380,middle,80,WARNING,39,yellow,3,2024-03-07,23.7,66,2.5,U2
+Stuttgart Hauptbahnhof,A,G03,,ICE,DB Fernverkehr,Hamburg Hbf,clear,closed,23.5,0.0,0,800,0.0,0,0,420,right,100,OPTIMAL,0,green,8,2024-03-22,10.2,51,0.7,U6
+Stuttgart Hauptbahnhof,B,G01,RE 44,Regional,DB Regio,Heilbronn Hbf,departed,closed,23.8,0.1,9,200,4.5,0,3,360,middle,97,OPTIMAL,6,green,1,2024-03-18,16.8,55,1.1,U4
+Stuttgart Hauptbahnhof,B,G02,ICE 310,Higher Speed,DB Fernverkehr,Berlin Hbf,approaching,jammed,47.8,4.9,30,800,3.8,6,12,420,middle,38,CRITICAL,71,red,6,2024-02-28,72.3,78,3.9,U5
+Stuttgart Hauptbahnhof,B,G03,S60,S-Bahn,S-Bahn Stuttgart,Böblingen,departed,closed,24.2,0.1,6,320,1.9,0,4,380,right,99,OPTIMAL,5,green,4,2024-03-19,14.6,55,1.0,U3
+Leipzig Hauptbahnhof,A,G01,ICE 19,Higher Speed,DB Fernverkehr,Frankfurt(Main)Hbf,approaching,closing,24.6,0.2,50,800,6.3,3,0,420,left,96,OPTIMAL,12,green,9,2024-03-16,37.9,57,1.6,U5
+Leipzig Hauptbahnhof,A,G02,S11,S-Bahn,S-Bahn Leipzig,Halle(Saale),arrived,open,26.2,0.6,35,320,10.9,0,1,380,right,86,MONITOR,24,green,2,2024-03-11,20.5,63,2.3,U1
+Leipzig Hauptbahnhof,B,G01,ICE 77,Higher Speed,DB Fernverkehr,München Hbf,departed,closed,24.0,0.1,14,800,1.8,0,0,420,middle,98,OPTIMAL,4,green,10,2024-03-18,29.1,56,1.2,U5
+Leipzig Hauptbahnhof,B,G02,,S-Bahn,S-Bahn Leipzig,Markkleeberg,clear,closed,23.7,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,1,green,3,2024-03-22,8.9,52,0.6,U2
+Leipzig Hauptbahnhof,B,G03,RE 1,Regional,DB Regio,Dresden Hbf,approaching,closing,24.8,0.3,22,200,11.0,2,-2,360,left,92,MONITOR,20,green,1,2024-03-17,18.4,58,1.4,U4
+Dortmund Hbf,A,G01,ICE 401,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.4,0.2,38,800,4.8,6,0,420,left,97,OPTIMAL,10,green,5,2024-03-15,35.2,57,1.5,U5
+Dortmund Hbf,A,G02,S1,S-Bahn,S-Bahn Dortmund,Dortmund Airport,arrived,open,26.3,0.8,25,320,7.8,0,2,380,middle,84,MONITOR,31,yellow,2,2024-03-09,21.6,64,2.4,U3
+Dortmund Hbf,A,G03,RE 3,Regional,DB Regio,Münster(Westf),departed,closed,23.9,0.1,15,200,7.5,0,0,360,right,98,OPTIMAL,5,green,3,2024-03-19,16.8,55,1.1,U4
+Dortmund Hbf,B,G01,ICE 511,Higher Speed,DB Fernverkehr,Frankfurt(Main)Hbf,approaching,closing,25.0,0.3,28,800,3.5,4,-1,420,middle,93,MONITOR,14,green,6,2024-03-14,31.7,59,1.7,U5
+Dortmund Hbf,B,G02,,S-Bahn,S-Bahn Dortmund,Dortmund-Dorstfeld,clear,closed,23.5,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,4,2024-03-22,9.4,51,0.7,U2
+Dortmund Hbf,B,G03,RE 6,Regional,DB Regio,Bielefeld Hbf,approaching,closing,24.6,0.2,18,200,9.0,3,2,360,left,95,OPTIMAL,12,green,1,2024-03-17,19.3,58,1.4,U4
+Düsseldorf Hbf,A,G01,ICE 10,Higher Speed,DB Fernverkehr,Berlin Hbf,approaching,closing,24.3,0.2,42,800,5.3,5,0,420,left,96,OPTIMAL,11,green,11,2024-03-16,34.1,57,1.5,U5
+Düsseldorf Hbf,A,G02,S28,S-Bahn,S-Bahn Düsseldorf,Mettmann Stadtwald,arrived,open,26.7,0.9,18,320,5.6,0,3,380,middle,82,WARNING,34,yellow,2,2024-03-06,22.9,65,2.5,U3
+Düsseldorf Hbf,A,G03,RE 1,Regional,DB Regio,Bochum Hbf,departed,closed,23.8,0.1,12,200,6.0,0,0,360,right,99,OPTIMAL,4,green,4,2024-03-18,15.4,55,1.0,U4
+Düsseldorf Hbf,B,G01,ICE 505,Higher Speed,DB Fernverkehr,Hamburg Hbf,approaching,closing,25.2,0.3,33,800,4.1,7,-2,420,middle,92,MONITOR,17,green,12,2024-03-13,29.8,60,1.8,U5
+Düsseldorf Hbf,B,G02,,S-Bahn,S-Bahn Düsseldorf,Düsseldorf Flughafen,clear,closed,23.6,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,3,2024-03-22,8.1,50,0.6,U1
+Düsseldorf Hbf,B,G03,RE 2,Regional,DB Regio,Essen Hbf,approaching,closing,24.9,0.3,20,200,10.0,2,-1,360,left,94,OPTIMAL,13,green,1,2024-03-16,17.6,58,1.3,U4
+Hannover Hbf,A,G01,ICE 270,Higher Speed,DB Fernverkehr,Berlin Hbf,approaching,closing,24.5,0.2,48,800,6.0,4,0,420,left,97,OPTIMAL,9,green,8,2024-03-15,33.8,57,1.5,U5
+Hannover Hbf,A,G02,S2,S-Bahn,S-Bahn Hannover,Wunstorf,arrived,open,26.1,0.7,22,320,6.9,0,1,380,middle,85,WARNING,27,green,2,2024-03-10,20.3,63,2.2,U3
+Hannover Hbf,A,G03,RE 2,Regional,DB Regio,Braunschweig Hbf,departed,closed,23.7,0.1,10,200,5.0,0,0,360,right,98,OPTIMAL,5,green,5,2024-03-18,14.9,55,1.1,U4
+Hannover Hbf,B,G01,ICE 372,Higher Speed,DB Fernverkehr,Frankfurt(Main)Hbf,approaching,closing,24.9,0.3,36,800,4.5,8,-3,420,middle,91,MONITOR,21,green,9,2024-03-14,26.5,59,1.7,U5
+Hannover Hbf,B,G02,,S-Bahn,S-Bahn Hannover,Sarstedt,clear,closed,23.4,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,6,2024-03-22,7.6,50,0.6,U2
+Hannover Hbf,B,G03,RE 7,Regional,DB Regio,Göttingen,approaching,closing,24.7,0.2,16,200,8.0,1,1,360,left,96,OPTIMAL,11,green,1,2024-03-16,16.2,58,1.2,U4
+Bremen Hbf,A,G01,ICE 102,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.1,0.2,32,800,4.0,7,0,420,left,98,OPTIMAL,8,green,6,2024-03-16,31.4,57,1.4,U5
+Bremen Hbf,A,G02,RE 1,Regional,DB Regio,Hannover Hbf,arrived,open,26.4,1.0,14,200,7.0,0,4,380,middle,86,WARNING,29,yellow,3,2024-03-08,23.7,64,2.6,U3
+Bremen Hbf,A,G03,S1,S-Bahn,S-Bahn Bremen,Farge,departed,closed,23.6,0.1,8,320,2.5,0,0,380,right,97,OPTIMAL,6,green,2,2024-03-19,12.8,55,1.0,U1
+Bremen Hbf,B,G01,ICE 226,Higher Speed,DB Fernverkehr,Frankfurt(Main)Hbf,approaching,closing,25.3,0.3,41,800,5.1,5,-2,420,middle,91,MONITOR,19,green,7,2024-03-13,28.9,59,1.7,U5
+Bremen Hbf,B,G02,S2,S-Bahn,S-Bahn Bremen,Osterholz,clear,closed,23.5,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,4,2024-03-22,8.9,51,0.7,U2
+Bremen Hbf,B,G03,RE 4,Regional,DB Regio,Oldenburg(Oldb),departed,closed,24.0,0.1,11,200,5.5,0,6,360,left,98,OPTIMAL,4,green,1,2024-03-17,15.3,56,1.1,U3
+Kiel Hbf,A,G01,ICE 20,Higher Speed,DB Fernverkehr,Köln Hbf,approaching,closing,24.7,0.2,25,800,3.1,9,0,420,left,96,OPTIMAL,10,green,4,2024-03-15,29.6,57,1.5,U5
+Kiel Hbf,A,G02,RE 7,Regional,DB Regio,Neumünster,arrived,open,26.8,0.9,12,200,6.0,0,3,380,middle,88,MONITOR,26,yellow,2,2024-03-12,19.4,63,2.4,U4
+Kiel Hbf,A,G03,,ICE,DB Fernverkehr,Hamburg Hbf,clear,closed,23.3,0.0,0,800,0.0,0,0,420,right,100,OPTIMAL,1,green,5,2024-03-22,7.1,50,0.6,U6
+Kiel Hbf,B,G01,IC 35,Intercity,DB Fernverkehr,Berlin Hbf,approaching,closing,25.4,0.4,30,400,7.5,4,-1,400,middle,89,MONITOR,22,yellow,1,2024-03-17,24.8,61,2.0,U4
+Kiel Hbf,B,G02,,S-Bahn,S-Bahn Kiel,Schönberg,clear,closed,23.6,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,3,2024-03-22,6.8,50,0.5,U1
+Kiel Hbf,B,G03,RE 72,Regional,DB Regio,Eckernförde,departed,closed,24.1,0.1,7,200,3.5,0,5,360,right,96,OPTIMAL,7,green,1,2024-03-16,13.9,55,1.0,U2
+Mainz Hbf,A,G01,ICE 45,Higher Speed,DB Fernverkehr,Köln Hbf,approaching,closing,24.2,0.2,28,800,3.5,3,0,420,left,97,OPTIMAL,9,green,2,2024-03-14,32.1,57,1.5,U5
+Mainz Hbf,A,G02,S6,S-Bahn,S-Bahn Mainz,Wiesbaden,arrived,open,26.5,0.8,16,320,5.0,0,2,380,middle,87,MONITOR,28,yellow,3,2024-03-05,18.9,62,2.3,U3
+Mainz Hbf,A,G03,RE 3,Regional,DB Regio,Mannheim Hbf,departed,closed,23.7,0.1,9,200,4.5,0,0,360,right,98,OPTIMAL,5,green,4,2024-03-19,14.2,55,1.0,U4
+Mainz Hbf,B,G01,ICE 156,Higher Speed,DB Fernverkehr,Berlin Hbf,approaching,closing,25.5,0.3,35,800,4.4,6,-2,420,middle,90,MONITOR,17,green,1,2024-03-12,27.6,59,1.7,U5
+Mainz Hbf,B,G02,,S-Bahn,S-Bahn Mainz,Rüsselsheim,clear,closed,23.5,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,5,2024-03-22,8.3,51,0.7,U2
+Mainz Hbf,B,G03,RE 14,Regional,DB Regio,Heidelberg Hbf,departed,closed,24.2,0.1,13,200,6.5,0,4,360,left,99,OPTIMAL,3,green,1,2024-03-16,15.8,56,1.1,U3
+Nürnberg Hbf,A,G01,ICE 29,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.8,0.2,42,800,5.3,4,0,420,left,96,OPTIMAL,11,green,10,2024-03-15,36.5,57,1.5,U5
+Nürnberg Hbf,A,G02,S2,S-Bahn,S-Bahn Nürnberg,Roth,arrived,open,26.9,0.8,19,320,5.9,0,1,380,middle,86,WARNING,30,yellow,3,2024-03-07,21.3,64,2.4,U3
+Nürnberg Hbf,A,G03,RE 30,Regional,DB Regio,Würzburg Hbf,departed,closed,23.9,0.1,11,200,5.5,0,0,360,right,98,OPTIMAL,5,green,4,2024-03-18,16.5,55,1.1,U4
+Nürnberg Hbf,B,G01,ICE 401,Higher Speed,DB Fernverkehr,Hamburg Hbf,approaching,closing,25.1,0.3,37,800,4.6,8,-1,420,middle,91,MONITOR,16,green,11,2024-03-11,30.2,59,1.7,U5
+Nürnberg Hbf,B,G02,,S-Bahn,S-Bahn Nürnberg,Dutzendteich,clear,closed,23.4,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,6,2024-03-22,8.5,50,0.7,U1
+Nürnberg Hbf,B,G03,RE 22,Regional,DB Regio,Bamberg,departed,closed,24.3,0.1,14,200,7.0,0,5,360,left,97,OPTIMAL,6,green,1,2024-03-17,13.7,56,1.0,U2
+Freiburg Hbf,A,G01,ICE 60,Higher Speed,DB Fernverkehr,Frankfurt(Main)Hbf,approaching,closing,24.4,0.2,31,800,3.9,5,0,420,left,97,OPTIMAL,8,green,1,2024-03-14,28.9,57,1.5,U5
+Freiburg Hbf,A,G02,RE 2,Regional,DB Regio,Offenburg,arrived,open,26.6,0.9,13,200,6.5,0,3,380,middle,89,MONITOR,25,yellow,2,2024-03-09,17.6,62,2.4,U4
+Freiburg Hbf,A,G03,S1,S-Bahn,S-Bahn Freiburg,Schwarzwald-Stadion,departed,closed,23.8,0.1,7,320,2.2,0,0,380,right,98,OPTIMAL,5,green,3,2024-03-18,11.4,55,1.0,U3
+Freiburg Hbf,B,G01,ICE 78,Higher Speed,DB Fernverkehr,Berlin Hbf,approaching,closing,25.6,0.3,40,800,5.0,7,-2,420,middle,89,MONITOR,22,yellow,4,2024-03-12,26.3,60,1.8,U5
+Freiburg Hbf,B,G02,,S-Bahn,S-Bahn Freiburg,Freiburg Messe,clear,closed,23.5,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,5,2024-03-22,7.9,50,0.6,U1
+Freiburg Hbf,B,G03,RE 7,Regional,DB Regio,Basel SBB,departed,closed,24.4,0.1,10,200,5.0,0,2,360,left,96,OPTIMAL,8,green,1,2024-03-15,14.7,56,1.1,U2
+Mannheim Hbf,A,G01,ICE 50,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.3,0.2,36,800,4.5,6,0,420,left,96,OPTIMAL,10,green,5,2024-03-16,32.8,57,1.5,U5
+Mannheim Hbf,A,G02,RE 1,Regional,DB Regio,Karlsruhe Hbf,arrived,open,26.7,1.0,17,200,8.5,0,2,380,middle,85,WARNING,31,yellow,3,2024-03-04,20.2,64,2.6,U4
+Mannheim Hbf,A,G03,S3,S-Bahn,S-Bahn Mannheim,Ludwigshafen(Rhein),departed,closed,23.9,0.1,6,320,1.9,0,0,380,right,98,OPTIMAL,6,green,1,2024-03-20,12.3,55,1.0,U2
+Mannheim Hbf,B,G01,ICE 106,Higher Speed,DB Fernverkehr,Hamburg Hbf,approaching,closing,25.4,0.3,44,800,5.5,4,-1,420,middle,91,MONITOR,15,green,6,2024-03-13,27.9,60,1.8,U5
+Mannheim Hbf,B,G02,RE 4,Regional,DB Regio,Heidelberg Hbf,departed,closed,24.0,0.1,10,200,5.0,0,3,360,middle,98,OPTIMAL,4,green,2,2024-03-17,16.1,56,1.1,U3
+Mannheim Hbf,B,G03,,ICE,DB Fernverkehr,Frankfurt(Main)Hbf,clear,closed,23.7,0.0,0,800,0.0,0,0,420,middle,100,OPTIMAL,1,green,7,2024-03-22,9.6,51,0.7,U6
+Dresden Hbf,A,G01,ICE 17,Higher Speed,DB Fernverkehr,München Hbf,approaching,closing,24.6,0.2,34,800,4.3,5,0,420,left,97,OPTIMAL,9,green,8,2024-03-16,31.2,57,1.5,U5
+Dresden Hbf,A,G02,S1,S-Bahn,S-Bahn Dresden,Schöna,arrived,open,26.4,0.8,15,320,4.7,0,1,380,middle,88,MONITOR,26,yellow,2,2024-03-08,19.8,63,2.3,U4
+Dresden Hbf,A,G03,RE 2,Regional,DB Regio,Zittau,departed,closed,23.8,0.1,8,200,4.0,0,0,360,right,98,OPTIMAL,5,green,3,2024-03-19,13.5,55,1.0,U3
+Dresden Hbf,B,G01,ICE 372,Higher Speed,DB Fernverkehr,Frankfurt(Main)Hbf,approaching,closing,25.2,0.3,39,800,4.9,7,-2,420,middle,90,MONITOR,18,green,9,2024-03-12,25.4,60,1.7,U5
+Dresden Hbf,B,G02,,S-Bahn,S-Bahn Dresden,Heidenau,clear,closed,23.5,0.0,0,320,0.0,0,0,380,middle,100,OPTIMAL,0,green,4,2024-03-22,7.3,50,0.6,U1
+Dresden Hbf,B,G03,RE 15,Regional,DB Regio,Pirna,departed,closed,24.1,0.1,12,200,6.0,0,4,360,left,97,OPTIMAL,6,green,1,2024-03-16,14.9,56,1.1,U2

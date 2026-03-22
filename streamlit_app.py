@@ -65,64 +65,325 @@ if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 'ops'
 
 # ═══════════════════════════════════════════════════
-# CSS — PREMIUM DARK RAIL DASHBOARD
+# CSS — MODERN CLEAN DASHBOARD
 # ═══════════════════════════════════════════════════
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-    /* ── Root Variables ── */
+    /* ═══════════════════════════════════════════════════ */
+    /* ROOT VARIABLES - Modern Clean Palette */
+    /* ═══════════════════════════════════════════════════ */
     :root {
-        --bg-primary: #0a0e17;
-        --bg-secondary: #0f1419;
-        --bg-glass: rgba(17, 24, 39, 0.7);
-        --bg-glass-hover: rgba(30, 41, 59, 0.8);
-        --bg-card: rgba(17, 24, 39, 0.6);
-        --bg-card-hover: rgba(30, 41, 59, 0.7);
-        --border-color: rgba(30, 41, 59, 0.6);
-        --border-glow: rgba(59, 130, 246, 0.3);
-        --text-primary: #f8fafc;
+        /* Colors - Cool sophisticated palette */
+        --bg-primary: #0b0f1a;
+        --bg-secondary: #111827;
+        --bg-tertiary: #1a2332;
+        --bg-card: rgba(26, 35, 50, 0.6);
+        --bg-card-hover: rgba(35, 48, 68, 0.7);
+        --bg-elevated: rgba(30, 41, 59, 0.8);
+
+        --border-subtle: rgba(148, 163, 184, 0.1);
+        --border-default: rgba(148, 163, 184, 0.2);
+        --border-active: rgba(59, 130, 246, 0.5);
+
+        --text-primary: #f1f5f9;
         --text-secondary: #cbd5e1;
+        --text-tertiary: #94a3b8;
         --text-muted: #64748b;
-        --accent-blue: #3b82f6;
-        --accent-cyan: #06b6d4;
-        --accent-teal: #14b8a6;
-        --accent-purple: #8b5cf6;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #14b8a6 100%);
-        --gradient-glass: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.05) 50%, rgba(20, 184, 166, 0.1) 100%);
-        --gradient-hover: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
-        --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
-        --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-        --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-        --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.2);
-        --shadow-glow-strong: 0 0 40px rgba(59, 130, 246, 0.3);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+        --accent-primary: #3b82f6;
+        --accent-secondary: #60a5fa;
+        --accent-tertiary: #93c5fd;
+
+        --status-ok: #10b981;
+        --status-warning: #f59e0b;
+        --status-error: #ef4444;
+
+        /* Shadows - Clean and minimal */
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+
+        /* Transitions */
+        --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+        /* Spacing scale */
+        --space-xs: 4px;
+        --space-sm: 8px;
+        --space-md: 12px;
+        --space-lg: 16px;
+        --space-xl: 24px;
+        --space-2xl: 32px;
+
+        /* Border radius */
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+        --radius-xl: 18px;
     }
 
-    /* ── Base ── */
+    /* ═══════════════════════════════════════════════════ */
+    /* BASE STYLES */
+    /* ═══════════════════════════════════════════════════ */
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         background: var(--bg-primary) !important;
         color: var(--text-primary);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 14px;
         line-height: 1.6;
         letter-spacing: -0.01em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* SIDEBAR - Clean & Minimal */
+    /* ═══════════════════════════════════════════════════ */
     [data-testid="stSidebar"] {
-        background: var(--bg-glass) !important;
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        border-right: 1px solid var(--border-color);
-        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-        position: relative;
-        overflow: hidden;
+        background: var(--bg-elevated) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: 1px solid var(--border-subtle);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    /* Sidebar Brand */
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: var(--space-md) 0;
+        margin-bottom: var(--space-xl);
+    }
+
+    .brand-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+        border-radius: var(--radius-md);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .brand-icon svg {
+        width: 20px;
+        height: 20px;
+        color: white;
+    }
+
+    .brand-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .brand-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        margin: 0;
+    }
+
+    .brand-subtitle {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    /* Sidebar Status Card */
+    .sidebar-status {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        margin: 0 0 var(--space-xl) 0;
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        transition: var(--transition-base);
+    }
+
+    .sidebar-status:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--border-default);
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 0 8px currentColor;
+    }
+
+    .status-dot.ok { background: var(--status-ok); color: var(--status-ok); }
+    .status-dot.warning { background: var(--status-warning); color: var(--status-warning); }
+    .status-dot.error { background: var(--status-error); color: var(--status-error); }
+
+    .status-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+    }
+
+    .status-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-desc {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        font-weight: 500;
+    }
+
+    /* Section Labels */
+    .sidebar-section {
+        margin: var(--space-xl) 0 var(--space-md) 0;
+    }
+
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: var(--space-sm);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: 0 0 0 var(--space-sm);
+    }
+
+    .section-label::before {
+        content: '';
+        width: 3px;
+        height: 10px;
+        background: var(--accent-primary);
+        border-radius: 2px;
+        opacity: 0.7;
+    }
+
+    /* Navigation Buttons - Clean Style */
+    .nav-button {
+        width: 100% !important;
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        color: var(--text-secondary) !important;
+        padding: var(--space-md) var(--space-md) !important;
+        border-radius: var(--radius-md) !important;
+        margin-bottom: var(--space-xs) !important;
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--space-md) !important;
+        justify-content: flex-start !important;
+        transition: var(--transition-base) !important;
+        position: relative !important;
+        overflow: hidden !important;
+        text-align: left !important;
+    }
+
+    .nav-button:hover {
+        background: var(--bg-card) !important;
+        border-color: var(--border-subtle) !important;
+        color: var(--text-primary) !important;
+        transform: translateX(4px);
+    }
+
+    .nav-button.active {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.08)) !important;
+        border-color: rgba(59, 130, 246, 0.4) !important;
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+    }
+
+    .nav-button.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--accent-primary);
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+    }
+
+    .nav-icon {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .nav-text {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .nav-label-text {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .nav-sublabel {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        font-weight: 400;
+        letter-spacing: 0.02em;
+    }
+
+    /* Divider */
+    .divider {
+        height: 1px;
+        background: var(--border-subtle);
+        margin: var(--space-xl) 0;
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+        margin-top: auto;
+        padding: var(--space-md);
+        border-top: 1px solid var(--border-subtle);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        text-align: center;
+    }
+
+    .footer-brand {
+        font-weight: 600;
+        color: var(--text-tertiary);
+        margin-bottom: 2px;
+    }
+
+    .footer-version {
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        opacity: 0.7;
+        font-family: 'JetBrains Mono', monospace;
     }
     [data-testid="stSidebar"]::before {
         content: '';
@@ -148,84 +409,173 @@ st.markdown("""
 
     /* ── Sidebar Brand Header ── */
     .sidebar-brand {
-        background: var(--gradient-glass);
-        backdrop-filter: blur(24px) saturate(180%);
-        -webkit-backdrop-filter: blur(24px) saturate(180%);
-        padding: 28px 24px 24px;
-        margin: -24px -24px 24px -24px;
-        border-bottom: 1px solid var(--border-color);
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-    }
-    .sidebar-brand::before {
-        content: '';
-        position: absolute;
-        top: -60%; right: -40%;
-        width: 240px; height: 240px;
-        background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%);
-        animation: pulse-glow 6s ease-in-out infinite;
-        filter: blur(20px);
-    }
-    .sidebar-brand::after {
-        content: '';
-        position: absolute;
-        bottom: -40%; left: -30%;
-        width: 180px; height: 180px;
-        background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);
-        animation: pulse-glow 8s ease-in-out infinite reverse;
-        filter: blur(15px);
-    }
-    @keyframes pulse-glow {
-        0%, 100% { opacity: 0.4; transform: scale(1); }
-        50% { opacity: 0.8; transform: scale(1.15); }
+        padding: 14px 12px;
+        margin: -12px -12px 12px -12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
     .brand-title {
-        font-size: 1.625rem; font-weight: 700; letter-spacing: -0.5px;
-        color: #fff; display: flex; align-items: center; gap: 12px;
-        position: relative; z-index: 2;
-        text-shadow: 0 2px 8px rgba(59,130,246,0.4);
+        font-size: 1rem; font-weight: 600; letter-spacing: 0.02em;
+        color: var(--text-primary); display: flex; align-items: center; gap: 8px;
         font-family: 'Space Grotesk', sans-serif;
     }
     .brand-title svg {
-        filter: drop-shadow(0 0 8px rgba(59,130,246,0.6));
-        transition: var(--transition);
-    }
-    .brand-title:hover svg {
-        filter: drop-shadow(0 0 12px rgba(59,130,246,0.8));
-        transform: rotate(10deg);
+        width: 18px; height: 18px;
+        color: var(--accent-blue);
+        flex-shrink: 0;
     }
     .brand-tagline {
-        font-size: 0.6875rem; font-family: 'JetBrains Mono', monospace;
-        color: var(--text-secondary); margin-top: 10px; letter-spacing: 2px;
-        text-transform: uppercase; position: relative; z-index: 2;
+        font-size: 0.7rem; font-family: 'JetBrains Mono', monospace;
+        color: var(--text-muted); margin-top: 6px; letter-spacing: 1.5px;
+        text-transform: uppercase;
         opacity: 0.8;
+        font-weight: 500;
     }
-    .brand-badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: rgba(16, 185, 129, 0.2);
-        border: 1px solid rgba(16, 185, 129, 0.5);
+
+    /* ── System Status Indicator - Clean & Elegant ── */
+    .system-status-indicator {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 14px;
+        background: rgba(17, 24, 39, 0.5);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        margin: 0 0 20px 0;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .system-status-indicator:hover {
+        background: rgba(30, 41, 59, 0.5);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .status-icon-section {
+        position: relative;
+        flex-shrink: 0;
+    }
+    .status-icon-large {
+        width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .status-icon-large svg {
+        width: 16px; height: 16px;
+        color: var(--accent-blue);
+    }
+    .system-status-indicator.status-normal .status-icon-large {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    .system-status-indicator.status-normal .status-icon-large svg {
         color: var(--success);
-        font-size: 0.625rem; padding: 4px 10px; border-radius: 999px;
-        margin-top: 14px; font-family: 'JetBrains Mono'; letter-spacing: 0.5px;
-        position: relative; z-index: 2;
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+    .system-status-indicator.status-warning .status-icon-large {
+        background: rgba(245, 158, 11, 0.1);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+    .system-status-indicator.status-warning .status-icon-large svg {
+        color: var(--warning);
+    }
+    .system-status-indicator.status-alert .status-icon-large {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+    .system-status-indicator.status-alert .status-icon-large svg {
+        color: var(--danger);
+    }
+    .status-content {
+        flex: 1;
+    }
+    .status-label-main {
+        font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+        text-transform: uppercase; color: var(--text-primary);
+        font-family: 'JetBrains Mono', monospace;
+    }
+    .status-label-sub {
+        font-size: 0.625rem; color: var(--text-muted);
+        margin-top: 2px; letter-spacing: 0.02em;
+    }
+
+    /* ── Section Headers ── */
+    .section-header-modern {
+        display: flex; align-items: center; justify-content: space-between;
+        margin: 24px 0 12px 0;
+        padding: 0 4px;
+    }
+    .section-title {
+        font-size: 0.6875rem; font-weight: 700; letter-spacing: 2px;
+        text-transform: uppercase; color: var(--text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::before {
+        content: '';
+        width: 3px; height: 11px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+    }
+
+    /* ── Navigation Divider ── */
+    .nav-divider {
+        height: 1px;
+        background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(30, 41, 59, 0.6) 30%,
+            rgba(30, 41, 59, 0.6) 70%,
+            transparent 100%);
+        margin: 20px 0;
+        position: relative;
+    }
+    .nav-divider::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%; transform: translateX(-50%);
+        width: 30px; height: 1px;
+        background: var(--gradient-primary);
+        opacity: 0.5;
+    }
+
+    /* ── Sidebar Footer ── */
+    .sidebar-footer {
+        font-size: 0.625rem; color: var(--text-muted); text-align: center;
+        padding: 14px 12px; font-family: 'JetBrains Mono';
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 20px;
+        opacity: 0.6;
+        position: relative;
+        background: rgba(17, 24, 39, 0.4);
+        border-radius: 10px 10px 0 0;
+    }
+    .footer-version {
+        font-size: 0.5625rem;
+        margin-top: 4px;
+        opacity: 0.7;
+    }
+
+    /* ── Sidebar Buttons - Pill Style ── */
+    [data-testid="stSidebar"] .stButton > button {
+        width: 100%; border: 1px solid transparent;
+        background: rgba(30, 41, 59, 0.3);
+        color: var(--text-secondary);
+        text-align: left; padding: 11px 16px;
+        border-radius: 10px; margin-bottom: 6px;
+        font-weight: 500; font-size: 0.875rem;
+        transition: all 0.2s ease;
+        display: flex; align-items: center; gap: 12px;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    [data-testid="stSidebar"] .stButton > button::before {
+        content: '';
+        position: absolute; left: 0; top: 0;
+        width: 4px; height: 100%;
+        background: var(--gradient-primary);
+        transform: translateX(-100%);
         transition: var(--transition);
-    }
-    .brand-badge:hover {
-        background: rgba(16, 185, 129, 0.25);
-        border-color: rgba(16, 185, 129, 0.6);
-        box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
-    }
-    @keyframes status-pulse {
-        0%, 100% {
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-            border-color: rgba(16, 185, 129, 0.5);
-        }
-        50% {
-            box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-            border-color: rgba(16, 185, 129, 0.4);
-        }
+        border-radius: 0 4px 4px 0;
     }
 
     /* ── Sidebar Nav Labels ── */
@@ -839,114 +1189,101 @@ st.markdown("""
         opacity: 1;
     }
 
-    /* ── System Status Indicator (Sidebar) - Wide Lifeline Style ── */
+    /* ═══════════════════════════════════════════════════ */
+    /* STATUS INDICATOR - Clean & Modern */
+    /* ═══════════════════════════════════════════════════ */
     .system-status-indicator {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
+        display: flex;
         align-items: center;
-        gap: 16px;
-        padding: 14px 20px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        margin: 0 12px 20px 12px;
-        transition: var(--transition);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        gap: var(--space-md);
+        padding: var(--space-md) var(--space-lg);
+        border-radius: var(--radius-lg);
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        margin: 0 0 var(--space-xl) 0;
+        transition: var(--transition-base);
         position: relative;
         overflow: hidden;
-        min-height: 52px;
     }
 
-    /* Lifeline flowing background animation */
     .system-status-indicator::before {
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255,255,255,0.06) 25%,
-            rgba(255,255,255,0.1) 50%,
-            rgba(255,255,255,0.06) 75%,
-            transparent 100%
-        );
-        background-size: 200% 100%;
-        animation: lifeline-flow 3s ease-in-out infinite;
-        z-index: 0;
-        pointer-events: none;
-    }
-
-    @keyframes lifeline-flow {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-    }
-
-    /* Additional pulse wave effect */
-    .system-status-indicator::after {
-        content: '';
-        position: absolute;
-        top: 0; left: -50%;
-        width: 100%; height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,0.08),
-            transparent
-        );
-        animation: lifeline-wave 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        z-index: 0;
-    }
-
-    @keyframes lifeline-wave {
-        0%, 100% { left: -50%; }
-        50% { left: 100%; }
-    }
-
-    /* Icon container */
-    .system-status-indicator .status-icon-section {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .system-status-indicator .status-icon-large {
-        width: 28px;
-        height: 28px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .system-status-indicator .status-icon-large svg {
-        width: 24px;
-        height: 24px;
-        filter: drop-shadow(0 0 6px currentColor);
-        position: relative;
-        z-index: 3;
-    }
-
-    /* Expanding ring animation (larger) */
-    .status-ring-pulse {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        width: 28px; height: 28px;
-        border-radius: 50%;
-        border: 2px solid currentColor;
+        inset: 0;
+        background: var(--gradient-glass);
         opacity: 0;
-        animation: ring-expand 2s ease-out infinite;
+        transition: var(--transition-base);
+        border-radius: var(--radius-lg);
     }
 
-    @keyframes ring-expand {
-        0% {
-            transform: translate(-50%, -50%) scale(0.6);
-            opacity: 0.7;
-        }
+    .system-status-indicator:hover {
+        border-color: var(--border-default);
+        background: var(--bg-card-hover);
+    }
+
+    .system-status-indicator:hover::before {
+        opacity: 1;
+    }
+
+    .status-indicator-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        transition: var(--transition-base);
+        box-shadow: 0 0 10px currentColor;
+    }
+
+    .status-indicator-dot.ok {
+        background: var(--status-ok);
+        color: var(--status-ok);
+    }
+
+    .status-indicator-dot.warning {
+        background: var(--status-warning);
+        color: var(--status-warning);
+        animation: pulse-warning 2s ease-in-out infinite;
+    }
+
+    .status-indicator-dot.error {
+        background: var(--status-error);
+        color: var(--status-error);
+        animation: pulse-error 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-warning {
+        0%, 100% { box-shadow: 0 0 4px currentColor; }
+        50% { box-shadow: 0 0 12px currentColor, 0 0 20px currentColor; }
+    }
+
+    @keyframes pulse-error {
+        0%, 100% { box-shadow: 0 0 4px currentColor; transform: scale(1); }
+        50% { box-shadow: 0 0 14px currentColor, 0 0 24px currentColor; transform: scale(1.05); }
+    }
+
+    .status-indicator-text {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .status-indicator-label {
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-indicator-desc {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        font-weight: 500;
+        letter-spacing: 0.02em;
+    }
         80% {
             opacity: 0.1;
         }
@@ -1010,104 +1347,34 @@ st.markdown("""
         color: #34d399;
     }
 
-    .system-status-indicator.status-warning {
-        background: linear-gradient(
-            135deg,
-            rgba(245, 158, 11, 0.12) 0%,
-            rgba(245, 158, 11, 0.05) 100%
-        );
-        border-color: rgba(245, 158, 11, 0.4);
-        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
-    }
-
-    .system-status-indicator.status-warning .status-label-main {
-        color: #fbbf24;
-        text-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
-    }
-
-    .system-status-indicator.status-warning .status-ring-pulse {
-        color: #fbbf24;
-        animation-delay: 0.7s;
-    }
-
-    .status-warning .status-icon-large svg {
-        color: #fbbf24;
-    }
-
-    .system-status-indicator.status-alert {
-        background: linear-gradient(
-            135deg,
-            rgba(239, 68, 68, 0.14) 0%,
-            rgba(239, 68, 68, 0.06) 100%
-        );
-        border-color: rgba(239, 68, 68, 0.45);
-        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.12);
-    }
-
-    .system-status-indicator.status-alert .status-label-main {
-        color: #f87171;
-        text-shadow: 0 0 12px rgba(248, 113, 113, 0.5);
-    }
-
-    .system-status-indicator.status-alert .status-ring-pulse {
-        color: #f87171;
-        animation-delay: 0s;
-        animation-duration: 1.8s;
-    }
-
-    .status-alert .status-icon-large svg {
-        color: #f87171;
-    }
-
+    /* ═══════════════════════════════════════════════════ */
+    /* STATUS INDICATOR COLORS - Subtle variations */
+    /* ═══════════════════════════════════════════════════ */
     .system-status-indicator.status-normal {
-        background: linear-gradient(
-            135deg,
-            rgba(16, 185, 129, 0.12) 0%,
-            rgba(16, 185, 129, 0.05) 100%
-        );
-        border-color: rgba(16, 185, 129, 0.4);
-        box-shadow: 0 2px 12px rgba(16, 185, 129, 0.1);
+        background: rgba(16, 185, 129, 0.08);
+        border-color: rgba(16, 185, 129, 0.2);
     }
 
-    .system-status-indicator.status-normal .status-text {
-        color: #34d399;
-        text-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
-    }
-
-    .system-status-indicator.status-normal .status-dot-ring {
-        color: #34d399;
-        animation-delay: 0s;
+    .system-status-indicator.status-normal .status-indicator-dot {
+        box-shadow: 0 0 8px var(--status-ok);
     }
 
     .system-status-indicator.status-warning {
-        background: linear-gradient(
-            135deg,
-            rgba(245, 158, 11, 0.12) 0%,
-            rgba(245, 158, 11, 0.05) 100%
-        );
-        border-color: rgba(245, 158, 11, 0.4);
-        box-shadow: 0 2px 12px rgba(245, 158, 11, 0.1);
+        background: rgba(245, 158, 11, 0.08);
+        border-color: rgba(245, 158, 11, 0.2);
     }
 
-    .system-status-indicator.status-warning .status-text {
-        color: #fbbf24;
-        text-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
-    }
-
-    .system-status-indicator.status-warning .status-dot-ring {
-        color: #fbbf24;
-        animation-delay: 0.7s;
+    .system-status-indicator.status-warning .status-indicator-label {
+        color: var(--status-warning);
     }
 
     .system-status-indicator.status-alert {
-        background: linear-gradient(
-            135deg,
-            rgba(239, 68, 68, 0.14) 0%,
-            rgba(239, 68, 68, 0.06) 100%
-        );
-        border-color: rgba(239, 68, 68, 0.45);
-        box-shadow: 0 2px 12px rgba(239, 68, 68, 0.12);
-        animation: sidebar-alert-glow 1.8s ease-in-out infinite;
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .system-status-indicator.status-alert .status-indicator-label {
+        color: var(--status-error);
     }
 
     .system-status-indicator.status-alert .status-text {
@@ -1239,105 +1506,115 @@ st.markdown("""
     }
 
     /* ── Main Header ── */
+    /* ═══════════════════════════════════════════════════ */
+    /* MAIN HEADER - Clean & Modern */
+    /* ═══════════════════════════════════════════════════ */
     .main-header {
-        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-        padding: 28px 32px;
-        margin-bottom: 28px;
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl) var(--space-2xl);
+        margin-bottom: var(--space-xl);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-md);
         position: relative;
-        overflow: hidden;
-    }
-    .main-header::before {
-        content: '';
-        position: absolute; top: 0; left: 0; right: 0; height: 2px;
-        background: var(--gradient-primary);
-        animation: header-shine 3s ease-in-out infinite;
-    }
-    @keyframes header-shine {
-        0%, 100% { opacity: 0.6; }
-        50% { opacity: 1; }
-    }
-    .station-title {
-        font-size: 1.875rem; font-weight: 800; color: #fff; margin: 0;
-        letter-spacing: -0.75px; line-height: 1.2;
-        text-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
-    }
-    .station-sub {
-        font-family: 'JetBrains Mono', monospace; font-size: 0.812rem;
-        color: var(--text-secondary); margin-top: 8px; letter-spacing: 1.5px;
-        display: flex; align-items: center; gap: 8px;
-    }
-    .station-sub::before {
-        content: '◈'; color: var(--accent-blue); font-size: 0.5rem;
     }
 
-    /* ── Status Badge (Modern Premium) ── */
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--accent-primary), var(--accent-tertiary));
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        opacity: 0.8;
+    }
+
+    .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .station-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+
+    .station-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        letter-spacing: 0.1em;
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-top: var(--space-xs);
+    }
+
+    .station-sub::before {
+        content: '●';
+        color: var(--accent-primary);
+        font-size: 0.5rem;
+        opacity: 0.7;
+    }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* STATUS BADGE - Clean Modern */
+    /* ═══════════════════════════════════════════════════ */
     .status-badge {
         display: inline-flex;
         align-items: center;
-        gap: 12px;
-        padding: 12px 28px;
-        border-radius: 999px;
-        font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
-        font-size: 0.875rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-lg);
+        border-radius: var(--radius-xl);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        transition: var(--transition);
-        border: 1.5px solid;
-        position: relative;
-        overflow: hidden;
-        isolation: isolate;
+        transition: var(--transition-base);
+        border: 1px solid;
         backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
         cursor: default;
     }
 
-    .status-label {
-        position: relative;
-        z-index: 1;
+    .status-badge.normal {
+        background: rgba(16, 185, 129, 0.12);
+        border-color: rgba(16, 185, 129, 0.3);
+        color: var(--status-ok);
     }
 
-    /* Glass overlay with gradient shimmer */
-    .status-badge::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(
-            135deg,
-            rgba(255,255,255,0.08) 0%,
-            rgba(255,255,255,0.02) 40%,
-            rgba(255,255,255,0.08) 100%
-        );
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        z-index: -1;
-        transition: var(--transition);
+    .status-badge.warning {
+        background: rgba(245, 158, 11, 0.12);
+        border-color: rgba(245, 158, 11, 0.3);
+        color: var(--status-warning);
     }
 
-    .status-badge::after {
-        content: '';
-        position: absolute;
-        top: 0; left: -100%;
-        width: 100%; height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,0.15),
-            transparent
-        );
-        animation: status-shimmer 3s ease-in-out infinite;
+    .status-badge.alert {
+        background: rgba(239, 68, 68, 0.12);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: var(--status-error);
     }
 
-    @keyframes status-shimmer {
-        0%, 100% { left: -100%; }
-        50% { left: 100%; }
+    .status-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+    }
+
+    .status-icon svg {
+        width: 16px;
+        height: 16px;
+        stroke-width: 2.5;
     }
 
     /* Status Icon Container */
@@ -1500,102 +1777,276 @@ st.markdown("""
     }
 
     /* ── Metric Cards ── */
+    /* ═══════════════════════════════════════════════════ */
+    /* METRIC CARDS - Clean & Modern */
+    /* ═══════════════════════════════════════════════════ */
     .metric-card {
-        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+        background: var(--bg-card);
         backdrop-filter: blur(12px);
-        border: 1px solid var(--border-color);
-        border-radius: 14px;
-        padding: 24px;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl);
         position: relative;
-        overflow: hidden;
-        transition: var(--transition);
+        transition: var(--transition-base);
         box-shadow: var(--shadow-md);
         cursor: default;
-        isolation: isolate;
-    }
-    .metric-card::after {
-        content: '';
-        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.03), transparent 60%);
-        pointer-events: none;
-    }
-    .metric-card:hover {
-        border-color: var(--accent-blue);
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg), 0 8px 32px rgba(59, 130, 246, 0.15);
-    }
-    .metric-card::before {
-        content: ''; position: absolute;
-        top: 0; left: 0; right: 0; height: 3px;
-        background: var(--gradient-primary);
-        transition: var(--transition);
-    }
-    .metric-card.alert::before {
-        background: var(--gradient-danger);
-        box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
-    }
-    .metric-card.warn::before {
-        background: var(--gradient-warning);
-        box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
-    }
-    .metric-card.green::before {
-        background: var(--gradient-success);
-        box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
-    }
-    .metric-title {
-        font-size: 0.6875rem; font-weight: 700;
-        letter-spacing: 2px; line-height: 1;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 16px;
-        display: flex; align-items: center; gap: 8px;
-    }
-    .metric-value {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 2.125rem; font-weight: 700;
-        color: var(--text-primary); line-height: 1.1;
-        margin-bottom: 8px;
-        text-shadow: 0 0 24px rgba(255, 255, 255, 0.1);
-    }
-    .metric-sub {
-        font-size: 0.75rem; color: var(--text-muted);
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 0.5px;
-        display: flex; align-items: center; gap: 6px;
-        opacity: 0.8;
-    }
-
-    /* ── Section Headings ── */
-    .section-heading {
-        font-size: 1.25rem; font-weight: 700; color: var(--text-primary);
-        letter-spacing: -0.025em; margin-bottom: 24px;
-        display: flex; align-items: center; gap: 12px;
-        padding-bottom: 14px;
-        border-bottom: 1px solid var(--border-color);
-        position: relative;
-        text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-    }
-    .section-heading::before {
-        content: ''; position: absolute; bottom: -1px; left: 0;
-        width: 80px; height: 3px; background: var(--gradient-primary);
-        border-radius: 2px;
-    }
-
-    /* ── PSD Gate Visualization ── */
-    .psd-container {
-        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--border-color);
-        border-radius: 14px; padding: 28px; margin-bottom: 20px;
-        box-shadow: var(--shadow-lg);
-        position: relative;
         overflow: hidden;
     }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 2px;
+        background: var(--accent-primary);
+        opacity: 0.6;
+        transition: var(--transition-base);
+    }
+
+    .metric-card:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--border-default);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .metric-card:hover::before {
+        opacity: 1;
+    }
+
+    .metric-card.alert::before {
+        background: var(--status-error);
+    }
+
+    .metric-card.warn::before {
+        background: var(--status-warning);
+    }
+
+    .metric-card.green::before {
+        background: var(--status-ok);
+    }
+
+    .metric-title {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--text-tertiary);
+        margin-bottom: var(--space-md);
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+
+    .metric-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.1;
+        margin-bottom: var(--space-xs);
+        letter-spacing: -0.02em;
+    }
+
+    .metric-sub {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        opacity: 0.7;
+    }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* KPI STRIP - Professional Dashboard */
+    /* ═══════════════════════════════════════════════════ */
+    .kpi-strip {
+        display: flex;
+        gap: 12px;
+        padding: 16px 0;
+        margin-bottom: 8px;
+    }
+    .kpi-card {
+        flex: 1;
+        background: linear-gradient(145deg, rgba(30,41,59,0.8) 0%, rgba(15,23,42,0.9) 100%);
+        border: 1px solid rgba(59,130,246,0.2);
+        border-radius: 12px;
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(59,130,246,0.4);
+        box-shadow: 0 8px 24px rgba(59,130,246,0.15);
+    }
+    .kpi-card.green { border-left: 3px solid #10b981; }
+    .kpi-card.warn { border-left: 3px solid #f59e0b; }
+    .kpi-card.alert { border-left: 3px solid #ef4444; }
+    .kpi-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        background: rgba(59,130,246,0.15);
+        color: #3b82f6;
+    }
+    .kpi-card.green .kpi-icon { background: rgba(16,185,129,0.15); color: #10b981; }
+    .kpi-card.warn .kpi-icon { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .kpi-card.alert .kpi-icon { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .kpi-body { flex: 1; }
+    .kpi-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #64748b;
+        margin-bottom: 2px;
+    }
+    .kpi-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #f8fafc;
+        line-height: 1.2;
+    }
+    .kpi-sub {
+        font-size: 0.65rem;
+        color: #64748b;
+        margin-top: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* PANELS - Professional Container */
+    /* ═══════════════════════════════════════════════════ */
+    .panel {
+        background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(6,12,26,0.98) 100%);
+        border: 1px solid rgba(59,130,246,0.15);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        margin-bottom: 16px;
+    }
+    .panel-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        background: linear-gradient(90deg, rgba(59,130,246,0.12) 0%, rgba(6,182,212,0.08) 100%);
+        border-bottom: 1px solid rgba(59,130,246,0.15);
+    }
+    .panel-icon {
+        font-size: 1.3rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(59,130,246,0.2);
+        border-radius: 8px;
+    }
+    .panel-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #f8fafc;
+        flex: 1;
+        letter-spacing: -0.01em;
+    }
+    .panel-badge {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.1em;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    .panel-content {
+        padding: 16px 20px;
+    }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* SECTION HEADINGS - Clean & Elegant */
+    /* ═══════════════════════════════════════════════════ */
+    .section-heading {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-lg);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding-bottom: var(--space-md);
+        border-bottom: 1px solid var(--border-subtle);
+        position: relative;
+    }
+
+    .section-heading::before {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: var(--accent-primary);
+        border-radius: 1px;
+    }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* CARDS & CONTAINERS - Unified Style */
+    /* ═══════════════════════════════════════════════════ */
+    .card, .psd-container {
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition-base);
+    }
+
+    .card:hover, .psd-container:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--border-default);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .psd-container {
+        padding: var(--space-2xl);
+        margin-bottom: var(--space-xl);
+    }
+
     .psd-container::before {
         content: '';
-        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-        background: radial-gradient(circle at top left, rgba(6, 182, 212, 0.03), transparent 50%);
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(6, 182, 212, 0.05), transparent 50%);
         pointer-events: none;
+    }
+
+    .platform-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.812rem;
+        color: var(--text-secondary);
+        margin-bottom: 18px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
     }
     .platform-label {
         font-family: 'JetBrains Mono', monospace; font-size: 0.812rem;
@@ -1661,31 +2112,68 @@ st.markdown("""
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
     /* ── Data Table ── */
+    /* ═══════════════════════════════════════════════════ */
+    /* DATA TABLES - Clean Modern */
+    /* ═══════════════════════════════════════════════════ */
     [data-testid="stDataFrame"] {
-        border: 1px solid var(--border-color) !important;
-        border-radius: 12px !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: var(--radius-lg) !important;
         overflow: hidden !important;
         box-shadow: var(--shadow-md);
     }
+
     [data-testid="stDataFrame"] table {
         background: transparent !important;
     }
+
     [data-testid="stDataFrame"] th {
-        background: rgba(59, 130, 246, 0.1) !important;
+        background: var(--bg-tertiary) !important;
         color: var(--text-secondary) !important;
         font-weight: 600 !important;
-        border-bottom: 1px solid var(--border-color) !important;
+        border-bottom: 1px solid var(--border-subtle) !important;
         font-size: 0.75rem !important;
-        text-transform: uppercase; letter-spacing: 1.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: var(--space-md) var(--space-lg) !important;
     }
+
     [data-testid="stDataFrame"] td {
-        border-bottom: 1px solid rgba(30, 41, 59, 0.5) !important;
+        border-bottom: 1px solid var(--border-subtle) !important;
         color: var(--text-primary) !important;
         font-size: 0.875rem !important;
+        padding: var(--space-md) var(--space-lg) !important;
     }
+
     [data-testid="stDataFrame"] tr:hover {
-        background: rgba(59, 130, 246, 0.05) !important;
+        background: var(--bg-card-hover) !important;
     }
+
+    [data-testid="stDataFrame"] tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Incident rows */
+    .incident-row {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-sm);
+        display: flex;
+        gap: var(--space-lg);
+        align-items: center;
+        transition: var(--transition-base);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .incident-row:hover {
+        border-color: var(--accent-primary);
+        box-shadow: var(--shadow-md);
+        transform: translateX(4px);
+    }
+
+    .incident-row.critical { border-left: 3px solid var(--status-error); }
+    .incident-row.warning { border-left: 3px solid var(--status-warning); }
 
     /* ── Incident Table ── */
     .incident-row {
@@ -1704,69 +2192,102 @@ st.markdown("""
     .incident-row.critical { border-left: 3px solid var(--danger); }
     .incident-row.warning { border-left: 3px solid var(--warning); }
 
-    /* ── Team Cards ── */
+    /* Team Cards */
     .team-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-lg);
     }
-    .team-card {
-        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--border-color);
-        border-radius: 14px; padding: 28px;
-        display: flex; gap: 20px; align-items: flex-start;
-        transition: var(--transition);
-        box-shadow: var(--shadow-md);
-        position: relative;
-        overflow: hidden;
-    }
-    .team-card::after {
-        content: '';
-        position: absolute; top: 0; right: 0; width: 60px; height: 60px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
-        border-radius: 50%;
-        transform: translate(30%, -30%);
-        pointer-events: none;
-    }
-    .team-card:hover {
-        border-color: var(--accent-blue);
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg), 0 0 32px rgba(59, 130, 246, 0.2);
-    }
-    .team-avatar img {
-        width: 66px; height: 66px; border-radius: 12px;
-        border: 2px solid var(--accent-blue); object-fit: cover;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 16px rgba(59, 130, 246, 0.2);
-    }
-    .team-role {
-        color: var(--accent-blue); font-size: 0.75rem; font-weight: 600;
-        margin: 2px 0 8px; text-transform: uppercase; letter-spacing: 1px;
-    }
-    .team-name { color: var(--text-primary); font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
-    .team-desc { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; }
 
-    /* ── Tech Stack Table ── */
+    .team-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl);
+        display: flex;
+        gap: var(--space-lg);
+        align-items: flex-start;
+        transition: var(--transition-base);
+        box-shadow: var(--shadow-md);
+    }
+
+    .team-card:hover {
+        border-color: var(--accent-primary);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .team-avatar img {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-md);
+        object-fit: cover;
+        border: 2px solid var(--accent-primary);
+    }
+
+    .team-role {
+        color: var(--accent-primary);
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin: 2px 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .team-name {
+        color: var(--text-primary);
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .team-desc {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+
+    /* Tech Stack Rows */
     .tech-row {
-        background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
-        border: 1px solid var(--border-color);
-        border-radius: 10px; padding: 16px 20px; margin-bottom: 10px;
-        display: grid; grid-template-columns: 100px 160px 1fr; gap: 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-sm);
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: var(--space-lg);
         align-items: center;
-        transition: var(--transition);
+        transition: var(--transition-base);
         box-shadow: var(--shadow-sm);
     }
+
     .tech-row:hover {
-        border-color: var(--accent-cyan);
+        border-color: var(--accent-primary);
         box-shadow: var(--shadow-md);
         transform: translateX(4px);
     }
+
     .tech-layer {
-        font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem;
-        color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 1.5px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--accent-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
         font-weight: 600;
     }
-    .tech-name { font-weight: 700; color: var(--text-primary); font-size: 0.9375rem; }
-    .tech-detail { color: var(--text-secondary); font-size: 0.875rem; }
+
+    .tech-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+
+    .tech-detail {
+        color: var(--text-tertiary);
+        font-size: 0.8rem;
+    }
 
     /* ── Info/Success Boxes ── */
     [data-testid="stInfo"], [data-testid="stSuccess"] {
@@ -2002,7 +2523,7 @@ stations = sorted(df["station"].unique())
 with st.sidebar:
     # Get current station for status
     current_station_sidebar = st.session_state.current_station
-    gates_total, gates_active, p_total, alerts, avg_sync, warnings = get_metrics(df, current_station_sidebar)
+    gates_total, gates_active, p_total, alerts, avg_sync, warnings, _ = get_metrics(df, current_station_sidebar)
     sys_status = "NORMAL" if alerts == 0 and warnings == 0 else ("ALERT" if alerts > 0 else "WARNING")
 
     # ── Brand Header ──
@@ -2106,7 +2627,7 @@ with st.sidebar:
 # HEADER
 # ═══════════════════════════════════════════════════
 current_station = st.session_state.current_station
-gates_total, gates_active, p_total, alerts, avg_sync, warnings = get_metrics(
+gates_total, gates_active, p_total, alerts, avg_sync, warnings, _ = get_metrics(
     df, current_station)
 active_tab = st.session_state.active_tab
 
@@ -2152,164 +2673,1225 @@ st.markdown(f"""
 
 
 # ═══════════════════════════════════════════════════
-# TRAIN ANIMATION HTML BUILDER
-# ═══════════════════════════════════════════════════
+# TRAIN ANIMATION HTML BUILDER - MODERN PREMIUM EDITION
+# ════════════════════════════════════════════════════
 @st.cache_data(ttl=60, show_spinner=False)
 def build_train_animation(station_name, station_df):
-    """Build a complete self-contained HTML/JS animation for the PSD platform simulation."""
-    # Pre-compute platform data efficiently
+    """Build a sophisticated HTML/JS animation with modern visuals and realistic train movement."""
     platforms_data = []
     station_df = station_df.copy()
-    
-    # Group by platform once
+
     grouped = station_df.groupby('platform')
-    
+
     for platform, plat_df in sorted(grouped, key=lambda x: x[0]):
         gates = []
-        # Use itertuples for faster iteration
+        train_types_found = []
+
         for row in plat_df.itertuples(index=False):
-            gates.append({
-                "id":     row.gate_id,
-                "state":  row.door_state,
-                "train":  str(row.train) if pd.notna(row.train) and row.train else "",
-                "temp":   float(row.sensor_temp),
-                "vib":    float(row.sensor_vib),
-                "risk":   int(row.risk_score),
-                "status": row.maintenance_status,
+            gate_data = {
+                "id": row.gate_id,
+                "state": row.door_state,
+                "train": str(row.train) if pd.notna(row.train) and row.train else "",
+                "train_type": str(row.train_type) if 'train_type' in row._fields and pd.notna(row.train_type) else "ICE",
+                "operator": str(row.operator) if 'operator' in row._fields and pd.notna(row.operator) else "DB",
+                "destination": str(row.destination) if 'destination' in row._fields and pd.notna(row.destination) else "Unknown",
+                "temp": float(row.sensor_temp),
+                "vib": float(row.sensor_vib),
+                "risk": int(row.risk_score) if 'risk_score' in row._fields else 0,
+                "status": row.maintenance_status if 'maintenance_status' in row._fields else "OPTIMAL",
                 "people": int(row.people),
-            })
+                "capacity": int(row.capacity) if 'capacity' in row._fields else 400,
+                "door_position": str(row.door_position) if 'door_position' in row._fields else "middle",
+                "signal_status": str(row.signal_status) if 'signal_status' in row._fields else "green",
+                "track_number": int(row.track_number) if 'track_number' in row._fields else 1,
+            }
+            gates.append(gate_data)
+            if gate_data["train"] and gate_data["train_type"] not in train_types_found:
+                train_types_found.append(gate_data["train_type"])
+
+        # Determine primary train type for animation
+        primary_train_type = train_types_found[0] if train_types_found else "ICE"
         train_name = next((g["train"] for g in gates if g["train"]),
-                          f"ICE {abs(hash(platform)) % 900 + 100}")
+                         f"{primary_train_type} {abs(hash(platform)) % 900 + 100}")
+
         platforms_data.append({
-            "platform":   platform,
-            "gates":      gates,
+            "platform": platform,
+            "gates": gates,
             "train_name": train_name,
+            "train_type": primary_train_type,
         })
 
     platforms_json = json.dumps(platforms_data)
 
-    # Build the HTML with an embedded JS animation engine
+    # Build the HTML with an embedded JS animation engine - MODERN PREMIUM EDITION
     html = """<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#060c1a;color:#e2e8f0;font-family:'Space Grotesk',sans-serif;overflow-x:hidden;}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
 
-/* Banner */
-.sta-banner{background:linear-gradient(90deg,#0d1b3e,#0a1628);border-bottom:1px solid #1e2d4d;padding:9px 18px;display:flex;justify-content:space-between;align-items:center;}
-.sta-name{font-size:.82rem;font-weight:700;color:#7ab3d4;letter-spacing:1px;text-transform:uppercase;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block;margin-right:5px;animation:lpulse 1.4s ease infinite;}
-@keyframes lpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.6);}50%{opacity:.7;box-shadow:0 0 0 5px rgba(16,185,129,0);}}
-.live-lbl{font-family:'IBM Plex Mono';font-size:.65rem;color:#10b981;}
+/* ── CSS VARIABLES & THEME ───────────────────────────────────────────── */
+:root {
+  --bg-primary: #060c1a;
+  --bg-secondary: #0a1221;
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-glass-hover: rgba(30, 41, 59, 0.8);
+  --border-color: rgba(30, 41, 59, 0.6);
+  --border-glow: rgba(59, 130, 246, 0.3);
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-teal: #14b8a6;
+  --accent-purple: #8b5cf6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+/* Global typography tweaks for cleaner, higher-contrast UI */
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
 
-/* Platform block */
-.plat-block{margin:12px 14px;border:1px solid #1e2d4d;border-radius:11px;overflow:hidden;background:#0a1221;}
-.plat-hdr{background:#0d1b3e;padding:7px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e2d4d;}
-.plat-lbl{font-family:'IBM Plex Mono';font-size:.72rem;font-weight:600;color:#4a6fa5;letter-spacing:1.5px;text-transform:uppercase;}
-.plat-st{font-family:'IBM Plex Mono';font-size:.63rem;font-weight:600;padding:2px 9px;border-radius:20px;}
-.st-ok{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.4);color:#10b981;}
-.st-bad{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#ef4444;animation:blink 1.2s ease infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.45;}}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* Scene */
-.scene{position:relative;height:195px;overflow:hidden;background:#060c1a;}
-.scene-bg{position:absolute;inset:0;background:linear-gradient(180deg,#060c1a 0%,#0a1221 55%,#0d1b3e 100%);}
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* Stars */
-.stars{position:absolute;top:0;left:0;right:0;height:60px;pointer-events:none;}
+/* ── STATION BANNER ───────────────────────────────────────────────────────── */
+.sta-banner {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
 
-/* Buildings */
-.bldgs{position:absolute;bottom:68px;left:0;right:0;height:55px;display:flex;align-items:flex-end;gap:2px;padding:0 8px;opacity:.15;}
-.bldg{background:#4a6fa5;border-radius:2px 2px 0 0;flex-shrink:0;}
+.sta-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+  animation: banner-shine 8s ease-in-out infinite;
+}
 
-/* Platform floor */
-.plat-floor{position:absolute;bottom:0;left:0;right:0;height:68px;background:linear-gradient(180deg,#0f1f40 0%,#0a1628 100%);border-top:2px solid #1e2d4d;}
+@keyframes banner-shine {
+  0%, 100% { transform: translateX(-50%); }
+  50% { transform: translateX(0%); }
+}
 
-/* Yellow edge strip */
-.edge-strip{position:absolute;bottom:68px;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,#f59e0b 0px,#f59e0b 18px,transparent 18px,transparent 28px);opacity:.65;}
+.sta-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
 
-/* Track */
-.track{position:absolute;bottom:38px;left:0;right:0;height:8px;}
-.rail{position:absolute;left:0;right:0;height:3px;background:#1e3060;border-radius:2px;}
-.rail.t{top:0;} .rail.b{bottom:0;}
-.sleeper{position:absolute;bottom:-2px;width:13px;height:8px;background:#162040;border-radius:1px;}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  display: inline-block;
+  margin-right: 8px;
+  animation: live-pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--success);
+  position: relative;
+}
 
-/* TRAIN */
-.train-wrap{position:absolute;bottom:40px;left:0;will-change:transform;display:flex;align-items:flex-end;z-index:10;filter:drop-shadow(0 4px 18px rgba(0,40,120,.8));}
-.t-car{position:relative;display:flex;flex-direction:column;align-items:center;}
-.car-body{background:linear-gradient(180deg,#cce4ff 0%,#a0ccff 28%,#1565c0 29%,#0d47a1 68%,#0a3688 100%);border-radius:5px 5px 0 0;position:relative;overflow:hidden;}
-.car-body::after{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#0288d1,#00b4d8,#0288d1);}
-.car-stripe{position:absolute;top:14px;left:0;right:0;height:3px;background:#ef4444;}
-.car-wins{position:absolute;top:20px;left:7px;right:7px;display:flex;gap:4px;}
-.win{flex:1;height:16px;background:#b3d9ff;border-radius:2px;border:1px solid #7ab3d4;position:relative;overflow:hidden;transition:background .4s;}
-.win.lit{background:#fff9c4;border-color:#f0c040;}
-.win::after{content:'';position:absolute;top:0;left:30%;width:20%;height:100%;background:rgba(255,255,255,.3);}
-.pax-sil{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:5px;height:9px;background:rgba(20,50,110,.75);border-radius:3px 3px 0 0;opacity:0;transition:opacity .35s;}
-/* Bogies */
-.bogie{position:absolute;bottom:-7px;background:#1a2040;border-radius:3px;height:9px;}
-.bg-l{left:11px;width:17px;} .bg-r{right:11px;width:17px;}
-.wheel{position:absolute;bottom:-5px;width:11px;height:11px;background:radial-gradient(circle,#4a6fa5 28%,#1e3060 100%);border-radius:50%;border:2px solid #0a1628;}
-.wl{left:0;} .wr{right:0;}
-.wspin{animation:wspin .28s linear infinite;}
-.wslow{animation:wspin 1.1s linear infinite;}
-@keyframes wspin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-/* Pantograph */
-.panto{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:28px;height:15px;}
-.pa{position:absolute;background:#4a6fa5;transform-origin:bottom center;width:2px;}
-.pa1{bottom:0;left:50%;height:7px;transform:translateX(-50%) rotate(-18deg);}
-.pa2{bottom:6px;left:48%;height:7px;transform:translateX(-50%) rotate(18deg);}
-.pa-head{top:0;left:18%;width:64%;height:2px;background:#7ab3d4;border-radius:1px;position:absolute;}
-/* Headlights */
-.hl{position:absolute;bottom:16px;width:9px;height:5px;border-radius:1px;transition:opacity .4s,box-shadow .4s;}
-.hl-f{right:3px;background:#fff9c4;box-shadow:0 0 10px 3px rgba(255,249,196,.6);}
-.hl-r{left:3px;background:#ef4444;box-shadow:0 0 7px 2px rgba(239,68,68,.5);opacity:0;}
-/* Coupling */
-.coupling{width:5px;height:7px;background:#1e3060;border:1px solid #2d4f8a;border-radius:1px;margin-bottom:13px;flex-shrink:0;align-self:flex-end;}
+.live-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: 150%;
+  border-radius: 50%;
+  background: var(--success);
+  opacity: 0.3;
+  transform: translate(-50%, -50%);
+  animation: live-ripple 2s ease-out infinite;
+}
 
-/* Speed lines */
-.splines{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden;opacity:0;transition:opacity .25s;}
-.sl{position:absolute;height:1px;background:linear-gradient(90deg,transparent,rgba(100,160,255,.28),transparent);border-radius:1px;}
+@keyframes live-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
 
-/* Sparks */
-.spark{position:absolute;width:3px;height:3px;background:#fff9c4;border-radius:50%;opacity:0;pointer-events:none;z-index:30;}
+@keyframes live-ripple {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
 
-/* PSD */
-.psd-layer{position:absolute;bottom:68px;left:0;right:0;height:108px;display:flex;z-index:20;pointer-events:none;}
-.psd-unit{flex:1;position:relative;display:flex;align-items:flex-end;}
-.door-l,.door-r{position:absolute;bottom:0;height:88px;width:50%;border-radius:3px 3px 0 0;transition:width .65s cubic-bezier(.4,0,.2,1);overflow:hidden;}
-.door-l{left:0;background:linear-gradient(180deg,#1565c0cc,#0d47a1cc);border:1px solid #2d4f8a;border-radius:3px 0 0 0;}
-.door-r{right:0;background:linear-gradient(180deg,#1565c0cc,#0d47a1cc);border:1px solid #2d4f8a;border-radius:0 3px 0 0;}
-.door-l.open,.door-r.open{width:4%!important;}
-.door-l.jammed,.door-r.jammed{background:linear-gradient(180deg,#b91c1ccc,#7f1d1dcc)!important;border-color:#ef4444!important;animation:jshake .12s ease infinite alternate;}
-@keyframes jshake{from{transform:translateX(-1px);}to{transform:translateX(1px);}}
-.d-glass{position:absolute;top:9px;left:14%;width:72%;height:52%;background:rgba(170,215,255,.07);border-radius:2px;border:1px solid rgba(120,180,240,.18);}
-.d-glass::after{content:'';position:absolute;top:0;left:18%;width:14%;height:100%;background:rgba(255,255,255,.1);}
-.d-led{position:absolute;top:0;left:0;right:0;height:3px;border-radius:2px;}
-.led-cl{background:#1565c0;box-shadow:0 0 5px #1565c0;}
-.led-op{background:#10b981;box-shadow:0 0 7px #10b981;}
-.led-jm{background:#ef4444;box-shadow:0 0 9px #ef4444;animation:blink .45s ease infinite;}
-.psd-col{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:5px;height:93px;background:#0f2050;border:1px solid #1e2d4d;border-radius:2px 2px 0 0;}
-.g-id{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono';font-size:.55rem;color:#2d4f8a;white-space:nowrap;}
+.live-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--success);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 
-/* Passengers walking */
-.pax-layer{position:absolute;bottom:68px;left:0;right:0;height:48px;z-index:15;pointer-events:none;overflow:hidden;}
-.pax{position:absolute;bottom:0;width:7px;height:17px;will-change:transform,opacity;}
-.pax-h{width:7px;height:7px;background:#f0c090;border-radius:50%;position:absolute;top:0;}
-.pax-b{width:5px;height:10px;position:absolute;top:7px;left:1px;border-radius:2px;}
+/* ── PLATFORM BLOCK ────────────────────────────────────────────────────────── */
+.plat-block {
+  margin: var(--space-lg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
 
-/* Status bar */
-.sbar{padding:7px 14px 8px;display:flex;gap:16px;align-items:center;background:#0a1221;border-top:1px solid #1e2d4d;flex-wrap:wrap;}
-.si{font-family:'IBM Plex Mono';font-size:.65rem;color:#4a6fa5;display:flex;align-items:center;gap:4px;}
-.sv{color:#7ab3d4;font-weight:600;}
-.ph-lbl{font-family:'IBM Plex Mono';font-size:.68rem;padding:2px 9px;border-radius:20px;background:rgba(0,180,216,.1);border:1px solid rgba(0,180,216,.3);color:#00b4d8;transition:all .4s;}
+.plat-block:hover {
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
 
-/* Legend */
-.leg-bar{padding:5px 14px 8px;display:flex;gap:14px;flex-wrap:wrap;background:#060c1a;}
-.li{display:flex;align-items:center;gap:4px;font-size:.67rem;color:#4a6fa5;font-family:'IBM Plex Mono';}
-.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.plat-hdr {
+  background: var(--bg-tertiary);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.plat-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.plat-st {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: all var(--transition-base);
+}
+
+.st-ok {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--status-ok);
+}
+
+.st-bad {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--status-error);
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* SCENE - Modern Clean */
+/* ────────────────────────────────────────────────────────────── */
+.scene {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-lg);
+}
+
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(6, 12, 26, 0.3) 0%,
+      transparent 50%,
+      rgba(6, 12, 26, 0.2) 100%
+    );
+}
+
+/* Platform floor - concrete texture */
+.plat-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  background: linear-gradient(
+    180deg,
+    #374151 0%,
+    #1f2937 40%,
+    #111827 100%
+  );
+  border-top: 1px solid #4b5563;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 -4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Yellow safety line (edge strip) */
+.edge-strip {
+  position: absolute;
+  bottom: 55px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    #f59e0b 0px,
+    #f59e0b 16px,
+    transparent 16px,
+    transparent 24px
+  );
+  opacity: 0.8;
+  filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.6));
+  z-index: 3;
+}
+
+/* Cityscape background buildings */
+.bldgs {
+  position: absolute;
+  bottom: 57px;
+  left: 0;
+  right: 0;
+  height: 45px;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  padding: 0 3px;
+  opacity: 0.12;
+  z-index: 1;
+}
+
+.bldg {
+  background: #6b7280;
+  border-radius: 1px 1px 0 0;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Railway track */
+.track {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    180deg,
+    #4b5563 0%,
+    #374151 50%,
+    #1f2937 100%
+  );
+  border-radius: 1px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.rail.t { top: 0; }
+.rail.b { bottom: 0; }
+
+.sleeper {
+  position: absolute;
+  bottom: -3px;
+  width: 14px;
+  height: 10px;
+  background: linear-gradient(
+    180deg,
+    #1f2937 0%,
+    #111827 100%
+  );
+  border-radius: 1.5px;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.05),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Train */
+.train-wrap {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  will-change: transform;
+  display: flex;
+  align-items: flex-end;
+  z-index: 10;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  transition: filter var(--transition-base);
+}
+
+.train-wrap.approaching {
+  filter: drop-shadow(0 6px 16px rgba(59, 130, 246, 0.5));
+}
+
+.train-wrap.departing {
+  filter: drop-shadow(0 4px 12px rgba(239, 68, 68, 0.5));
+}
+
+/* ═══════════════════════════════════════════════════ */
+/* TRAIN - Realistic Modern Design */
+/* ═══════════════════════════════════════════════════ */
+.t-car {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Main car body - 3D appearance */
+.car-body {
+  background: linear-gradient(
+    180deg,
+    #2d3748 0%,
+    #1a202c 40%,
+    #171923 100%
+  );
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  border: 1px solid #1a202c;
+  border-bottom: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.car-body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.3),
+    rgba(6, 182, 212, 0.4),
+    rgba(59, 130, 246, 0.3)
+  );
+  border-radius: 3px 3px 0 0;
+}
+
+.car-stripe {
+  position: absolute;
+  top: 45%;
+  left: 6%;
+  width: 88%;
+  height: 2px;
+  background: #f59e0b;
+  opacity: 0.7;
+  border-radius: 1px;
+  box-shadow: 0 0 4px rgba(245, 158, 11, 0.5);
+}
+
+.car-body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 30%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Windows - Glass effect */
+.car-wins {
+  position: absolute;
+  top: 18%;
+  left: 10%;
+  width: 80%;
+  height: 52%;
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+.win {
+  flex: 1;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.9) 0%,
+    rgba(30, 41, 59, 0.85) 70%,
+    rgba(15, 23, 42, 0.95) 100%
+  );
+  border-radius: 2px;
+  border: 1px solid #1a202c;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.win::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+}
+
+.win.lit {
+  background: linear-gradient(
+    180deg,
+    rgba(59, 130, 246, 0.25) 0%,
+    rgba(6, 182, 212, 0.2) 70%,
+    rgba(59, 130, 246, 0.25) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+/* Passenger silhouettes */
+.pax-sil {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 80%;
+  background: linear-gradient(
+    180deg,
+    rgba(50, 50, 80, 0.4) 0%,
+    rgba(40, 40, 60, 0.3) 100%
+  );
+  border-radius: 30% 30% 35% 35%;
+  filter: blur(1px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.pax-sil.visible {
+  opacity: 0.6;
+}
+
+.pax-sil {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 70%;
+  background: var(--text-muted);
+  opacity: 0.15;
+  border-radius: 30% 30% 40% 40%;
+  filter: blur(1px);
+  transition: opacity var(--transition-base);
+}
+
+.win:hover .pax-sil,
+.pax-sil.visible {
+  opacity: 0.4;
+}
+
+/* Passenger silhouettes */
+.pax-sil {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 11px;
+  background: rgba(20, 50, 110, 0.7);
+  border-radius: 3px 3px 0 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  filter: blur(0.5px);
+}
+
+.win:hover .pax-sil,
+.pax-sil.visible {
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════ */
+/* BOGIES & WHEELS - Realistic */
+/* ═══════════════════════════════════════════════════ */
+.bogie {
+  position: absolute;
+  bottom: -6px;
+  background: linear-gradient(
+    180deg,
+    #1a202c 0%,
+    #0f161a 100%
+  );
+  border-radius: 3px;
+  height: 10px;
+  border: 1px solid #0a0a0a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.bg-l { left: 12px; width: 20px; }
+.bg-r { right: 12px; width: 20px; }
+
+.wheel {
+  position: absolute;
+  bottom: -8px;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #4a5568 0%,
+    #2d3748 60%,
+    #1a202c 100%
+  );
+  border-radius: 50%;
+  border: 2px solid #0a0a0a;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.wl { left: 4px; }
+.wr { right: 4px; }
+
+.wheel.spinning {
+  animation: wheel-spin 0.8s linear infinite;
+}
+
+.wheel.slow-spin {
+  animation: wheel-spin 1.5s linear infinite;
+}
+
+@keyframes wheel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════ */
+/* PSD GATES - Clear & Realistic */
+/* ═══════════════════════════════════════════════════ */
+.psd-col {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 60px;
+  background: linear-gradient(
+    180deg,
+    #2d3748 0%,
+    #1a202c 100%
+  );
+  border: 1px solid #0a0a0a;
+  border-radius: 3px 3px 0 0;
+  z-index: 8;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.05),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.door-l, .door-r {
+  position: absolute;
+  top: 6px;
+  width: 50%;
+  height: 44px;
+  background: linear-gradient(
+    180deg,
+    #374151 0%,
+    #1f2937 100%
+  );
+  border: 1px solid #111827;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.door-l {
+  left: 0;
+  border-radius: 2px 0 0 2px;
+  border-right: none;
+}
+
+.door-r {
+  right: 0;
+  border-radius: 0 2px 2px 0;
+  border-left: none;
+}
+
+.door-l.open, .door-r.open {
+  background: linear-gradient(
+    180deg,
+    rgba(16, 185, 129, 0.25) 0%,
+    rgba(16, 185, 129, 0.15) 100%
+  );
+  border-color: #10b981;
+  box-shadow:
+    inset 0 1px 0 rgba(16, 185, 129, 0.3),
+    0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.door-l.jam, .door-r.jam {
+  background: linear-gradient(
+    180deg,
+    rgba(239, 68, 68, 0.25) 0%,
+    rgba(239, 68, 68, 0.15) 100%
+  );
+  border-color: #ef4444;
+  box-shadow:
+    inset 0 1px 0 rgba(239, 68, 68, 0.3),
+    0 0 12px rgba(239, 68, 68, 0.3);
+  animation: door-jam 1s ease-in-out infinite;
+}
+
+@keyframes door-jam {
+  0%, 100% { box-shadow: inset 0 1px 0 rgba(239, 68, 68, 0.3), 0 0 12px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: inset 0 1px 0 rgba(239, 68, 68, 0.3), 0 0 20px rgba(239, 68, 68, 0.5); }
+}
+
+/* Train lighting */
+.hl {
+  position: absolute;
+  bottom: 22px;
+  width: 14px;
+  height: 8px;
+  border-radius: 4px;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+}
+
+.hl-f {
+  right: 8px;
+  background: radial-gradient(
+    ellipse at center,
+    #fff 0%,
+    #fff9c4 30%,
+    rgba(255, 249, 196, 0.6) 60%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 15px 4px rgba(255, 249, 196, 0.6),
+    0 0 30px 8px rgba(255, 249, 196, 0.3);
+  animation: headlight-pulse 2s ease-in-out infinite;
+}
+
+.hl-r {
+  left: 8px;
+  background: radial-gradient(
+    ellipse at center,
+    #ff6b6b 0%,
+    #ef4444 50%,
+    rgba(239, 68, 68, 0.6) 100%
+  );
+  box-shadow:
+    0 0 10px 3px rgba(239, 68, 68, 0.6),
+    0 0 20px 6px rgba(239, 68, 68, 0.3);
+}
+
+@keyframes headlight-pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+.door-r {
+  right: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.door-l.open, .door-r.open {
+  background: rgba(16, 185, 129, 0.4);
+  border-color: var(--status-ok);
+}
+
+.door-l.jam, .door-r.jam {
+  background: rgba(239, 68, 68, 0.4);
+  border-color: var(--status-error);
+}
+
+/* Gate status indicator */
+.g-stat {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--bg-tertiary);
+}
+
+.g-stat.closed { background: var(--text-muted); }
+.g-stat.open { background: var(--status-ok); }
+.g-stat.jam { background: var(--status-error); animation: status-pulse 1.5s infinite; }
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* Coupling - Realistic connector */
+.coupling {
+  width: 6px;
+  height: 14px;
+  background: linear-gradient(
+    180deg,
+    #374151 0%,
+    #1f2937 100%
+  );
+  border: 1px solid #0a0a0a;
+  border-radius: 2px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  align-self: flex-end;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* ── MOTION EFFECTS ────────────────────────────────────────────────────────── */
+.splines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.sl {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(100, 160, 255, 0.4),
+    rgba(150, 200, 255, 0.3),
+    rgba(100, 160, 255, 0.4),
+    transparent
+  );
+  border-radius: 2px;
+  animation: speedline-move 0.6s linear infinite;
+}
+
+@keyframes speedline-move {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 0.7; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* Sparks from wheels/overhead line */
+.spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #fff 0%, #ffd54f 50%, transparent 100%);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  filter: blur(0.5px);
+}
+
+.spark.active {
+  animation: spark-fly 0.5s ease-out forwards;
+}
+
+@keyframes spark-fly {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-30px) translateX(var(--spark-x, 0));
+  }
+}
+
+/* ── PLATFORM SCREEN DOORS (PSD) ───────────────────────────────────────────── */
+.psd-layer {
+  position: absolute;
+  bottom: 64px;
+  left: 0;
+  right: 0;
+  height: 110px;
+  display: flex;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.psd-unit {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 2px;
+}
+
+.door-l,
+.door-r {
+  position: absolute;
+  bottom: 0;
+  height: 90px;
+  width: 50%;
+  border-radius: 4px 4px 0 0;
+  transition: width 0.75s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
+  overflow: hidden;
+  box-shadow:
+    inset 0 2px 6px rgba(255, 255, 255, 0.1),
+    0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.door-l {
+  left: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(21, 101, 192, 0.85) 0%,
+    rgba(13, 71, 161, 0.9) 100%
+  );
+  border: 1px solid rgba(45, 79, 138, 0.6);
+  border-radius: 4px 0 0 0;
+}
+
+.door-r {
+  right: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(21, 101, 192, 0.85) 0%,
+    rgba(13, 71, 161, 0.9) 100%
+  );
+  border: 1px solid rgba(45, 79, 138, 0.6);
+  border-radius: 0 4px 0 0;
+}
+
+.door-l.open,
+.door-r.open {
+  width: 5% !important;
+  min-width: 8px;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 185, 129, 0.7) 0%,
+    rgba(5, 150, 105, 0.8) 100%
+  );
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow:
+    inset 0 2px 6px rgba(255, 255, 255, 0.15),
+    0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.door-l.jammed,
+.door-r.jammed {
+  background: linear-gradient(
+    180deg,
+    rgba(185, 28, 28, 0.9) 0%,
+    rgba(127, 29, 29, 0.9) 100%
+  ) !important;
+  border-color: var(--danger) !important;
+  animation: door-jam 0.15s ease-in-out infinite alternate;
+}
+
+.door-l.jammed::before,
+.door-r.jammed::before {
+  content: '!';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 0 10px currentColor;
+  animation: alert-blink 1s ease-in-out infinite;
+}
+
+@keyframes door-jam {
+  from { transform: translateX(-1px); }
+  to { transform: translateX(1px); }
+}
+
+@keyframes alert-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Glass panel */
+.d-glass {
+  position: absolute;
+  top: 12px;
+  left: 12%;
+  width: 76%;
+  height: 54%;
+  background: rgba(170, 215, 255, 0.08);
+  border-radius: 3px;
+  border: 1px solid rgba(120, 180, 240, 0.22);
+  backdrop-filter: blur(2px);
+}
+
+.d-glass::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 20%;
+  height: 80%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  transform: skewX(-10deg);
+}
+
+/* LED indicator */
+.d-led {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.led-cl {
+  background: linear-gradient(90deg, #1565c0, #0d47a1);
+  box-shadow: 0 0 8px rgba(21, 101, 192, 0.6);
+}
+
+.led-op {
+  background: linear-gradient(90deg, #10b981, #059669);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+}
+
+.led-jm {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.9);
+  animation: led-alert 1s ease-in-out infinite;
+}
+
+@keyframes led-alert {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Gate Label */
+.g-id {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+/* ── STATUS BAR ────────────────────────────────────────────────────────────── */
+.sbar {
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  gap: var(--space-lg);
+  align-items: center;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  min-height: 44px;
+}
+
+.si {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.si::before {
+  content: '▸';
+  color: var(--accent-primary);
+  font-size: 0.6rem;
+  opacity: 0.7;
+}
+
+.sv {
+  color: var(--accent-tertiary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.ph-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 999px;
+  background: rgba(0, 180, 216, 0.1);
+  border: 1px solid rgba(0, 180, 216, 0.2);
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ph-lbl.boarding {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--status-ok);
+}
+
+.ph-lbl.alert {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--status-error);
+}
+
+/* Legend Bar */
+.leg-bar {
+  padding: var(--space-sm) var(--space-lg);
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.ld {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .scene {
+    height: 160px;
+  }
+
+  .plat-block {
+    margin: var(--space-sm);
+    border-radius: var(--radius-md);
+  }
+
+  .plat-hdr {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .sbar {
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.65rem;
+  }
+
+  .metric-card {
+    padding: var(--space-md);
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .main-header {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: flex-start;
+  }
+
+  .station-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.train-wrap,
+.car-body,
+.wheel {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  [data-testid="stSidebar"] {
+    display: none;
+  }
+
+  .main-header {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
 </style>
 </head>
 <body>
@@ -2343,23 +3925,19 @@ function buildPlatform(pdata,idx){
   const div=document.createElement('div');
   div.className='plat-block';
   div.id='pb'+idx;
-  div.innerHTML=`
+    div.innerHTML=`
     <div class="plat-hdr">
       <span class="plat-lbl">Platform ${pdata.platform}</span>
       <span class="plat-st ${isOk?'st-ok':'st-bad'}">${isOk?'✓ OPERATIONAL':'⚠ MAINTENANCE REQ'}</span>
     </div>
     <div class="scene" id="sc${idx}">
       <div class="scene-bg"></div>
-      <div class="stars" id="st${idx}"></div>
       <div class="bldgs" id="bg${idx}"></div>
       <div class="plat-floor"></div>
       <div class="edge-strip"></div>
       <div class="track" id="tr${idx}"></div>
-      <div class="splines" id="sp${idx}"></div>
-      <div id="sk${idx}"></div>
       <div class="train-wrap" id="tw${idx}"></div>
       <div class="psd-layer" id="psd${idx}"></div>
-      <div class="pax-layer" id="px${idx}"></div>
     </div>
     <div class="sbar">
       <span class="ph-lbl" id="ph${idx}">INIT</span>
@@ -2368,23 +3946,8 @@ function buildPlatform(pdata,idx){
       <span class="si">SYNC <span class="sv" id="sy${idx}">—</span></span>
       <span class="si">PAX <span class="sv" id="pa${idx}">—</span></span>
     </div>
-    <div class="leg-bar">
-      <div class="li"><div class="ld" style="background:#1565c0"></div>Closed</div>
-      <div class="li"><div class="ld" style="background:#10b981"></div>Open / Boarding</div>
-      <div class="li"><div class="ld" style="background:#ef4444"></div>Jammed (Alert)</div>
-      <div class="li"><div class="ld" style="background:#0288d1"></div>Closing</div>
-    </div>`;
+    `;
   return div;
-}
-
-function buildStars(idx){
-  const c=document.getElementById('st'+idx);
-  if(!c)return;
-  for(let i=0;i<30;i++){
-    const s=document.createElement('div');
-    s.style.cssText=`position:absolute;width:${Math.random()>0.7?2:1}px;height:${Math.random()>0.7?2:1}px;border-radius:50%;background:rgba(180,220,255,${0.1+Math.random()*.4});top:${Math.random()*95}%;left:${Math.random()*100}%`;
-    c.appendChild(s);
-  }
 }
 
 function buildBuildings(idx){
@@ -2412,28 +3975,13 @@ function buildTrack(idx){
   }
 }
 
-function buildSpeedLines(idx){
-  const sp=document.getElementById('sp'+idx);
-  if(!sp)return;
-  sp.innerHTML='';
-  for(let i=0;i<14;i++){
-    const l=document.createElement('div');
-    l.className='sl';
-    l.style.top=(16+i*9)+'px';
-    l.style.opacity=(.25+Math.random()*.4).toString();
-    sp.appendChild(l);
-  }
-}
-
 function buildTrain(numCars,idx){
   let h='';
-  for(let c=0;c<numCars;c++){
+    for(let c=0;c<numCars;c++){
     const loco=c===0;
-    const cw=loco?118:98, ch=loco?53:48;
-    const nw=loco?3:4;
-    const wins=Array.from({length:nw},(_,i)=>
-      `<div class="win${Math.random()>.35?' lit':''}" id="w${c}_${i}_${idx}"><div class="pax-sil" id="ps${c}_${i}_${idx}"></div></div>`
-    ).join('');
+    const cw=loco?128:108, ch=loco?62:52;
+    const nw=0;
+    const wins='';
     h+=`${c>0?'<div class="coupling"></div>':''}
     <div class="t-car" style="width:${cw}px">
       ${loco?'<div class="panto"><div class="pa pa1"></div><div class="pa pa2"></div><div class="pa-head"></div></div>':''}
@@ -2700,10 +4248,8 @@ PLATFORMS.forEach((pdata,idx)=>{
   const block=buildPlatform(pdata,idx);
   root.appendChild(block);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    buildStars(idx);
     buildBuildings(idx);
     buildTrack(idx);
-    buildSpeedLines(idx);
     buildPSD(idx,pdata.gates);
     setTimeout(()=>animatePlatform(idx,pdata.gates,pdata.train_name),idx*2100);
   }));
@@ -2720,7 +4266,7 @@ PLATFORMS.forEach((pdata,idx)=>{
 if active_tab == 'ops':
 
     # ── KPI Row ──
-    st.markdown('<div class="animate-fade-in">', unsafe_allow_html=True)
+    st.markdown('<div class="kpi-strip">', unsafe_allow_html=True)
     c1, c2, c3, c4, c5 = st.columns(5)
     kpis = [
         (c1, "PSD Gates", f"{gates_active}/{gates_total}",
@@ -2736,109 +4282,114 @@ if active_tab == 'ops':
     for col, title, val, sub, cls in kpis:
         with col:
             st.markdown(f"""
-            <div class="metric-card {cls}">
-                <div class="metric-title">{title}</div>
-                <div class="metric-value">{val}</div>
-                <div class="metric-sub">{sub}</div>
+            <div class="kpi-card {cls}">
+                <div class="kpi-icon">{('&#9888;' if cls=='alert' else '&#10003;' if cls=='green' else '&#9888;' if cls=='warn' else '&#9679;')}</div>
+                <div class="kpi-body">
+                    <div class="kpi-label">{title}</div>
+                    <div class="kpi-value">{val}</div>
+                    <div class="kpi-sub">{sub}</div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
-
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
     # ── Main Split ──
-    left, right = st.columns([3, 2])
+    left, right = st.columns([65, 35])
 
     with left:
-        st.markdown('<div class="section-heading animate-fade-in">🚆 Live Platform Simulation</div>',
-                    unsafe_allow_html=True)
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128646;</span>'
+                    '<span class="panel-title">Live Platform Simulation</span>'
+                    '</div>', unsafe_allow_html=True)
 
-        # Use cached station data
         station_data = get_station_data_cached(current_station, df)
         num_platforms = station_data['platform'].nunique()
         anim_html = build_train_animation(current_station, station_data)
         anim_height = num_platforms * 295 + 60
         components.html(anim_html, height=anim_height, scrolling=False)
-
-    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with right:
-        st.markdown(
-            '<div class="section-heading animate-fade-in">Sensor Analytics</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128202;</span>'
+                    '<span class="panel-title">Sensor Analytics</span>'
+                    '</div>', unsafe_allow_html=True)
+
         cycles_df, temp_df = get_psd_analytics_cached(current_station)
 
-        # Temperature Chart
         fig_temp = go.Figure()
         fig_temp.add_trace(go.Scatter(
             x=temp_df["Hour"], y=temp_df["Avg Temp (°C)"],
             mode='lines+markers',
-            line=dict(color='#ef4444', width=2.5, shape='spline'),
+            line=dict(color='#ef4444', width=2, shape='spline'),
             marker=dict(size=5, color='#ef4444'),
             fill='tozeroy',
-            fillcolor='rgba(239,68,68,0.06)',
+            fillcolor='rgba(239,68,68,0.08)',
             name="Temp (°C)"
         ))
         fig_temp.add_hline(y=45, line_dash="dot", line_color="#f97316",
-                           annotation_text="Warning Threshold", annotation_font_color="#f97316")
+                           annotation_text="Warning", annotation_font_color="#f97316")
         fig_temp.update_layout(
-            title=dict(text="Gate Temperature (°C)",
-                       font=dict(size=13, color="#94a3b8", family="Inter"), x=0),
-            height=250, margin=dict(l=0, r=0, b=40, t=50),
-            paper_bgcolor='rgba(10, 14, 23, 0)',
-            plot_bgcolor='rgba(10, 14, 23, 0)',
-            font=dict(color="#64748b", family="Inter", size=11),
+            height=190,
+            margin=dict(l=0, r=0, b=24, t=8),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="#94a3b8", family="Inter", size=10),
             yaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.6)',
+                gridcolor='rgba(30,41,59,0.5)',
                 zeroline=False,
-                tickfont=dict(size=10, color="#94a3b8")
+                tickfont=dict(size=9, color="#94a3b8")
             ),
             xaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.6)',
-                tickfont=dict(size=10, color="#94a3b8")
+                gridcolor='rgba(30,41,59,0.5)',
+                tickfont=dict(size=9, color="#94a3b8")
             ),
             showlegend=False,
             hovermode='x unified',
             hoverlabel=dict(
-                bgcolor='rgba(17, 24, 39, 0.95)',
+                bgcolor='rgba(17,24,39,0.98)',
                 bordercolor='#3b82f6',
                 font_color='#f1f5f9',
-                font_size=11
+                font_size=10
             )
         )
+        st.markdown('<div class="panel-content">', unsafe_allow_html=True)
         st.plotly_chart(fig_temp, use_container_width=True)
 
-        # Door Cycles Chart
-        fig_cycles = px.bar(cycles_df, x="Hour", y="Door Cycles",
-                            title="Door Operation Cycles / Hour")
+        fig_cycles = px.bar(cycles_df, x="Hour", y="Door Cycles")
         fig_cycles.update_traces(
             marker_color='#3b82f6',
             marker_line_width=0,
             hovertemplate='<b>Hour</b>: %{x}<br><b>Cycles</b>: %{y}<extra></extra>'
         )
         fig_cycles.update_layout(
-            height=250, margin=dict(l=0, r=0, b=40, t=50),
-            paper_bgcolor='rgba(10, 14, 23, 0)',
-            plot_bgcolor='rgba(10, 14, 23, 0)',
-            font=dict(color="#64748b", family="Inter", size=11),
-            title=dict(font=dict(size=13, color="#94a3b8", family="Inter"), x=0),
+            height=155,
+            margin=dict(l=0, r=0, b=24, t=8),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="#94a3b8", family="Inter", size=10),
             yaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.6)',
+                gridcolor='rgba(30,41,59,0.5)',
                 zeroline=False,
-                tickfont=dict(size=10, color="#94a3b8")
+                tickfont=dict(size=9, color="#94a3b8")
             ),
             xaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.6)',
-                tickfont=dict(size=10, color="#94a3b8")
+                gridcolor='rgba(30,41,59,0.5)',
+                tickfont=dict(size=9, color="#94a3b8")
             ),
+            showlegend=False,
             hovermode='x unified',
             hoverlabel=dict(
-                bgcolor='rgba(17, 24, 39, 0.95)',
+                bgcolor='rgba(17,24,39,0.98)',
                 bordercolor='#3b82f6',
                 font_color='#f1f5f9',
-                font_size=11
+                font_size=10
             )
         )
         st.plotly_chart(fig_cycles, use_container_width=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
@@ -2903,39 +4454,38 @@ elif active_tab == 'network':
     net = get_network_summary_cached(df)
 
     # ── Network KPIs ──
+    st.markdown('<div class="kpi-strip">', unsafe_allow_html=True)
     c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.markdown(f"""<div class="metric-card">
-            <div class="metric-title">Network Gates</div>
-            <div class="metric-value">{net['total_gates']}</div>
-            <div class="metric-sub">Across {len(stations)} Stations</div>
-        </div>""", unsafe_allow_html=True)
-    with c2:
-        st.markdown(f"""<div class="metric-card green">
-            <div class="metric-title">Optimal Gates</div>
-            <div class="metric-value">{net['optimal_count']}</div>
-            <div class="metric-sub">Running Normally</div>
-        </div>""", unsafe_allow_html=True)
-    with c3:
-        st.markdown(f"""<div class="metric-card alert">
-            <div class="metric-title">Network Alerts</div>
-            <div class="metric-value">{net['critical_count']}</div>
-            <div class="metric-sub">Critical Incidents</div>
-        </div>""", unsafe_allow_html=True)
-    with c4:
-        st.markdown(f"""<div class="metric-card">
-            <div class="metric-title">Total Passengers</div>
-            <div class="metric-value">{net['total_people']:,}</div>
-            <div class="metric-sub">On All Platforms</div>
-        </div>""", unsafe_allow_html=True)
+    kpis_net = [
+        (c1, "Network Gates", f"{net['total_gates']}", f"Across {len(stations)} Stations", ""),
+        (c2, "Optimal Gates", f"{net['optimal_count']}", "Running Normally", "green"),
+        (c3, "Network Alerts", f"{net['critical_count']}", "Critical Incidents", "alert"),
+        (c4, "Total Passengers", f"{net['total_people']:,}", "On All Platforms", ""),
+    ]
+    for col, title, val, sub, cls in kpis_net:
+        with col:
+            st.markdown(f"""
+            <div class="kpi-card {cls}">
+                <div class="kpi-icon">{('&#128270;' if cls=='' else '&#10003;' if cls=='green' else '&#9888;' if cls=='alert' else '&#9679;')}</div>
+                <div class="kpi-body">
+                    <div class="kpi-label">{title}</div>
+                    <div class="kpi-value">{val}</div>
+                    <div class="kpi-sub">{sub}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    left, right = st.columns([3, 2])
+    # ── Main Content Grid ──
+    left, right = st.columns([55, 45])
 
     with left:
-        st.markdown(
-            '<div class="section-heading">Station Performance Matrix</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128202;</span>'
+                    '<span class="panel-title">Station Performance Matrix</span>'
+                    '</div>'
+                    '<div class="panel-content">', unsafe_allow_html=True)
         styled_net = (
             net['station_summary']
             .style
@@ -2944,9 +4494,14 @@ elif active_tab == 'network':
             .format({'Avg Sync %': "{}%", 'Avg Risk': "{:.1f}/100", 'Passengers': "{:,}"})
         )
         st.dataframe(styled_net, use_container_width=True, hide_index=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
-        st.markdown(
-            '<div class="section-heading">Passengers by Station</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128100;</span>'
+                    '<span class="panel-title">Passengers by Station</span>'
+                    '</div>'
+                    '<div class="panel-content">', unsafe_allow_html=True)
         fig_pass = px.bar(
             net['station_summary'].sort_values('Passengers', ascending=True),
             x='Passengers', y='Station', orientation='h',
@@ -2956,27 +4511,27 @@ elif active_tab == 'network':
             title=""
         )
         fig_pass.update_layout(
-            height=300,
-            margin=dict(l=0, r=0, b=20, t=20),
+            height=280,
+            margin=dict(l=0, r=0, b=20, t=10),
             paper_bgcolor='rgba(10, 14, 23, 0)',
             plot_bgcolor='rgba(10, 14, 23, 0)',
             font=dict(color="#94a3b8", family="Inter", size=11),
             yaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.5)',
+                gridcolor='rgba(30, 41, 59, 0.3)',
                 tickfont=dict(size=10)
             ),
             xaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.5)',
+                gridcolor='rgba(30, 41, 59, 0.3)',
                 tickfont=dict(size=10)
             ),
             coloraxis_colorbar=dict(
                 title=dict(
-                    text="Risk Score",
-                    font=dict(color="#94a3b8", size=11)
+                    text="Risk",
+                    font=dict(color="#94a3b8", size=10)
                 ),
-                tickfont=dict(color="#94a3b8", size=10),
-                thickness=8,
-                len=0.8
+                tickfont=dict(color="#94a3b8", size=9),
+                thickness=6,
+                len=0.7
             ),
             hovermode='y unified',
             hoverlabel=dict(
@@ -2990,12 +4545,16 @@ elif active_tab == 'network':
             hovertemplate='<b>Station</b>: %{y}<br><b>Passengers</b>: %{x:,}<br><b>Avg Risk</b>: %{customdata[0]:.1f}/100<extra></extra>',
             customdata=net['station_summary'][['Avg Risk']].values
         )
-
         st.plotly_chart(fig_pass, use_container_width=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
     with right:
-        st.markdown(
-            '<div class="section-heading">Maintenance Status Distribution</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#9881;</span>'
+                    '<span class="panel-title">Maintenance Status</span>'
+                    '</div>'
+                    '<div class="panel-content">', unsafe_allow_html=True)
         color_map = {
             'OPTIMAL': '#10b981', 'MONITOR': '#60a5fa',
             'WARNING': '#f59e0b', 'CRITICAL': '#ef4444'
@@ -3006,44 +4565,83 @@ elif active_tab == 'network':
             values='Count',
             color='maintenance_status',
             color_discrete_map=color_map,
-            hole=0.55
+            hole=0.5
         )
         fig_pie.update_layout(
-            height=300, margin=dict(l=20, r=20, b=40, t=20),
-            paper_bgcolor='rgba(10, 14, 23, 0)',
-            font=dict(color="#94a3b8", family="Inter", size=11),
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=-0.15,
-                xanchor="center",
-                x=0.5,
-                font=dict(color="#94a3b8", size=10),
-                bgcolor='rgba(17, 24, 39, 0.6)',
-                bordercolor='#1e293b',
-                borderwidth=1
-            ),
+            height=180,
+            margin=dict(l=5, r=5, b=5, t=5),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="#94a3b8", family="Inter", size=9),
             showlegend=True,
             hoverlabel=dict(
                 bgcolor='rgba(17, 24, 39, 0.95)',
                 bordercolor='#3b82f6',
                 font_color='#f1f5f9',
-                font_size=11
+                font_size=10
             )
         )
         fig_pie.update_traces(
             textposition='inside',
-            textinfo='percent+label',
-            textfont_size=10,
+            textinfo='percent',
+            textfont_size=8,
             textfont_color='#f1f5f9',
-            marker_line_color='rgba(30, 41, 59, 0.5)',
+            marker_line_color='rgba(30, 41, 59, 0.3)',
             marker_line_width=1,
             hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
         )
         st.plotly_chart(fig_pie, use_container_width=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
-        st.markdown(
-            '<div class="section-heading">Door State Distribution</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128642;</span>'
+                    '<span class="panel-title">Train Types</span>'
+                    '</div>'
+                    '<div class="panel-content">', unsafe_allow_html=True)
+        if not net['train_type_dist'].empty:
+            train_colors = px.colors.qualitative.Set3
+            fig_train = px.pie(
+                net['train_type_dist'],
+                names='train_type',
+                values='Count',
+                hole=0.5
+            )
+            fig_train.update_layout(
+                height=180,
+                margin=dict(l=5, r=5, b=5, t=5),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                font=dict(color="#94a3b8", family="Inter", size=9),
+                showlegend=True,
+                hoverlabel=dict(
+                    bgcolor='rgba(17, 24, 39, 0.95)',
+                    bordercolor='#3b82f6',
+                    font_color='#f1f5f9',
+                    font_size=10
+                )
+            )
+            fig_train.update_traces(
+                textposition='inside',
+                textinfo='percent',
+                textfont_size=8,
+                textfont_color='#f1f5f9',
+                marker_line_color='rgba(30, 41, 59, 0.3)',
+                marker_line_width=1,
+                hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
+            )
+            st.plotly_chart(fig_train, use_container_width=True)
+        else:
+            st.markdown('<div style="text-align: center; color: #64748b; font-size: 0.8rem; padding: 20px;">No train type data available</div>', unsafe_allow_html=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
+
+        # Door State Distribution
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128682;</span>'
+                    '<span class="panel-title">Door State Distribution</span>'
+                    '</div>'
+                    '<div class="panel-content">', unsafe_allow_html=True)
         door_color = {'closed': '#1565c0', 'open': '#10b981',
                       'jammed': '#ef4444', 'closing': '#0288d1'}
         fig_door = px.bar(
@@ -3055,36 +4653,77 @@ elif active_tab == 'network':
             category_orders={'door_state': ['closed', 'open', 'closing', 'jammed']}
         )
         fig_door.update_layout(
-            height=250,
-            margin=dict(l=0, r=0, b=40, t=20),
+            height=200,
+            margin=dict(l=0, r=0, b=30, t=10),
             paper_bgcolor='rgba(10, 14, 23, 0)',
             plot_bgcolor='rgba(10, 14, 23, 0)',
-            font=dict(color="#94a3b8", family="Inter", size=11),
+            font=dict(color="#64748b", family="Inter", size=10),
             yaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.6)',
-                tickfont=dict(size=10),
+                gridcolor='rgba(30, 41, 59, 0.4)',
+                tickfont=dict(size=9, color="#94a3b8"),
                 title=''
             ),
             xaxis=dict(
-                gridcolor='rgba(30, 41, 59, 0.6)',
-                tickfont=dict(size=10),
+                gridcolor='rgba(30, 41, 59, 0.4)',
+                tickfont=dict(size=9, color="#94a3b8"),
                 title='',
                 categoryorder='array',
                 categoryarray=['closed', 'open', 'closing', 'jammed']
             ),
-            showlegend=False,
+            showlegend=True,
             hovermode='x unified',
             hoverlabel=dict(
                 bgcolor='rgba(17, 24, 39, 0.95)',
                 bordercolor='#3b82f6',
                 font_color='#f1f5f9',
-                font_size=11
+                font_size=10
             )
         )
         fig_door.update_traces(
             hovertemplate='<b>State</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>'
         )
         st.plotly_chart(fig_door, use_container_width=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Operator Performance
+        if not net['operator_stats'].empty:
+            st.markdown(
+                '<div class="section-heading">Operator Performance</div>', unsafe_allow_html=True)
+
+            # Use styled dataframe for better rendering compatibility
+            op_display = net['operator_stats'].copy()
+            op_display = op_display.rename(columns={'Avg Sync %': 'Sync %', 'Avg Risk': 'Risk'})
+
+            def style_sync(val):
+                if val >= 85: return 'color: #10b981; font-weight: 600;'
+                elif val >= 70: return 'color: #f59e0b; font-weight: 600;'
+                else: return 'color: #ef4444; font-weight: 600;'
+
+            def style_risk(val):
+                if val <= 20: return 'color: #10b981; font-weight: 600;'
+                elif val <= 40: return 'color: #f59e0b; font-weight: 600;'
+                else: return 'color: #ef4444; font-weight: 600;'
+
+            styled_op = (op_display.style
+                        .format({'Sync %': '{:.1f}%', 'Risk': '{:.1f}'})
+                        .map(style_sync, subset=['Sync %'])
+                        .map(style_risk, subset=['Risk']))
+            st.dataframe(styled_op, use_container_width=True, hide_index=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Network Health Metrics
+        st.markdown(
+            '<div class="section-heading">Network Health</div>', unsafe_allow_html=True)
+        col_a, col_b, col_c = st.columns(3)
+        with col_a:
+            st.markdown(f'<div style="background: rgba(26, 35, 50, 0.4); border-radius: 8px; padding: 12px; text-align: center; border: 1px solid rgba(148, 163, 184, 0.1);"><div style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px;">Sync Score</div><div style="font-size: 1.2rem; font-weight: 700; color: #3b82f6;">{net["network_sync"]}%</div></div>', unsafe_allow_html=True)
+        with col_b:
+            st.markdown(f'<div style="background: rgba(26, 35, 50, 0.4); border-radius: 8px; padding: 12px; text-align: center; border: 1px solid rgba(148, 163, 184, 0.1);"><div style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px;">Avg Risk</div><div style="font-size: 1.2rem; font-weight: 700; color: #f59e0b;">{net["network_risk"]}/100</div></div>', unsafe_allow_html=True)
+        with col_c:
+            health_color = '#10b981' if net['network_health'] >= 80 else '#f59e0b' if net['network_health'] >= 60 else '#ef4444'
+            st.markdown(f'<div style="background: rgba(26, 35, 50, 0.4); border-radius: 8px; padding: 12px; text-align: center; border: 1px solid rgba(148, 163, 184, 0.1);"><div style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px;">Health Score</div><div style="font-size: 1.2rem; font-weight: 700; color: {health_color};">{net["network_health"]}</div></div>', unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════════════════
@@ -3093,68 +4732,86 @@ elif active_tab == 'network':
 elif active_tab == 'incidents':
     incidents = get_incident_log_cached(df)
 
-    st.markdown('<div class="section-heading">Active Incidents — All Stations</div>',
-                unsafe_allow_html=True)
-
     if incidents.empty:
-        st.success("✓ No active incidents. All systems operating normally.")
+        st.markdown('<div class="panel">'
+                    '<div class="panel-header">'
+                    '<span class="panel-icon">&#10003;</span>'
+                    '<span class="panel-title">Active Incidents — All Stations</span>'
+                    '</div>'
+                    '<div class="panel-content" style="text-align:center;padding:40px;color:#64748b;">'
+                    '✓ No active incidents. All systems operating normally.'
+                    '</div></div>', unsafe_allow_html=True)
     else:
-        # Summary bar
         crit = (incidents["Severity"].str.contains("CRITICAL")).sum()
         warn = (incidents["Severity"].str.contains("WARNING")).sum()
+        
+        st.markdown('<div class="kpi-strip">', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
-        with c1:
-            st.markdown(f"""<div class="metric-card alert">
-                <div class="metric-title">Critical</div>
-                <div class="metric-value">{crit}</div>
-                <div class="metric-sub">Immediate action needed</div>
-            </div>""", unsafe_allow_html=True)
-        with c2:
-            st.markdown(f"""<div class="metric-card warn">
-                <div class="metric-title">Warning</div>
-                <div class="metric-value">{warn}</div>
-                <div class="metric-sub">Under observation</div>
-            </div>""", unsafe_allow_html=True)
-        with c3:
-            st.markdown(f"""<div class="metric-card">
-                <div class="metric-title">Total Incidents</div>
-                <div class="metric-value">{len(incidents)}</div>
-                <div class="metric-sub">This session</div>
-            </div>""", unsafe_allow_html=True)
+        kpis_inc = [
+            (c1, "Critical", str(crit), "Immediate Action", "alert"),
+            (c2, "Warning", str(warn), "Under Observation", "warn"),
+            (c3, "Total", str(len(incidents)), "This Session", ""),
+        ]
+        for col, title, val, sub, cls in kpis_inc:
+            with col:
+                st.markdown(f"""
+                <div class="kpi-card {cls}">
+                    <div class="kpi-icon">{('&#9888;' if cls=='alert' else '&#9888;' if cls=='warn' else '&#9679;')}</div>
+                    <div class="kpi-body">
+                        <div class="kpi-label">{title}</div>
+                        <div class="kpi-value">{val}</div>
+                        <div class="kpi-sub">{sub}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Incident cards
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128680;</span>'
+                    '<span class="panel-title">Incident List</span>'
+                    '</div>'
+                    '<div class="panel-content">', unsafe_allow_html=True)
+        
         for _, row in incidents.iterrows():
             cls = "critical" if "CRITICAL" in row["Severity"] else "warning"
             border_col = "#ef4444" if cls == "critical" else "#f59e0b"
             st.markdown(f"""
             <div class="incident-row {cls}" style="border-left-color:{border_col};">
-                <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:#4a6fa5; min-width:50px;">{row['Time']}</div>
-                <div style="min-width:60px;">{row['Severity']}</div>
-                <div style="font-size:0.78rem; color:#7ab3d4; min-width:100px;">{row['Station'][:12]}…</div>
+                <div style="font-family:'JetBrains Mono'; font-size:0.75rem; color:#64748b; min-width:50px;">{row['Time']}</div>
+                <div style="min-width:70px;font-weight:600;color:{'#ef4444' if 'CRITICAL' in row['Severity'] else '#f59e0b'};">{row['Severity']}</div>
+                <div style="font-size:0.78rem; color:#94a3b8; min-width:100px;">{row['Station'][:14]}…</div>
                 <div style="font-size:0.78rem; color:#e2e8f0; flex:1;">{row['Description']}</div>
-                <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:#4a6fa5;">
+                <div style="font-family:'JetBrains Mono'; font-size:0.72rem; color:#64748b;">
                     {row['Temp (°C)']}°C | {row['Vibration']} mm/s
                 </div>
             </div>
             """, unsafe_allow_html=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown(
-            '<div class="section-heading">Incident Detail Table</div>', unsafe_allow_html=True)
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-header">'
+                    '<span class="panel-icon">&#128202;</span>'
+                    '<span class="panel-title">Incident Detail Table</span>'
+                    '</div>'
+                    '<div class="panel-content">', unsafe_allow_html=True)
         st.dataframe(incidents, use_container_width=True, hide_index=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════════════════
 # ── TAB: PREDICTIVE ANALYTICS ─────────────────────
 # ═══════════════════════════════════════════════════
 elif active_tab == 'forecast':
-    st.markdown(f'<div class="section-heading">Predictive Analytics — {current_station}</div>',
-                unsafe_allow_html=True)
-
-    # FIRST ROW: 7-Day Forecast (full width)
     forecast_df = get_maintenance_forecast_cached(current_station)
+
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown('<div class="panel-header">'
+                '<span class="panel-icon">&#128200;</span>'
+                '<span class="panel-title">Predictive Analytics — ' + current_station + '</span>'
+                '</div>'
+                '<div class="panel-content">', unsafe_allow_html=True)
+
     fig_fc = go.Figure()
     fig_fc.add_trace(go.Scatter(
         x=forecast_df["Date"], y=forecast_df["Predicted Risk %"],
@@ -3172,11 +4829,9 @@ elif active_tab == 'forecast':
                      line_width=0, annotation_text="Watch Zone",
                      annotation_font_color="#f59e0b")
     fig_fc.update_layout(
-        title=dict(text="7-Day Maintenance Risk Forecast",
-                   font=dict(size=14, color="#94a3b8", family="Inter"), x=0),
-        height=300, margin=dict(l=0, r=0, b=50, t=60),
-        paper_bgcolor='rgba(10, 14, 23, 0)',
-        plot_bgcolor='rgba(10, 14, 23, 0)',
+        height=300, margin=dict(l=0, r=0, b=50, t=30),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
         font=dict(color="#64748b", family="Inter", size=11),
         yaxis=dict(
             gridcolor='rgba(30, 41, 59, 0.6)',
@@ -3188,7 +4843,7 @@ elif active_tab == 'forecast':
             gridcolor='rgba(30, 41, 59, 0.6)',
             tickfont=dict(size=10, color="#94a3b8")
         ),
-        showlegend=False,
+        showlegend=True,
         hovermode='x unified',
         hoverlabel=dict(
             bgcolor='rgba(17, 24, 39, 0.95)',
@@ -3203,12 +4858,10 @@ elif active_tab == 'forecast':
     )
     st.plotly_chart(fig_fc, use_container_width=True)
 
-    # SECOND ROW: Heatmap and Network Sync Health side by side
     col_heat, col_sync = st.columns([2, 1])
 
     with col_heat:
-        st.markdown('<div class="section-heading">Weekly Passenger Flow Heatmap</div>',
-                    unsafe_allow_html=True)
+        st.markdown('<div style="font-size:0.9rem;font-weight:600;color:#94a3b8;margin:20px 0 10px 0;">Weekly Passenger Flow Heatmap</div>', unsafe_allow_html=True)
         heatmap_df = get_passenger_heatmap_cached(current_station)
         fig_heat = px.imshow(
             heatmap_df, aspect="auto",
@@ -3317,7 +4970,15 @@ elif active_tab == 'forecast':
             title='Risk Score',
             range=[0, 100]
         ),
-        coloraxis_showscale=False,
+        coloraxis_colorbar=dict(
+            title=dict(
+                text="Risk",
+                font=dict(color="#94a3b8", size=10)
+            ),
+            tickfont=dict(color="#94a3b8", size=9),
+            thickness=6,
+            len=0.7
+        ),
         hovermode='y unified',
         hoverlabel=dict(
             bgcolor='rgba(17, 24, 39, 0.95)',
@@ -3331,6 +4992,7 @@ elif active_tab == 'forecast':
         marker_line_width=0
     )
     st.plotly_chart(fig_risk, use_container_width=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════════════════
@@ -3343,22 +5005,39 @@ elif active_tab == 'financial':
         plot_bgcolor='rgba(10, 14, 23, 0)',
         paper_bgcolor='rgba(10, 14, 23, 0)',
         font=dict(color='#94a3b8', family='Inter', size=11),
-        xaxis=dict(gridcolor='rgba(30, 41, 59, 0.6)', zeroline=False),
-        yaxis=dict(gridcolor='rgba(30, 41, 59, 0.6)', zeroline=False),
-        legend=dict(
-            bgcolor='rgba(17, 24, 39, 0.8)',
-            bordercolor='#1e293b',
-            borderwidth=1,
-            font=dict(size=10, color='#94a3b8')
+        xaxis=dict(
+            gridcolor='rgba(148, 163, 184, 0.1)',
+            zeroline=False,
+            tickfont=dict(size=10, color='#94a3b8')
         ),
-        margin=dict(l=40, r=20, t=50, b=40),
+        yaxis=dict(
+            gridcolor='rgba(148, 163, 184, 0.1)',
+            zeroline=False,
+            tickfont=dict(size=10, color='#94a3b8')
+        ),
+        legend=dict(
+            bgcolor='rgba(26, 35, 50, 0.8)',
+            bordercolor='rgba(148, 163, 184, 0.1)',
+            borderwidth=1,
+            font=dict(size=10, color='#94a3b8'),
+            orientation='h',
+            yanchor='bottom',
+            y=1.02,
+            xanchor='right',
+            x=1
+        ),
+        margin=dict(l=40, r=20, t=80, b=60),
         hovermode='x unified',
         hoverlabel=dict(
-            bgcolor='rgba(17, 24, 39, 0.95)',
-            bordercolor='#3b82f6',
+            bgcolor='rgba(26, 35, 50, 0.95)',
+            bordercolor='rgba(59, 130, 246, 0.3)',
             font_color='#f1f5f9',
             font_size=11
-        )
+        ),
+        title_font=dict(size=14, color='#f1f5f9', family='Inter'),
+        title_x=0,
+        title_y=0.95,
+        title_pad=dict(t=10, b=10)
     )
 
     def fin_fig(layout_extra=None):
@@ -3367,8 +5046,12 @@ elif active_tab == 'financial':
             d.update(layout_extra)
         return d
 
-    # ── PARAMETER INPUTS ─────────────────────────────────────────────────────
-    st.markdown('<div class="section-heading">⚙️ Model Parameters</div>', unsafe_allow_html=True)
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown('<div class="panel-header">'
+                '<span class="panel-icon">&#9881;</span>'
+                '<span class="panel-title">Financial Model</span>'
+                '</div>'
+                '<div class="panel-content">', unsafe_allow_html=True)
     
     with st.expander("Configure SaaS Model Parameters", expanded=True):
         col1, col2, col3 = st.columns(3)
@@ -3690,6 +5373,7 @@ elif active_tab == 'financial':
                                     line=dict(color="#e74c3c", width=2, dash="dash"), marker=dict(size=4))
                     fig.update_layout(title=title, yaxis_title=ylabel, **fin_fig())
                     st.plotly_chart(fig, use_container_width=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
 elif active_tab == 'company':
     # ── Modern Blue Minimalist CSS ──
@@ -3834,9 +5518,14 @@ elif active_tab == 'company':
     </style>
     """, unsafe_allow_html=True)
 
-    # ── About Section ──
-    st.markdown('<div class="section-heading">About SicherGleis GmbH</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown('<div class="panel-header">'
+                '<span class="panel-icon">&#127970;</span>'
+                '<span class="panel-title">Company & Team</span>'
+                '</div>'
+                '<div class="panel-content">', unsafe_allow_html=True)
+
+    st.markdown('<div class="section-heading" style="font-size:1.2rem;margin:0 0 16px 0;">About SicherGleis GmbH</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="about-container">
         <div class="about-card">
@@ -3859,9 +5548,7 @@ elif active_tab == 'company':
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Leadership Team ──
-    st.markdown('<div class="section-heading">Leadership Team</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-heading" style="font-size:1.2rem;margin:24px 0 16px 0;">Leadership Team</div>', unsafe_allow_html=True)
     team = get_leadership_data()
     for member in team:
         if not member.get('img'):
@@ -3946,3 +5633,4 @@ data-driven dashboard to shift to proactive maintenance.
         }
         st.dataframe(pd.DataFrame(kpi_data),
                      use_container_width=True, hide_index=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
