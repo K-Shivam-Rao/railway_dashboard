@@ -7162,7 +7162,7 @@ elif active_tab == "customer":
 
     if not rfm_summary.empty:
         st.dataframe(
-            rfm_summary.style.applymap(
+            rfm_summary.style.map(
                 highlight_rfm, subset=["Avg Recency", "Avg Frequency", "Avg Monetary"]
             ),
             use_container_width=True,
@@ -7617,7 +7617,7 @@ elif active_tab == "customer":
                 return "background-color: rgba(59, 130, 246, 0.3); color: #3b82f6"
 
             st.dataframe(
-                display_renewals.style.applymap(urgency_color, subset=["Urgency"]),
+                display_renewals.style.map(urgency_color, subset=["Urgency"]),
                 use_container_width=True,
                 hide_index=True,
                 height=300,
@@ -7659,7 +7659,7 @@ elif active_tab == "customer":
                 return "background-color: rgba(245, 158, 11, 0.3); color: #f59e0b"
 
             st.dataframe(
-                risk_table.style.applymap(risk_color, subset=["Risk Level"]),
+                risk_table.style.map(risk_color, subset=["Risk Level"]),
                 use_container_width=True,
                 hide_index=True,
                 height=300,
