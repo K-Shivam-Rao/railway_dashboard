@@ -2,11 +2,15 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+*.egg
 
 # Virtual environments
 venv/
 env/
 ENV/
+.venv/
+.ENV/
 
 # Streamlit cache
 .streamlit/
@@ -20,6 +24,10 @@ ENV/
 .idea/
 *.swp
 *.swo
+*.swn
+.project
+.pydevproject
+.settings/
 
 # OS files
 .DS_Store
@@ -27,22 +35,67 @@ Thumbs.db
 
 # Logs
 *.log
+app.log
+*.log.*
 
 # Python build files
 build/
 dist/
 *.egg-info/
+wheelhouse/
 
 # Jupyter
 .ipynb_checkpoints/
+*.ipynb
 
 # Testing
 .pytest_cache/
-
-# Coverage
 .coverage
 htmlcov/
+coverage.json
+.coverage.*
+tests/dashboard/pytest_results.json
+
+# Claude Code memory
+.omc/
+.claude/
+
+# Kiło
+.kilo/
+
+# Generated files
+stations.csv.bak
+reports/*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.csv.bak
 
 # Temporary files
+*~
+*.bak
 *.tmp
 *.temp
+*.swp
+
+# Coverage reports
+*.cover
+.coverage.*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# Ruff cache
+.ruff_cache/
