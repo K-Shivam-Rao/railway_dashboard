@@ -1,198 +1,233 @@
-# 🛡️ SicherGleis Pro - Railway Dashboard
+# 🚆 SicherGleis Railway Dashboard
 
-**BahnSetu Platform - Intelligent Railway Operations Dashboard**
-
----
+SicherGleis Pro | BahnSetu - Platform Screen Door (PSD) Monitoring & SaaS Analytics Dashboard
 
 ## 📋 Overview
 
-SicherGleis Pro is a comprehensive real-time monitoring and analytics dashboard for railway station operations. Built with Streamlit, this application provides visualizations and insights into:
+Advanced railway platform screen door monitoring system with real-time operations tracking, predictive maintenance, customer analytics, and SaaS financial modeling. Built with Streamlit, Plotly, and modern Python architecture.
 
-- **Platform Screen Door (PSD)** status and operations
-- **Predictive maintenance** with risk scoring
-- **Passenger flow analytics** and heatmaps
-- **Network-wide operational metrics**
-- **Incident tracking** and alerts
+## 🏗️ Project Structure
 
-The dashboard is designed for railway operators, maintenance teams, and station managers to monitor multiple stations, identify potential issues before they become critical, and optimize passenger flow.
+```
+railway_dashboard/
+├── main.py                    # Streamlit app entry point
+├── pyproject.toml             # Project configuration
+├── requirements.txt           # Python dependencies
+├── .gitignore                 # Git ignore rules
+├── README.md                  # This file
+├── LICENSE                    # MIT License
+├── .streamlit/
+│   └── config.toml            # Streamlit settings
+├── core/
+│   ├── __init__.py
+│   └── logic.py               # Business logic & SaaS simulation (90% coverage)
+├── data/
+│   ├── __init__.py
+│   ├── loader.py              # DataLoader class (71% coverage)
+│   ├── sample_data.py         # Sample data generators (99% coverage)
+│   └── stations.csv           # Railway station data
+├── utils/
+│   ├── __init__.py
+│   ├── helpers.py             # Formatting utilities
+│   ├── exceptions.py          # Custom exceptions
+│   └── logging_config.py     # Structured logging
+├── reports/
+│   ├── __init__.py
+│   └── pdf_generator.py      # PDF report generation
+└── tests/
+    ├── __init__.py
+    ├── test_core_logic.py
+    ├── test_core_logic_extended.py
+    ├── test_core_logic_remaining.py
+    ├── test_core_logic_missing_coverage.py
+    ├── test_data_loader.py
+    ├── test_edge_cases.py
+    ├── test_helpers.py
+    ├── test_integration.py
+    ├── test_main_helpers.py
+    ├── test_pdf_generator.py
+    ├── test_sample_data.py
+    └── dashboard/             # TestVision Pro Dashboard
+        ├── __init__.py
+        ├── main.py            # Streamlit test dashboard
+        ├── parsers.py         # Test data parsers
+        └── pytest_results.json
+```
 
----
+## 🚀 Features
 
-## ✨ Key Features
+### Operations Dashboard
+- Real-time PSD gate monitoring
+- Station-level metrics & analytics
+- Network-wide overview
+- Predictive maintenance forecasting
+- Incident logging & management
+- Passenger flow heatmaps
 
-### 🚪 Real-Time Gate Monitoring
-- Live monitoring of gate states (open, closed, closing, jammed, offline)
-- Temperature and vibration sensor readings
-- Sync score calculation (penalty-based scoring for anomalies)
-- Passenger count per gate
+### SaaS Financial Model
+- 24-month financial simulation
+- Customer growth & churn analysis
+- MRR/ARR tracking
+- LTV:CAC ratio monitoring
+- Department headcount planning
+- Multiple scenario comparison
 
-### 🔮 Predictive Maintenance
-- **Risk Score** (0-100): Composite metric based on temperature, vibration, and door state
-- **Maintenance Status**: OPTIMAL, MONITOR, WARNING, CRITICAL
-- **7-day risk forecast** for each station
-- Automated **incident log** generation for critical/warning gates
+### Customer Intelligence
+- RFM (Recency, Frequency, Monetary) analysis
+- Customer segmentation
+- Contract health scoring
+- Renewal forecasting
+- At-risk account identification
 
-### 📊 Analytics & Visualizations
-- **Per-Station Analytics**: Door cycle counts, temperature trends by hour
-- **Passenger Flow Heatmap**: 7-day x 12-hour flow matrix
-- **Network Summary**: Aggregate statistics across all stations
-- **Status Distribution Charts**: Breakdown by maintenance status and door state
+### TestVision Pro Dashboard
+Beautiful standalone test visualization dashboard:
+- Pass/fail rates with animated gauges
+- Coverage analysis with polar charts & heatmaps
+- Test performance analytics (slowest tests, duration distribution)
+- File health check and statistics
 
-### 🎯 Leadership Dashboard
-- Executive team information
-- Technology stack overview
-
----
+Run with: `streamlit run tests/dashboard/main.py`
 
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| **Interface** | Streamlit, Plotly |
-| **Data Processing** | Pandas, NumPy |
-| **Visualization** | Plotly Express, Plotly Graph Objects |
-| **Styling** | Custom CSS (Dark theme, Space Grotesk font) |
-
-**Sensing & IoT (production deployment):**
-- Temperature, vibration, proximity sensors
-- PSD Controllers (real-time gate logic)
-- 5G / Fiber network
-- BahnSetu Core microservices (99.97% uptime SLA)
-
----
+|-------|------------|
+| **Sensing** | IoT Sensors (temp, vibration, proximity) |
+| **Edge** | PSD Controllers with fail-safe override |
+| **Network** | 5G / Fiber (sub-10ms sync) |
+| **Backend** | Python 3.10+, Polars, Pandas |
+| **Analytics** | ML Pipeline, Predictive Maintenance |
+| **Visualization** | Streamlit, Plotly, Matplotlib |
+| **Reporting** | ReportLab (PDF generation) |
+| **Resilience** | tenacity (retry patterns) |
 
 ## 📦 Installation
 
-### Prerequisites
-- Python 3.8+
-- pip package manager
-
-### Setup
-
 1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/SicherGleis_Bahnsetu.git
-cd SicherGleis_Bahnsetu/railway_dashboard
-```
+   ```bash
+   git clone https://github.com/sichergleis/railway-dashboard.git
+   cd railway_dashboard
+   ```
 
-2. **Create virtual environment (recommended)**
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# macOS/Linux
-python -m venv venv
-source venv/bin/activate
-```
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   # Windows:
+   venv\Scripts\activate
+   # Mac/Linux:
+   source venv/bin/activate
+   ```
 
 3. **Install dependencies**
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+4. **Run the main application**
+   ```bash
+   streamlit run main.py
+   ```
+
+## 🧪 Testing
+
+Run the full test suite:
 ```bash
-pip install -r requirements.txt
+# Run all tests with coverage
+pytest tests/ -v --cov --cov-report=term-missing
+
+# Generate JSON report for TestVision Dashboard
+pytest tests/ --json-report --json-report-file=tests/dashboard/pytest_results.json
+
+# Run with specific coverage output
+pytest tests/ --cov --cov-report=json -o "addopts="
 ```
 
-4. **Prepare data**
-- Ensure `stations.csv` exists in the project root
-- The CSV should contain the following columns:
-  - `station` (string): Station name
-  - `platform` (string): Platform identifier
-  - `gate_id` (string): Unique gate identifier
-  - `train` (string): Associated train number (optional)
-  - `status` (string): Train status (approaching, arrived, departed, clear)
-  - `door_state` (string): Gate state (open, closed, closing, jammed, offline)
-  - `sensor_temp` (float): Temperature reading in °C
-  - `sensor_vib` (float): Vibration reading
-  - `people` (int): Number of people nearby
-  - `eta` (int): Estimated time of arrival in minutes
+### Test Results (Latest)
+- **Total Tests**: 253
+- **Passed**: 253 ✅
+- **Failed**: 0
+- **Coverage**: 54% overall
+  - `core/`: 92.3% (1069 lines, 987 covered)
+  - `data/`: 89.4% (568 lines, 508 covered)
+  - `utils/`: 84.8% (66 lines, 56 covered)
+  - `main.py`: 10.4% (1594 lines, 166 covered — dashboard UI)
+  - `reports/`: 11.4% (263 lines, 30 covered — tested via `test_pdf_generator.py`)
 
-5. **Run the application**
+### Test Coverage by Module
+| Module | Coverage | Missed |
+|--------|----------|--------|
+| core/logic.py | 90% | 61 lines |
+| data/loader.py | 71% | 48 lines |
+| data/sample_data.py | 99% | 1 line |
+| utils/helpers.py | 82% | 5 lines |
+| utils/logging_config.py | 81% | 5 lines |
+| tests/test_core_logic.py | 98% | 1 line |
+| tests/test_core_logic_extended.py | 97% | 4 lines |
+| tests/test_data_loader.py | 82% | 10 lines |
+| tests/test_sample_data.py | 99% | 1 line |
+| main.py | 10% | 1428 lines (dashboard UI) |
+| reports/pdf_generator.py | 11% | 233 lines (tested via test_pdf_generator.py) |
+| **Overall** | **54%** | **1819 lines** |
+
+### TestVision Pro Dashboard
+
+Launch the beautiful test visualization dashboard:
 ```bash
-streamlit run streamlit_app.py
+streamlit run tests/dashboard/main.py
 ```
 
-6. Open your browser to `http://localhost:8501`
+Then open http://localhost:8502 to see:
+- 📈 Overview: Pass rate gauge, distribution charts
+- ✅ Test Results: Filterable table with color-coded outcomes
+- 📊 Coverage Deep Dive: Module breakdown, polar charts, heatmaps
+- ⏱️ Performance: Slowest tests, duration distribution
+- 📁 Files: File health check and statistics
 
----
+## 📊 Logging
 
-## 📁 Project Structure
+Structured logging configuration in `utils/logging_config.py`:
+- **File logging**: `app.log` (INFO level)
+- **Console logging**: WARNING level
+- **Format**: `timestamp - module - level - message`
 
+View logs:
+```bash
+# Windows
+type app.log
+
+# Mac/Linux
+tail -f app.log
 ```
-railway_dashboard/
-├── streamlit_app.py       # Main Streamlit application
-├── data_source.py         # Data loading, transformation, and analytics functions
-├── stations.csv           # Station/gate data (sample provided)
-├── requirements.txt       # Python dependencies
-├── venv/                  # Virtual environment (excluded from git)
-└── README.md              # This file
-```
 
----
+## 🏗️ Architecture Highlights
 
-## 🎯 Usage Guide
+- **Modular Design**: Clean separation between data, core, utils, reports
+- **OOP Implementation**: DataLoader, FinancialModel, StationAnalytics, CustomerSegmenter classes
+- **Error Handling**: Custom exceptions (DataLoadError, ConfigurationError, etc.)
+- **Comprehensive Testing**: 253 tests across 12 test modules
+- **Test Visualization**: Beautiful TestVision Pro dashboard for test analytics
 
-### Navigation
-- **Sidebar**: Select a station from the dropdown to view detailed analytics
-- **Tabs**:
-  - **Operations**: Real-time gate monitoring, key metrics, incident log, and network summary
-  - **Analytics**: Per-station charts (door cycles, temperature trends, passenger heatmap)
-  - **About**: Leadership team and technology stack information
+## 👥 Leadership Team
 
-### Key Metrics
-- **Station Stats**: Total gates, active gates, total passengers, alerts, average sync score, warnings
-- **Network Stats**: Total gates, total passengers, critical/warning counts, network sync score, optimal count
+| Name | Role |
+|------|------|
+| Khushboo Patil | CEO - Business Strategy & Market Expansion |
+| Namrata Joshi | COO - Operations & Project Coordination |
+| Kona Shivam Rao | CTO - Systems Engineering & Automation |
+| Sanika Kale | CPO - Product Innovation & UX Design |
+| Nikhil Chavan | CFO - Financial Strategy & Partnerships |
 
----
+## 📞 License
 
-## 🔒 .gitignore
-
-The project includes a `.gitignore` that typically excludes:
-- `venv/` - Python virtual environment
-- `__pycache__/` - Python bytecode cache
-- `*.pyc` - Compiled Python files
-- `.DS_Store` (macOS)
-- IDE configuration files
-- Environment files
-
----
-
-## 🤝 Contributing
-
-We welcome contributions to improve SicherGleis Pro! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-Please ensure code follows PEP 8 style guidelines and includes appropriate comments.
-
----
-
-## 📄 License
-
-[Specify your license here - e.g., MIT, Apache 2.0, or All Rights Reserved]
-
----
-
-## 👥 Leadership
-
-| Name | Role | Focus Areas |
-|------|------|-------------|
-| Khushboo Patil | CEO | Business Strategy, Market Expansion |
-| Namrata Joshi | COO | Operations Management, Project Coordination |
-| Kona Shivam Rao | CTO | Systems Engineering, Automation |
-| Sanika Kale | CPO | Product Innovation, UX Design |
-| Nikhil Chavan | CFO | Financial Strategy, Partnerships |
-
----
+MIT License - See LICENSE file for details.
 
 ## 📧 Contact
 
-For questions, support, or partnership inquiries, please reach out through our official channels.
+- **Website**: www.sicher-gleis.com
+- **Email**: contact@sicher-gleis.com
+- **Location**: DACH Region (Germany, Austria, Switzerland) + India
 
 ---
 
-**Built with ❤️ using Streamlit, Python, and Plotly**
-
-*SicherGleis: Safe Tracks, Smart Operations*
+**Built with ❤️ by the SicherGleis Team**

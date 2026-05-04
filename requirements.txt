@@ -1,12 +1,14 @@
 # ============================================
 # SicherGleis Railway Dashboard - Dependencies
 # ============================================
-# Generated: Complete required packages with compatible versions
-# Python: 3.10+ (Windows)
+# Python: 3.10+ (Windows/Linux/Mac)
+# Install: pip install -r requirements.txt
+# Upgrade: pip install --upgrade -r requirements.txt
 
 # ─── Core Data Science Stack ─────────────────────
 numpy>=2.2.0
 pandas>=2.2.6
+polars>=1.21.0
 matplotlib>=3.5.0
 
 # ─── Interactive Dashboard ───────────────────────
@@ -14,16 +16,21 @@ streamlit>=1.55.0
 
 # ─── Plotting & Visualization ────────────────────
 plotly>=6.6.0
+altair>=5.0.0
+pydeck>=0.8.0
 
-# ─── PDF Report Generation ───────────────────────
+# ─── Mapping ──────────────────────────────────────
+cartopy>=0.23.0
+Pillow>=10.0.0
+
+# ─── PDF Report Generation ────────────────────────
 reportlab>=4.0.0
 
-# ─── Notes ───────────────────────────────────────
-# - All versions tested and compatible with Python 3.10
-# - Compatible set: numpy 2.2.6, pandas 2.3.3, matplotlib 3.10.8
-# - Streamlit 1.55.0 tested and stable
-# - Plotly 6.6.0 for interactive charts
-# - ReportLab 4.x for PDF exports
-#
-# To install: pip install -r requirements.txt
-# To upgrade: pip install --upgrade -r requirements.txt
+# ─── Testing ────────────────────────────────────────
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-json-report>=1.5.0
+
+# ─── Utilities ──────────────────────────────────────
+python-dotenv>=1.0.0
+tenacity>=8.0.0

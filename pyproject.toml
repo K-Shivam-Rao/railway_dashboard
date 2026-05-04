@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sichergleis-railway-dashboard"
+version = "1.0.0"
+description = "SicherGleis Railway Dashboard - Platform Screen Door Monitoring & SaaS Analytics"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "SicherGleis Team", email = "contact@sicher-gleis.com"},
+]
+maintainers = [
+    {name = "SicherGleis Team", email = "contact@sicher-gleis.com"},
+]
+keywords = ["railway", "dashboard", "streamlit", "data-science", "predictive-maintenance", "saas"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://www.sicher-gleis.com"
+Repository = "https://github.com/sichergleis/railway-dashboard"
+Documentation = "https://docs.sicher-gleis.com"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["data", "core", "utils", "reports", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=core --cov=data --cov=utils --cov-report=term-missing"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
