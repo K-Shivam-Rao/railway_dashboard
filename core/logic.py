@@ -1310,12 +1310,13 @@ def get_engagement_timeline(customer_id=None, months_back=12):
 def get_operator_health_trend(customer_id=None, months_back=12):
     """Return operator health trend from sample data."""
     if not customer_id:
-        return {}
+        return pd.DataFrame()
     try:
         from data.sample_data import get_operator_health_trend as _get_trend
-        return _get_trend(customer_id, months_back)
+        result = _get_trend(customer_id, months_back)
+        return result if isinstance(result, pd.DataFrame) else pd.DataFrame()
     except:
-        return {}
+        return pd.DataFrame()
 
 
 def get_support_ticket_trend(customer_id=None, months_back=6):

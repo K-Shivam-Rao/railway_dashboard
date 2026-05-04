@@ -2674,12 +2674,14 @@ with st.sidebar:
 
     # ── TestVision Pro Button ──
     st.markdown("### 🧪 Test Analytics")
-    if st.button("Open TestVision Pro", type="primary", use_container_width=True):
-        import subprocess
-        subprocess.Popen(["streamlit", "run", "tests/dashboard/main.py", "--server.port", "8502"])
-        st.success("Opening TestVision Pro...")
-    
-    st.caption("Test insights dashboard")
+    st.markdown(
+        '<a href="http://localhost:8502" target="_blank">'
+        '<button style="background:linear-gradient(135deg,#3b82f6,#06b6d4);color:white;padding:12px 24px;border:none;border-radius:10px;font-weight:600;cursor:pointer;width:100%;">'
+        '🚀 Open TestVision Pro'
+        '</button></a>',
+        unsafe_allow_html=True
+    )
+    st.caption("Test insights dashboard (port 8502)")
 
     # ── Station Selection (Modern Dropdown) ──
     st.markdown(
