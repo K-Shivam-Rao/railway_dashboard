@@ -8229,9 +8229,7 @@ elif active_tab == "portfolio":
             health_trend_df = get_operator_health_trend(
                 selected_operator_id, months_back=12
             )
-            # DEBUG: show type and content
-            st.caption(f"DEBUG: type={type(health_trend_df)}, rows={len(health_trend_df) if hasattr(health_trend_df, '__len__') else 'N/A'}")
-            if hasattr(health_trend_df, 'empty') and not health_trend_df.empty:
+            if not health_trend_df.empty:
                 fig_health = px.line(
                     health_trend_df,
                     x="Month",

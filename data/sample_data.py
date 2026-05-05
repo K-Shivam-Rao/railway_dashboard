@@ -635,6 +635,7 @@ def get_engagement_timeline(customer_id, months_back=12):
 
 def get_operator_monthly_stats(customer_id, months_back=6):
     """Return monthly stats (mock data)."""
+    # Function ignores customer_id and generates random data for any operator or "all"
     return pd.DataFrame({
         "Month": pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m"),
         "PSD Activations": np.random.randint(120, 480, months_back),
@@ -691,6 +692,7 @@ def get_operator_comparison_benchmarks(customer_id=None):
 
 def get_support_ticket_trend(customer_id, months_back=6):
     """Return support ticket trend."""
+    # Function ignores customer_id and generates random data for any operator or "all"
     return pd.DataFrame({
         "Month": pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m"),
         "Tickets": np.random.randint(1, 8, months_back),
