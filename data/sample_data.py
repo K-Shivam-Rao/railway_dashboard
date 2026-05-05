@@ -625,14 +625,15 @@ def get_engagement_timeline(customer_id, months_back=12):
     if not isinstance(months_back, int) or months_back < 1:
         months_back = 12
     date_range = pd.date_range(end=datetime.now(), periods=months_back, freq="ME")
+    num_periods = len(date_range)  # Use actual length
     follow_up_range = date_range + timedelta(days=14)
     return pd.DataFrame({
         "date": date_range.strftime("%Y-%m-%d"),
-        "type": np.random.choice(["Meeting", "Review", "Training", "Support Call", "On-site Visit"], months_back),
-        "direction": np.random.choice(["Inbound", "Outbound"], months_back),
-        "our_participants": np.random.randint(2, 6, months_back),
-        "their_participants": np.random.randint(2, 8, months_back),
-        "outcome": np.random.choice(["Successful", "Follow-up Required", "Resolved", "Pending Decision"], months_back),
+        "type": np.random.choice(["Meeting", "Review", "Training", "Support Call", "On-site Visit"], num_periods),
+        "direction": np.random.choice(["Inbound", "Outbound"], num_periods),
+        "our_participants": np.random.randint(2, 6, num_periods),
+        "their_participants": np.random.randint(2, 8, num_periods),
+        "outcome": np.random.choice(["Successful", "Follow-up Required", "Resolved", "Pending Decision"], num_periods),
         "follow_up_date": follow_up_range.strftime("%Y-%m-%d"),
     })
 
@@ -643,14 +644,15 @@ def get_operator_monthly_stats(customer_id, months_back=6):
     if not isinstance(months_back, int) or months_back < 1:
         months_back = 6
     date_range = pd.date_range(end=datetime.now(), periods=months_back, freq="ME")
+    num_periods = len(date_range)  # Use actual length
     return pd.DataFrame({
         "Month": date_range.strftime("%Y-%m"),
-        "PSD Activations": np.random.randint(120, 480, months_back),
-        "Incidents": np.random.randint(1, 8, months_back),
-        "Uptime %": np.round(np.random.uniform(99.2, 99.95, months_back), 2),
-        "Projects Completed": np.random.randint(1, 4, months_back),
-        "Tickets Opened": np.random.randint(2, 8, months_back),
-        "Engagements": np.random.randint(3, 10, months_back),
+        "PSD Activations": np.random.randint(120, 480, num_periods),
+        "Incidents": np.random.randint(1, 8, num_periods),
+        "Uptime %": np.round(np.random.uniform(99.2, 99.95, num_periods), 2),
+        "Projects Completed": np.random.randint(1, 4, num_periods),
+        "Tickets Opened": np.random.randint(2, 8, num_periods),
+        "Engagements": np.random.randint(3, 10, num_periods),
     })
 
 
@@ -703,9 +705,10 @@ def get_support_ticket_trend(customer_id, months_back=6):
     if not isinstance(months_back, int) or months_back < 1:
         months_back = 6
     date_range = pd.date_range(end=datetime.now(), periods=months_back, freq="ME")
+    num_periods = len(date_range)  # Use actual length
     return pd.DataFrame({
         "Month": date_range.strftime("%Y-%m"),
-        "Tickets": np.random.randint(1, 8, months_back),
+        "Tickets": np.random.randint(1, 8, num_periods),
     })
 
 
