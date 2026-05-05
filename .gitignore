@@ -50,7 +50,7 @@ wheelhouse/
 .pytest_cache/
 .coverage
 htmlcov/
-coverage.json
+
 .coverage.*
 tests/dashboard/pytest_results.json
 
