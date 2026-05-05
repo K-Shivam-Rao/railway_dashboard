@@ -1,0 +1,11 @@
+[server]
+enableStaticServing = false
+headless = true
+enableCORS = false
+port = ${PORT}
+
+[runner]
+fastReruns = true
+
+[browser]
+gatherUsageStats = false
