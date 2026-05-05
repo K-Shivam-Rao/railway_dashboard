@@ -1210,25 +1210,37 @@ def get_customer_business_insights(customer_df=None):
 
 def get_contract_health_score(customer_df=None):
     """Return contract health scores from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         return get_contract_health_df()
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load contract health data: {e}")
         return pd.DataFrame()
 
 
 def get_renewal_forecast(customer_df=None):
     """Return renewal forecast from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame(columns=["days_to_renewal", "total_contract_value_eur"])
     try:
         return get_renewal_forecast_df()
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load renewal forecast: {e}")
         return pd.DataFrame(columns=["days_to_renewal", "total_contract_value_eur"])
 
 
 def get_at_risk_accounts(customer_df=None):
     """Return at-risk accounts from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame(columns=["risk_level"])
     try:
         return get_at_risk_df()
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load at-risk accounts: {e}")
         return pd.DataFrame(columns=["risk_level"])
 
 
@@ -1295,29 +1307,47 @@ def get_renewal_health_summary(customer_df=None):
 
 def get_operator_history(customer_id=None):
     """Return operator history from sample data."""
+    if not customer_id:
+        return pd.DataFrame()
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         from data.sample_data import get_operator_history as _get_data
-        return _get_data(customer_id) if customer_id else pd.DataFrame()
-    except:
+        return _get_data(customer_id)
+    except Exception as e:
+        logger.error(f"Failed to load operator history: {e}")
         return pd.DataFrame()
 
 
 def get_contract_amendments(customer_id=None, customer_df=None):
     """Return contract amendments from sample data."""
+    if not customer_id:
+        return pd.DataFrame()
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         from data.sample_data import get_contract_amendments as _get_data
-        result = _get_data(customer_id) if customer_id else []
+        result = _get_data(customer_id)
         return pd.DataFrame(result) if isinstance(result, list) else result
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load contract amendments: {e}")
         return pd.DataFrame()
 
 
 def get_support_tickets(customer_id=None, limit=100):
     """Return support tickets from sample data."""
+    if not customer_id:
+        return pd.DataFrame()
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         from data.sample_data import get_support_tickets as _get_data
-        return _get_data(customer_id, limit) if customer_id else pd.DataFrame()
-    except:
+        return _get_data(customer_id, limit)
+    except Exception as e:
+        logger.error(f"Failed to load support tickets: {e}")
         return pd.DataFrame()
 
 
@@ -1325,10 +1355,14 @@ def get_engagement_timeline(customer_id=None, months_back=12):
     """Return engagement timeline from sample data."""
     if not customer_id:
         customer_id = "all"
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         from data.sample_data import get_engagement_timeline as _get_data
         return _get_data(customer_id, months_back)
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load engagement timeline: {e}")
         return pd.DataFrame()
 
 
@@ -1336,11 +1370,15 @@ def get_operator_health_trend(customer_id=None, months_back=12):
     """Return operator health trend from sample data."""
     if not customer_id:
         customer_id = "all"
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
-        from data.sample_data import get_operator_health_trend as _get_trend
-        result = _get_trend(customer_id, months_back)
+        from data.sample_data import get_operator_health_trend as _get_data
+        result = _get_data(customer_id, months_back)
         return result if isinstance(result, pd.DataFrame) else pd.DataFrame()
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load operator health trend: {e}")
         return pd.DataFrame()
 
 
@@ -1348,28 +1386,40 @@ def get_support_ticket_trend(customer_id=None, months_back=6):
     """Return support ticket trend from sample data."""
     if not customer_id:
         customer_id = "all"
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         from data.sample_data import get_support_ticket_trend as _get_data
         return _get_data(customer_id, months_back)
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load support ticket trend: {e}")
         return pd.DataFrame()
 
 
 def get_financial_projections(months_ahead=24):
     """Return financial projections from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return {}
     try:
-        from data.sample_data import get_financial_projections as _get_proj
-        return _get_proj(months_ahead)
-    except:
+        from data.sample_data import get_financial_projections as _get_data
+        return _get_data(months_ahead)
+    except Exception as e:
+        logger.error(f"Failed to load financial projections: {e}")
         return {}
 
 
 def get_operator_comparison_benchmarks(customer_id=None):
     """Return operator comparison benchmarks from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return {}
     try:
-        from data.sample_data import get_operator_comparison_benchmarks as _get_bench
-        return _get_bench(customer_id)
-    except:
+        from data.sample_data import get_operator_comparison_benchmarks as _get_data
+        return _get_data(customer_id)
+    except Exception as e:
+        logger.error(f"Failed to load operator benchmarks: {e}")
         return {}
 
 
@@ -1377,16 +1427,25 @@ def get_operator_monthly_stats(customer_id=None, months_back=6):
     """Return operator monthly stats from sample data."""
     if not customer_id:
         customer_id = "all"
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         from data.sample_data import get_operator_monthly_stats as _get_data
         return _get_data(customer_id, months_back)
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load operator monthly stats: {e}")
         return pd.DataFrame()
 
 
 def get_business_map_data():
     """Return business map data from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame(columns=["status"])
     try:
-        return get_station_df()
-    except:
+        from data.sample_data import get_station_df as _get_data
+        return _get_data()
+    except Exception as e:
+        logger.error(f"Failed to load business map data: {e}")
         return pd.DataFrame(columns=["status"])

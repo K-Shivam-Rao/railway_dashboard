@@ -2791,7 +2791,9 @@ try:
     gates_total, gates_active, p_total, alerts, avg_sync, warnings, _ = get_metrics(
         df, current_station
     )
-except:
+except Exception as e:
+    import logging
+    logging.warning(f"Error loading metrics: {e}")
     gates_total = gates_active = p_total = alerts = avg_sync = warnings = 0
 
 active_tab = st.session_state.get("active_tab", "ops")
@@ -2828,11 +2830,13 @@ elif active_tab == "portfolio":
     if selected_op_id:
         try:
             customer_df = get_customer_data()
-            op_row = customer_df[customer_df["customer_id"] == selected_op_id]
-            if not op_row.empty:
-                display_title = op_row.iloc[0]["customer_name"]
-        except:
-            pass
+            if customer_df is not None and not customer_df.empty:
+                op_row = customer_df[customer_df["customer_id"] == selected_op_id]
+                if not op_row.empty:
+                    display_title = op_row.iloc[0]["customer_name"]
+        except Exception as e:
+            import logging
+            logging.warning(f"Error loading operator name: {e}")
 elif active_tab == "kpi":
     display_title = "KPI Dashboard"
     display_sub = "KEY PERFORMANCE INDICATORS // OVERVIEW"
@@ -4949,11 +4953,11 @@ elif active_tab == "network":
 
                 try:
                     ax.outline_patch.set_visible(False)
-                except:
+                except Exception:
                     pass
                 try:
                     ax.spines["geo"].set_visible(False)
-                except:
+                except Exception:
                     pass
                 ax.set_xticks([])
                 ax.set_yticks([])
@@ -9252,16 +9256,18 @@ elif active_tab == "kpi":
     hist_trend = None
     try:
         hist_trend = get_historical_trends(ops_df, days_back=7)
-    except:
-        pass
+    except Exception as e:
+        import logging
+        logging.warning(f"Error loading historical trends: {e}")
 
     # Maintenance forecast
     maint_forecast = None
     if stations.shape[0] > 0:
         try:
             maint_forecast = get_maintenance_forecast(stations[0])
-        except:
-            pass
+        except Exception as e:
+            import logging
+            logging.warning(f"Error loading maintenance forecast: {e}")
 
     st.markdown(
         '<div class="kpi-section-header"><span class="icon">🚂</span> Operations</div>',
