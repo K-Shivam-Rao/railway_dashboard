@@ -621,23 +621,30 @@ def get_support_tickets(customer_id, limit=100):
 
 def get_engagement_timeline(customer_id, months_back=12):
     """Return engagement timeline (mock data)."""
-    months = pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m")
+    # Ensure months_back is a valid integer
+    if not isinstance(months_back, int) or months_back < 1:
+        months_back = 12
+    date_range = pd.date_range(end=datetime.now(), periods=months_back, freq="ME")
+    follow_up_range = date_range + timedelta(days=14)
     return pd.DataFrame({
-        "date": pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m-%d"),
+        "date": date_range.strftime("%Y-%m-%d"),
         "type": np.random.choice(["Meeting", "Review", "Training", "Support Call", "On-site Visit"], months_back),
         "direction": np.random.choice(["Inbound", "Outbound"], months_back),
         "our_participants": np.random.randint(2, 6, months_back),
         "their_participants": np.random.randint(2, 8, months_back),
         "outcome": np.random.choice(["Successful", "Follow-up Required", "Resolved", "Pending Decision"], months_back),
-        "follow_up_date": (pd.date_range(end=datetime.now(), periods=months_back, freq="ME") + timedelta(days=14)).strftime("%Y-%m-%d"),
+        "follow_up_date": follow_up_range.strftime("%Y-%m-%d"),
     })
 
 
 def get_operator_monthly_stats(customer_id, months_back=6):
     """Return monthly stats (mock data)."""
-    # Function ignores customer_id and generates random data for any operator or "all"
+    # Ensure months_back is a valid integer
+    if not isinstance(months_back, int) or months_back < 1:
+        months_back = 6
+    date_range = pd.date_range(end=datetime.now(), periods=months_back, freq="ME")
     return pd.DataFrame({
-        "Month": pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m"),
+        "Month": date_range.strftime("%Y-%m"),
         "PSD Activations": np.random.randint(120, 480, months_back),
         "Incidents": np.random.randint(1, 8, months_back),
         "Uptime %": np.round(np.random.uniform(99.2, 99.95, months_back), 2),
@@ -692,9 +699,12 @@ def get_operator_comparison_benchmarks(customer_id=None):
 
 def get_support_ticket_trend(customer_id, months_back=6):
     """Return support ticket trend."""
-    # Function ignores customer_id and generates random data for any operator or "all"
+    # Ensure months_back is a valid integer
+    if not isinstance(months_back, int) or months_back < 1:
+        months_back = 6
+    date_range = pd.date_range(end=datetime.now(), periods=months_back, freq="ME")
     return pd.DataFrame({
-        "Month": pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m"),
+        "Month": date_range.strftime("%Y-%m"),
         "Tickets": np.random.randint(1, 8, months_back),
     })
 
@@ -795,17 +805,21 @@ def get_operator_health_trend(customer_id, months_back=12):
     import numpy as np
     from datetime import datetime
 
-    dates = pd.date_range(end=datetime.now(), periods=months_back, freq='ME').strftime('%Y-%m')
+    # Ensure months_back is a valid integer
+    if not isinstance(months_back, int) or months_back < 1:
+        months_back = 12
+
+    date_range = pd.date_range(end=datetime.now(), periods=months_back, freq='ME')
+    dates = date_range.strftime('%Y-%m')
 
     if customer_id is None or customer_id == "all":
-        all_ids = ['OP001', 'OP002', 'OP003', 'OP004', 'OP005', 'OP006', 'OP007', 'OP008', 'OP009', 'OP010']
-        health_scores = [int(np.random.uniform(75, 95)) for _ in range(months_back)]
+        health_scores = [int(np.random.uniform(75, 95)) for _ in range(len(dates))]
     else:
         at_risk_ids = ['OP007', 'OP010', 'OP014', 'OP015']
         if customer_id in at_risk_ids:
-            health_scores = np.linspace(70, 45, months_back, dtype=int).tolist()
+            health_scores = np.linspace(70, 45, len(dates), dtype=int).tolist()
         else:
-            health_scores = np.linspace(85, 95, months_back, dtype=int).tolist()
+            health_scores = np.linspace(85, 95, len(dates), dtype=int).tolist()
 
     return pd.DataFrame({
         'Month': dates.tolist(),
