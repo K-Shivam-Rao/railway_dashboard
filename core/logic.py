@@ -1300,9 +1300,11 @@ def get_support_tickets(customer_id=None, limit=100):
 
 def get_engagement_timeline(customer_id=None, months_back=12):
     """Return engagement timeline from sample data."""
+    if not customer_id:
+        customer_id = "all"
     try:
         from data.sample_data import get_engagement_timeline as _get_data
-        return _get_data(customer_id, months_back) if customer_id else pd.DataFrame()
+        return _get_data(customer_id, months_back)
     except:
         return pd.DataFrame()
 
