@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple, Optional
 from utils.exceptions import DataValidationError, SimulationError, ConfigurationError
 
 # Import sample data functions
+SAMPLE_DATA_AVAILABLE = False
 try:
     from data.sample_data import (
         get_customer_df, get_rfm_df, get_customer_insights,
@@ -25,9 +26,11 @@ try:
         get_support_ticket_trend, get_business_map_data,
         get_leadership_data,
     )
-except ImportError:
-    # Fallback if sample_data not available
-    pass
+    SAMPLE_DATA_AVAILABLE = True
+    logger.info("Successfully loaded sample data functions")
+except ImportError as e:
+    logger.error(f"Failed to import sample_data module: {e}")
+    logger.warning("Customer/operator data will not be available")
 
 
 # ─────────────────────────────────────
@@ -1131,9 +1134,17 @@ def get_financial_model_data(months=24, starting_customers=50, monthly_growth_ra
 
 def get_customer_data():
     """Return customer/operator data from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available - cannot load customer data")
+        return pd.DataFrame(columns=[
+            "customer_id", "customer_name", "tier", "satisfaction_score",
+            "rfm_segment", "segment", "risk_level", "total_contract_value_eur",
+            "days_to_renewal", "avg_response_hours"
+        ])
     try:
         return get_customer_df()
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load customer data: {e}")
         return pd.DataFrame(columns=[
             "customer_id", "customer_name", "tier", "satisfaction_score",
             "rfm_segment", "segment", "risk_level", "total_contract_value_eur",
@@ -1143,9 +1154,17 @@ def get_customer_data():
 
 def get_rfm_analysis(customer_df=None):
     """Return RFM analysis DataFrame from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available - cannot load RFM data")
+        return pd.DataFrame(columns=[
+            "rfm_segment", "segment",
+            "recency_score", "frequency_score", "monetary_score",
+            "platforms_installed", "total_contract_value_eur"
+        ])
     try:
         return get_rfm_df()
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load RFM analysis: {e}")
         return pd.DataFrame(columns=[
             "rfm_segment", "segment",
             "recency_score", "frequency_score", "monetary_score",
@@ -1155,9 +1174,13 @@ def get_rfm_analysis(customer_df=None):
 
 def get_high_value_customers(customer_df=None):
     """Return high-value customers from sample data."""
+    if not SAMPLE_DATA_AVAILABLE:
+        logger.error("sample_data module not available")
+        return pd.DataFrame()
     try:
         return get_high_value_customers_df()
-    except:
+    except Exception as e:
+        logger.error(f"Failed to load high value customers: {e}")
         return pd.DataFrame()
 
 
