@@ -12,8 +12,6 @@ ENV/
 .venv/
 .ENV/
 
-# Streamlit cache
-.streamlit/
 
 # Environment variables
 .env

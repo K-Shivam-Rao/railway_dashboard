@@ -2674,12 +2674,14 @@ with st.sidebar:
 
     # ── TestVision Pro Button ──
     st.markdown("### 🧪 Test Analytics")
-    if st.button("Open TestVision Pro", type="primary", use_container_width=True):
-        import subprocess
-        subprocess.Popen(["streamlit", "run", "tests/dashboard/main.py", "--server.port", "8502"])
-        st.success("Opening TestVision Pro...")
-    
-    st.caption("Test insights dashboard")
+    st.markdown(
+        '<a href="http://localhost:8502" target="_blank">'
+        '<button style="background:linear-gradient(135deg,#3b82f6,#06b6d4);color:white;padding:12px 24px;border:none;border-radius:10px;font-weight:600;cursor:pointer;width:100%;">'
+        '🚀 Open TestVision Pro'
+        '</button></a>',
+        unsafe_allow_html=True
+    )
+    st.caption("Test insights dashboard (port 8502)")
 
     # ── Station Selection (Modern Dropdown) ──
     st.markdown(
@@ -7160,7 +7162,7 @@ elif active_tab == "customer":
 
     if not rfm_summary.empty:
         st.dataframe(
-            rfm_summary.style.applymap(
+            rfm_summary.style.map(
                 highlight_rfm, subset=["Avg Recency", "Avg Frequency", "Avg Monetary"]
             ),
             use_container_width=True,
@@ -7615,7 +7617,7 @@ elif active_tab == "customer":
                 return "background-color: rgba(59, 130, 246, 0.3); color: #3b82f6"
 
             st.dataframe(
-                display_renewals.style.applymap(urgency_color, subset=["Urgency"]),
+                display_renewals.style.map(urgency_color, subset=["Urgency"]),
                 use_container_width=True,
                 hide_index=True,
                 height=300,
@@ -7657,7 +7659,7 @@ elif active_tab == "customer":
                 return "background-color: rgba(245, 158, 11, 0.3); color: #f59e0b"
 
             st.dataframe(
-                risk_table.style.applymap(risk_color, subset=["Risk Level"]),
+                risk_table.style.map(risk_color, subset=["Risk Level"]),
                 use_container_width=True,
                 hide_index=True,
                 height=300,
@@ -8028,59 +8030,101 @@ elif active_tab == "portfolio":
             break
 
     if operator_options:
+        option_labels_with_all = ["All Operators"] + option_labels
+        option_to_id_with_all = {"All Operators": "all"}
+        option_to_id_with_all.update(option_to_id)
+
+        if not current_index:
+            current_index = 0
+
         selected_operator_label = st.selectbox(
             "Select an operator to view details",
-            options=option_labels,
+            options=option_labels_with_all,
             index=current_index,
             key="operator_selector",
         )
 
-        selected_operator_id = option_to_id[selected_operator_label]
+        selected_operator_id = option_to_id_with_all[selected_operator_label]
         if st.session_state.selected_operator != selected_operator_id:
             st.session_state.selected_operator = selected_operator_id
             st.rerun()
     else:
         st.info("No customer data available")
-        selected_operator_id = None
+        selected_operator_id = "all"
 
-    if not selected_operator_id:
-        st.stop()
+    if selected_operator_id == "all":
+        st.markdown("### 📊 All Operators Overview")
 
-    # Quick stats for selected operator
-    selected_op = customer_df[customer_df["customer_id"] == selected_operator_id].iloc[
-        0
-    ]
-    col_quick1, col_quick2, col_quick3 = st.columns(3)
-    with col_quick1:
-        st.markdown(
-            f"""
-            <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Satisfaction</div>
-                <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{selected_op["satisfaction_score"]}/10</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with col_quick2:
-        st.markdown(
-            f"""
-            <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">PSD Units</div>
-                <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{selected_op["psd_units"]:,}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with col_quick3:
-        st.markdown(
-            f"""
-            <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Contract Value</div>
-                <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{format_euro(selected_op["total_contract_value_eur"])}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    if selected_operator_id != "all":
+        selected_op = customer_df[customer_df["customer_id"] == selected_operator_id].iloc[
+            0
+        ]
+        col_quick1, col_quick2, col_quick3 = st.columns(3)
+        with col_quick1:
+            st.markdown(
+                f"""
+                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                    <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Satisfaction</div>
+                    <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{selected_op["satisfaction_score"]}/10</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_quick2:
+            st.markdown(
+                f"""
+                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                    <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">PSD Units</div>
+                    <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{selected_op["psd_units"]:,}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_quick3:
+            st.markdown(
+                f"""
+                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                    <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Contract Value</div>
+                    <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{format_euro(selected_op["total_contract_value_eur"])}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+    else:
+        col_quick1, col_quick2, col_quick3 = st.columns(3)
+        total_psd = customer_df["psd_units"].sum()
+        avg_satisfaction = round(customer_df["satisfaction_score"].mean(), 1)
+        total_contract = customer_df["total_contract_value_eur"].sum()
+        with col_quick1:
+            st.markdown(
+                f"""
+                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                    <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Avg Satisfaction</div>
+                    <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{avg_satisfaction}/10</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_quick2:
+            st.markdown(
+                f"""
+                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                    <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total PSD Units</div>
+                    <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{total_psd:,}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_quick3:
+            st.markdown(
+                f"""
+                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                    <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Contract Value</div>
+                    <div style="font-size:1.4rem;font-weight:700;color:var(--text-primary);">{format_euro(total_contract)}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 

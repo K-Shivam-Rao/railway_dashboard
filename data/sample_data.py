@@ -635,6 +635,7 @@ def get_engagement_timeline(customer_id, months_back=12):
 
 def get_operator_monthly_stats(customer_id, months_back=6):
     """Return monthly stats (mock data)."""
+    # Function ignores customer_id and generates random data for any operator or "all"
     return pd.DataFrame({
         "Month": pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m"),
         "PSD Activations": np.random.randint(120, 480, months_back),
@@ -691,6 +692,7 @@ def get_operator_comparison_benchmarks(customer_id=None):
 
 def get_support_ticket_trend(customer_id, months_back=6):
     """Return support ticket trend."""
+    # Function ignores customer_id and generates random data for any operator or "all"
     return pd.DataFrame({
         "Month": pd.date_range(end=datetime.now(), periods=months_back, freq="ME").strftime("%Y-%m"),
         "Tickets": np.random.randint(1, 8, months_back),
@@ -792,15 +794,19 @@ def get_operator_health_trend(customer_id, months_back=12):
     """Return operator health trend (mock data)."""
     import numpy as np
     from datetime import datetime
-    
+
     dates = pd.date_range(end=datetime.now(), periods=months_back, freq='ME').strftime('%Y-%m')
-    # Generate decreasing trend for at-risk, stable for healthy
-    at_risk_ids = ['OP007', 'OP010', 'OP014', 'OP015']
-    if customer_id in at_risk_ids:
-        health_scores = np.linspace(70, 45, months_back, dtype=int).tolist()
+
+    if customer_id is None or customer_id == "all":
+        all_ids = ['OP001', 'OP002', 'OP003', 'OP004', 'OP005', 'OP006', 'OP007', 'OP008', 'OP009', 'OP010']
+        health_scores = [int(np.random.uniform(75, 95)) for _ in range(months_back)]
     else:
-        health_scores = np.linspace(85, 95, months_back, dtype=int).tolist()
-    
+        at_risk_ids = ['OP007', 'OP010', 'OP014', 'OP015']
+        if customer_id in at_risk_ids:
+            health_scores = np.linspace(70, 45, months_back, dtype=int).tolist()
+        else:
+            health_scores = np.linspace(85, 95, months_back, dtype=int).tolist()
+
     return pd.DataFrame({
         'Month': dates.tolist(),
         'Health Score': health_scores,
