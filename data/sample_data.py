@@ -792,15 +792,19 @@ def get_operator_health_trend(customer_id, months_back=12):
     """Return operator health trend (mock data)."""
     import numpy as np
     from datetime import datetime
-    
+
     dates = pd.date_range(end=datetime.now(), periods=months_back, freq='ME').strftime('%Y-%m')
-    # Generate decreasing trend for at-risk, stable for healthy
-    at_risk_ids = ['OP007', 'OP010', 'OP014', 'OP015']
-    if customer_id in at_risk_ids:
-        health_scores = np.linspace(70, 45, months_back, dtype=int).tolist()
+
+    if customer_id is None or customer_id == "all":
+        all_ids = ['OP001', 'OP002', 'OP003', 'OP004', 'OP005', 'OP006', 'OP007', 'OP008', 'OP009', 'OP010']
+        health_scores = [int(np.random.uniform(75, 95)) for _ in range(months_back)]
     else:
-        health_scores = np.linspace(85, 95, months_back, dtype=int).tolist()
-    
+        at_risk_ids = ['OP007', 'OP010', 'OP014', 'OP015']
+        if customer_id in at_risk_ids:
+            health_scores = np.linspace(70, 45, months_back, dtype=int).tolist()
+        else:
+            health_scores = np.linspace(85, 95, months_back, dtype=int).tolist()
+
     return pd.DataFrame({
         'Month': dates.tolist(),
         'Health Score': health_scores,

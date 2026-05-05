@@ -1310,7 +1310,7 @@ def get_engagement_timeline(customer_id=None, months_back=12):
 def get_operator_health_trend(customer_id=None, months_back=12):
     """Return operator health trend from sample data."""
     if not customer_id:
-        return pd.DataFrame()
+        customer_id = "all"
     try:
         from data.sample_data import get_operator_health_trend as _get_trend
         result = _get_trend(customer_id, months_back)
@@ -1321,9 +1321,11 @@ def get_operator_health_trend(customer_id=None, months_back=12):
 
 def get_support_ticket_trend(customer_id=None, months_back=6):
     """Return support ticket trend from sample data."""
+    if not customer_id:
+        customer_id = "all"
     try:
         from data.sample_data import get_support_ticket_trend as _get_data
-        return _get_data(customer_id, months_back) if customer_id else pd.DataFrame()
+        return _get_data(customer_id, months_back)
     except:
         return pd.DataFrame()
 
@@ -1348,9 +1350,11 @@ def get_operator_comparison_benchmarks(customer_id=None):
 
 def get_operator_monthly_stats(customer_id=None, months_back=6):
     """Return operator monthly stats from sample data."""
+    if not customer_id:
+        customer_id = "all"
     try:
         from data.sample_data import get_operator_monthly_stats as _get_data
-        return _get_data(customer_id, months_back) if customer_id else pd.DataFrame()
+        return _get_data(customer_id, months_back)
     except:
         return pd.DataFrame()
 
