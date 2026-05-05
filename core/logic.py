@@ -1358,9 +1358,22 @@ def get_engagement_timeline(customer_id=None, months_back=12):
     if not SAMPLE_DATA_AVAILABLE:
         logger.error("sample_data module not available")
         return pd.DataFrame()
+    # Ensure months_back is valid
+    try:
+        months_back = int(months_back) if months_back else 12
+        if months_back < 1:
+            months_back = 12
+    except (ValueError, TypeError):
+        months_back = 12
     try:
         from data.sample_data import get_engagement_timeline as _get_data
         return _get_data(customer_id, months_back)
+    except ValueError as e:
+        if "All arrays must be of the same length" in str(e):
+            logger.warning(f"Data shape mismatch in engagement timeline, returning empty: {e}")
+            return pd.DataFrame(columns=["date", "type", "direction", "our_participants", "their_participants", "outcome", "follow_up_date"])
+        logger.error(f"Failed to load engagement timeline: {e}")
+        return pd.DataFrame()
     except Exception as e:
         logger.error(f"Failed to load engagement timeline: {e}")
         return pd.DataFrame()
@@ -1373,10 +1386,23 @@ def get_operator_health_trend(customer_id=None, months_back=12):
     if not SAMPLE_DATA_AVAILABLE:
         logger.error("sample_data module not available")
         return pd.DataFrame()
+    # Ensure months_back is valid
+    try:
+        months_back = int(months_back) if months_back else 12
+        if months_back < 1:
+            months_back = 12
+    except (ValueError, TypeError):
+        months_back = 12
     try:
         from data.sample_data import get_operator_health_trend as _get_data
         result = _get_data(customer_id, months_back)
         return result if isinstance(result, pd.DataFrame) else pd.DataFrame()
+    except ValueError as e:
+        if "All arrays must be of the same length" in str(e):
+            logger.warning(f"Data shape mismatch in health trend, returning empty: {e}")
+            return pd.DataFrame(columns=["Month", "Health Score"])
+        logger.error(f"Failed to load operator health trend: {e}")
+        return pd.DataFrame()
     except Exception as e:
         logger.error(f"Failed to load operator health trend: {e}")
         return pd.DataFrame()
@@ -1389,9 +1415,22 @@ def get_support_ticket_trend(customer_id=None, months_back=6):
     if not SAMPLE_DATA_AVAILABLE:
         logger.error("sample_data module not available")
         return pd.DataFrame()
+    # Ensure months_back is valid
+    try:
+        months_back = int(months_back) if months_back else 6
+        if months_back < 1:
+            months_back = 6
+    except (ValueError, TypeError):
+        months_back = 6
     try:
         from data.sample_data import get_support_ticket_trend as _get_data
         return _get_data(customer_id, months_back)
+    except ValueError as e:
+        if "All arrays must be of the same length" in str(e):
+            logger.warning(f"Data shape mismatch in ticket trend, returning empty: {e}")
+            return pd.DataFrame(columns=["Month", "Tickets"])
+        logger.error(f"Failed to load support ticket trend: {e}")
+        return pd.DataFrame()
     except Exception as e:
         logger.error(f"Failed to load support ticket trend: {e}")
         return pd.DataFrame()
@@ -1430,9 +1469,22 @@ def get_operator_monthly_stats(customer_id=None, months_back=6):
     if not SAMPLE_DATA_AVAILABLE:
         logger.error("sample_data module not available")
         return pd.DataFrame()
+    # Ensure months_back is valid
+    try:
+        months_back = int(months_back) if months_back else 6
+        if months_back < 1:
+            months_back = 6
+    except (ValueError, TypeError):
+        months_back = 6
     try:
         from data.sample_data import get_operator_monthly_stats as _get_data
         return _get_data(customer_id, months_back)
+    except ValueError as e:
+        if "All arrays must be of the same length" in str(e):
+            logger.warning(f"Data shape mismatch in monthly stats, returning empty: {e}")
+            return pd.DataFrame(columns=["Month", "PSD Activations", "Incidents", "Uptime %", "Projects Completed", "Tickets Opened", "Engagements"])
+        logger.error(f"Failed to load operator monthly stats: {e}")
+        return pd.DataFrame()
     except Exception as e:
         logger.error(f"Failed to load operator monthly stats: {e}")
         return pd.DataFrame()

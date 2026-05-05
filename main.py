@@ -4548,7 +4548,7 @@ if active_tab == "ops":
         num_platforms = station_data["platform"].nunique()
         anim_html = build_train_animation(current_station, station_data)
         anim_height = num_platforms * 295 + 60
-        components.html(anim_html, height=anim_height, scrolling=False)
+        st.html(anim_html)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
