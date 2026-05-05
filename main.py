@@ -2889,7 +2889,9 @@ def build_train_animation(station_name, station_df):
             gate_data = {
                 "id": row.gate_id,
                 "state": row.door_state,
-                "train": str(row.train) if pd.notna(row.train) and row.train else "",
+                "train": str(row.train)
+                if "train" in row._fields and pd.notna(row.train) and row.train
+                else "",
                 "train_type": str(row.train_type)
                 if "train_type" in row._fields and pd.notna(row.train_type)
                 else "ICE",
@@ -4548,7 +4550,8 @@ if active_tab == "ops":
         num_platforms = station_data["platform"].nunique()
         anim_html = build_train_animation(current_station, station_data)
         anim_height = num_platforms * 295 + 60
-        st.html(anim_html)
+        # Using deprecated API but it still works - height parameter needed for animation
+        st.components.v1.html(anim_html, height=anim_height, scrolling=False)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
