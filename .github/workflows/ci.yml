@@ -19,6 +19,7 @@ concurrency:
 env:
   PYTHONUNBUFFERED: "1"
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   NODE_OPTIONS: "--max_old_space_size=4096"
 
 # ──────────────────────────────────────────────────────────────
@@ -114,7 +115,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-cli-action@v1
+        uses: codecov/codecov-action@v5
         if: matrix.python-version == '3.13' && github.event_name != 'pull_request'
         continue-on-error: true
         with:

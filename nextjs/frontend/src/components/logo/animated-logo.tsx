@@ -15,12 +15,6 @@ const sizeMap = {
   lg: "w-14 h-14",
 };
 
-const iconSizes = {
-  sm: 16,
-  md: 20,
-  lg: 28,
-};
-
 const statusAnimations = {
   normal: { scale: [1, 1.05, 1], transition: { duration: 2, repeat: Infinity } },
   warning: { rotate: [0, 5, -5, 0], transition: { duration: 0.5, repeat: Infinity } },

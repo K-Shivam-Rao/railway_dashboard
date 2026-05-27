@@ -16,6 +16,14 @@ export function useWebSocket(
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<unknown>(null);
+  const onMessageRef = useRef(onMessage);
+  const onOpenRef = useRef(onOpen);
+  const onCloseRef = useRef(onClose);
+  const onErrorRef = useRef(onError);
+  onMessageRef.current = onMessage;
+  onOpenRef.current = onOpen;
+  onCloseRef.current = onClose;
+  onErrorRef.current = onError;
 
   useEffect(() => {
     const ws = new WebSocket(url);
@@ -23,26 +31,26 @@ export function useWebSocket(
 
     ws.onopen = () => {
       setIsConnected(true);
-      onOpen?.();
+      onOpenRef.current?.();
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         setLastMessage(data);
-        onMessage?.(data);
+        onMessageRef.current?.(data);
       } catch {
-        onMessage?.(event.data);
+        onMessageRef.current?.(event.data);
       }
     };
 
     ws.onclose = () => {
       setIsConnected(false);
-      onClose?.();
+      onCloseRef.current?.();
     };
 
     ws.onerror = (error) => {
-      onError?.(error);
+      onErrorRef.current?.(error);
     };
 
     return () => {

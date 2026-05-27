@@ -16,12 +16,12 @@ interface AreaChartProps {
   height?: number;
 }
 
-const defaultTooltip = ({ active, payload, label }: any) => {
+const defaultTooltip = ({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-border-default bg-bg-surface px-3 py-2 shadow-lg">
       <p className="text-xs text-text-muted mb-1">{label}</p>
-      {payload.map((p: any, i: number) => (
+      {payload.map((p, i) => (
         <p key={i} className="text-sm text-text-primary" style={{ color: p.color }}>
           {p.name}: {p.value.toLocaleString()}
         </p>

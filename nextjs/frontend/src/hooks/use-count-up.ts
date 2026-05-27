@@ -32,7 +32,7 @@ export function useCountUp(end: number, duration = 1500, delay = 0) {
       clearTimeout(timeout);
       cancelAnimationFrame(frameRef.current);
     };
-  }, [end, duration, delay]);
+  }, [end, duration, delay, decimals]);
 
   return value;
 }

@@ -40,11 +40,11 @@ export function LineChart({ data, series, height = 300 }: LineChartProps) {
           width={50}
         />
         <Tooltip
-          content={({ active, payload, label }: any) =>
+          content={({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) =>
             active && payload?.length ? (
               <div className="rounded-lg border border-border-default bg-bg-surface px-3 py-2 shadow-lg">
                 <p className="text-xs text-text-muted mb-1">{label}</p>
-                {payload.map((p: any, i: number) => (
+                {payload.map((p, i) => (
                   <p key={i} className="text-sm text-text-primary" style={{ color: p.color }}>
                     {p.name}: {p.value.toLocaleString()}
                   </p>

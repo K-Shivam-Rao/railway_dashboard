@@ -7,13 +7,6 @@ import { PieChart } from "@/components/charts/pie-chart";
 import { BarChart } from "@/components/charts/bar-chart";
 import { DollarSign, TrendingUp, TrendingDown, Users } from "lucide-react";
 
-const segments = [
-  { name: "High-Value", value: 12, color: "#f59e0b" },
-  { name: "At Risk", value: 5, color: "#ef4444" },
-  { name: "Growing", value: 8, color: "#10b981" },
-  { name: "New (30d)", value: 3, color: "#06b6d4" },
-];
-
 const mrrBySegment = [
   { name: "High-Value", value: 185000 },
   { name: "Growing", value: 62000 },

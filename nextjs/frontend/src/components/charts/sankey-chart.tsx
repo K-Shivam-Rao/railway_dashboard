@@ -10,12 +10,6 @@ interface SankeyNode {
   color: string;
 }
 
-interface SankeyLink {
-  source: number;
-  target: number;
-  value: number;
-}
-
 interface SankeyChartProps {
   nodes: { name: string; color?: string }[];
   links: { source: number; target: number; value: number }[];

@@ -25,8 +25,6 @@ export default function DashboardLayout({
 
   useKeyboard();
 
-  const sidebarVisible = isMobile ? mobileSidebarOpen : !sidebarCollapsed;
-
   return (
     <div className="flex h-screen relative" role="application">
       <DynamicParticleBg />
