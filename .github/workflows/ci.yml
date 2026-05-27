@@ -1,16 +1,8 @@
-# ════════════════════════════════════════════════════════════════
-# SicherGleis Railway Dashboard — CI Pipeline
-# ────────────────────────────────────────────────────────────────
-# Streamlit (Python matrix) + Next.js (Node matrix) + coverage
-# ════════════════════════════════════════════════════════════════
-
 name: CI
 
 on:
-  push:
-    branches: [main, master, develop, "release/*"]
-  pull_request:
-    branches: [main, master, develop]
+  push: { branches: [main, master, develop, "release/*"] }
+  pull_request: { branches: [main, master, develop] }
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,100 +14,52 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   NODE_OPTIONS: "--max_old_space_size=4096"
 
-# ──────────────────────────────────────────────────────────────
 jobs:
-
-  # ── Streamlit: test + lint + coverage ──────────────────────
   streamlit:
     name: Streamlit (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: streamlit
-
+    defaults: { run: { working-directory: streamlit } }
     strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+      matrix: { python-version: ["3.10", "3.11", "3.12", "3.13"] }
       fail-fast: false
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: streamlit/requirements.txt
-
-      - name: Install system deps
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends libgl1-mesa-dev 2>&1 | tail -3
+      - run: pip install -r requirements.txt pytest-cov pytest-json-report ruff mypy bandit
+      - run: ruff check . --target-version py310 --line-length 120
+      - run: mypy . --ignore-missing-imports || true
+      - run: bandit -r . -x tests/ -q || true
+      - name: Tests + coverage
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends \
-            libgl1-mesa-dev \
-            2>&1 | tail -3
-
-      - name: Install Python deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest-cov pytest-json-report ruff mypy bandit
-
-      - name: Lint (ruff)
-        run: ruff check . --target-version py310 --line-length 120
-
-      - name: Type check (mypy)
-        run: mypy . --ignore-missing-imports || true
-
-      - name: Security (bandit)
-        run: bandit -r . -x tests/ -q || true
-
-      - name: Run tests with coverage
-        run: |
-          python -m pytest tests/ \
-            --cov=core --cov=data --cov=utils --cov=reports \
-            --cov-branch \
-            --cov-report=term-missing \
-            --cov-report=xml:coverage.xml \
-            -q --tb=short
-
-      - name: Check per-module coverage
-        run: |
+          python -m pytest tests/ --cov=core --cov=data --cov=utils --cov=reports --cov-branch \
+            --cov-report=term-missing --cov-report=xml:coverage.xml -q --tb=short
           python -c "
-          import xml.etree.ElementTree as ET
-          import sys
-          tree = ET.parse('coverage.xml')
-          root = tree.getroot()
-          thresholds = {'core': 80.0, 'data': 95.0, 'utils': 95.0, 'reports': 88.0}
-          failures = []
-          for pkg in root.findall('.//package'):
-            name = pkg.get('name', '')
-            for module, threshold in thresholds.items():
-              if name.startswith(module) or name == module:
-                line_rate = float(pkg.get('line-rate', 0)) * 100
-                status = '✅' if line_rate >= threshold else '❌'
-                print(f'  {status} {name}: {line_rate:.1f}% (≥{threshold:.0f}%)')
-                if line_rate < threshold:
-                  failures.append(f'{name}: {line_rate:.1f}% < {threshold:.0f}%')
+          import xml.etree.ElementTree as ET, sys
+          t = {'core':80,'data':95,'utils':95,'reports':88}
+          f = []
+          for p in ET.parse('coverage.xml').getroot().findall('.//package'):
+            n = p.get('name','')
+            for m,v in t.items():
+              if n.startswith(m) or n==m:
+                r = float(p.get('line-rate',0))*100
+                print(f'  {\"✅\" if r>=v else \"❌\"} {n}: {r:.1f}% (≥{v}%)')
+                if r<v: f.append(f'{n}: {r:.1f}% < {v}%')
                 break
-          if failures:
-            print('\n❌ Per-module coverage check FAILED:')
-            for f in failures: print(f'  - {f}')
-            sys.exit(1)
-          else:
-            print('\n✅ All per-module coverage thresholds met!')
+          if f: print(*[f'\n❌ {x}' for x in f]); sys.exit(1)
+          else: print('\n✅ All per-module thresholds met!')
           "
-
-      - name: Upload coverage XML
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-xml-${{ matrix.python-version }}
           path: streamlit/coverage.xml
           if-no-files-found: ignore
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v5
         if: matrix.python-version == '3.13' && github.event_name != 'pull_request'
         continue-on-error: true
         with:
@@ -125,67 +69,36 @@ jobs:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  # ── Next.js frontend: lint + type-check + build ────────────
   nextjs-frontend:
     name: Next.js (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: nextjs/frontend
-
+    defaults: { run: { working-directory: nextjs/frontend } }
     strategy:
-      matrix:
-        node-version: ["20", "22"]
+      matrix: { node-version: ["20", "22"] }
       fail-fast: false
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
           cache-dependency-path: nextjs/frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint || true
+      - run: npx tsc --noEmit || true
+      - run: npm run build
 
-      - name: Install deps
-        run: npm ci
-
-      - name: Lint (ESLint)
-        run: npm run lint || true
-
-      - name: Type check (tsc)
-        run: npx tsc --noEmit || true
-
-      - name: Build
-        run: npm run build
-
-  # ── FastAPI backend: lint + test ───────────────────────────
   nextjs-backend:
     name: FastAPI (Python 3.12)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: nextjs/backend
-
+    defaults: { run: { working-directory: nextjs/backend } }
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: nextjs/backend/requirements.txt
-
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install ruff pytest httpx
-
-      - name: Lint
-        run: ruff check . --line-length 100 || true
-
-      - name: Run tests
-        run: python -m pytest . -q --tb=short || true
+      - run: pip install -r requirements.txt ruff pytest httpx
+      - run: ruff check . --line-length 100 || true
+      - run: python -m pytest . -q --tb=short || true
