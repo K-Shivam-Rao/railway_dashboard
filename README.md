@@ -16,6 +16,66 @@ built for <strong>hyper-growth startup scale</strong>.</p>
 
 ---
 
+## Migration: Flat → Monorepo
+
+This project was restructured from a flat root layout into a clean monorepo with dedicated `streamlit/` and `nextjs/` applications.
+
+### Before (Flat)
+
+```
+railway_dashboard/
+├── core/               # Business logic at root
+├── data/               # Data layer at root
+├── utils/              # Utilities at root
+├── reports/            # Reports at root
+├── tests/              # Tests at root
+├── main.py             # Single 11K-line entry point
+├── pyproject.toml      # Root-level config
+├── .streamlit/         # Root-level Streamlit config
+├── stations.csv        # Data at root
+├── stations.parquet    # Data at root
+├── report.md           # Documentation at root
+└── requirements.txt    # Root deps
+```
+
+### After (Monorepo)
+
+```
+railway_dashboard/
+├── streamlit/           # Streamlit app (migrated under one roof)
+├── nextjs/              # NEW: Next.js 15 + FastAPI app
+├── .github/workflows/   # CI pipeline
+├── requirements.txt     # Root → forwards to streamlit/
+├── packages.txt         # System deps
+├── .gitignore
+├── LICENSE
+└── README.md
+```
+
+### What Changed
+
+| Change | Detail |
+|--------|--------|
+| **Restructured** | `core/`, `data/`, `utils/`, `reports/`, `tests/` moved into `streamlit/` |
+| **Removed** | Root `main.py` (11K lines), `stations.csv`, `stations.parquet`, `report.md` |
+| **Added** | `nextjs/` — full Next.js 15 dashboard + FastAPI backend |
+| **Added** | `.github/workflows/ci.yml` — 3-job CI pipeline |
+| **Added** | `streamlit/assets/css/` — 18-file design token system |
+| **Expanded** | Tests: ~40 files → 85+ files |
+| **Modernized** | README with team section, commands table, inline SVG avatars |
+
+### PR: The Merge
+
+```
+Commit  : 29e5dd0
+Branch  : New-Features
+Files   : 206 changed (53,010 insertions / 13,494 deletions)
+```
+
+<br>
+
+---
+
 ## Quick Start
 
 ```bash
