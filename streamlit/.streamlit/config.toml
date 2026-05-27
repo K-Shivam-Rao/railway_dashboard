@@ -1,0 +1,18 @@
+[server]
+enableStaticServing = false
+headless = true
+enableCORS = false
+
+[runner]
+fastReruns = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "dark"
+primaryColor = "#fbbf24"
+backgroundColor = "#070c1f"
+secondaryBackgroundColor = "#0b1128"
+textColor = "#f1f0f5"
+font = "sans serif"

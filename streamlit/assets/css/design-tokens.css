@@ -1,0 +1,182 @@
+:root {
+  /* ── Colors: Surface (Midnight Express v5 — OLED-ready, richer layering) ── */
+  --bg-deepest: #020610;
+  --bg-deep: #070c1f;
+  --bg-base: #0b1128;
+  --bg-surface: #111936;
+  --bg-elevated: #192045;
+  --bg-glass: rgba(11, 17, 40, 0.58);
+  --bg-glass-hover: rgba(25, 32, 69, 0.82);
+
+  /* ── Colors: Ambient glow (for backgrounds) ── */
+  --glow-amber: rgba(251, 191, 36, 0.055);
+  --glow-fuchsia: rgba(217, 70, 239, 0.045);
+  --glow-cyan: rgba(34, 211, 238, 0.045);
+  --glow-blue: rgba(96, 165, 250, 0.04);
+
+  /* ── Colors: Primary — Rich Amber → Golden gradient ── */
+  --color-primary: #f59e0b;
+  --color-primary-light: #fbbf24;
+  --color-primary-lighter: #fcd34d;
+  --color-primary-dark: #b45309;
+  --color-primary-subtle: rgba(245, 158, 11, 0.09);
+  --color-primary-border: rgba(245, 158, 11, 0.2);
+  --color-primary-glow: rgba(245, 158, 11, 0.14);
+  --gradient-primary: linear-gradient(135deg, #f59e0b 0%, #d946ef 100%);
+
+  /* ── Colors: Secondary — Cyan → Teal gradient ── */
+  --color-secondary: #06b6d4;
+  --color-secondary-light: #22d3ee;
+  --color-secondary-dark: #0e7490;
+  --color-secondary-subtle: rgba(6, 182, 212, 0.09);
+  --color-secondary-border: rgba(6, 182, 212, 0.2);
+  --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+
+  /* ── Colors: Accent ── */
+  --color-accent: #3b82f6;
+  --color-accent-light: #60a5fa;
+  --color-accent-dark: #1d4ed8;
+  --color-accent-subtle: rgba(59, 130, 246, 0.09);
+  --color-accent-border: rgba(59, 130, 246, 0.2);
+  --color-fuchsia: #d946ef;
+  --color-fuchsia-subtle: rgba(217, 70, 239, 0.09);
+
+  /* ── Colors: Emerald — Success states ── */
+  --color-emerald: #10b981;
+  --color-emerald-light: #34d399;
+  --color-emerald-subtle: rgba(16, 185, 129, 0.09);
+  --color-emerald-border: rgba(16, 185, 129, 0.22);
+  --color-emerald-dark: #065f46;
+  --green-glow: rgba(34, 197, 94, 0.25);
+  --green-glow-intense: rgba(34, 197, 94, 0.45);
+
+  /* ── Colors: Status ── */
+  --color-success: #10b981;
+  --color-success-subtle: rgba(16, 185, 129, 0.09);
+  --color-success-border: rgba(16, 185, 129, 0.22);
+  --color-success-dark: #065f46;
+  --color-warning: #f59e0b;
+  --color-warning-subtle: rgba(245, 158, 11, 0.09);
+  --color-warning-border: rgba(245, 158, 11, 0.22);
+  --color-warning-dark: #78350f;
+  --color-danger: #ef4444;
+  --color-danger-subtle: rgba(239, 68, 68, 0.09);
+  --color-danger-border: rgba(239, 68, 68, 0.22);
+  --color-danger-dark: #7f1d1d;
+
+  /* ── Colors: Text ── */
+  --text-primary: #f1f0f5;
+  --text-secondary: #c4c2d2;
+  --text-muted: #848298;
+  --text-tertiary: #5e5c72;
+  --text-inverse: #070c1f;
+
+  /* ── Colors: Borders ── */
+  --border-subtle: rgba(241, 240, 245, 0.055);
+  --border-default: rgba(241, 240, 245, 0.09);
+  --border-strong: rgba(241, 240, 245, 0.16);
+  --border-focus: rgba(245, 158, 11, 0.55);
+  --focus-ring: 0 0 0 3px rgba(251, 191, 36, 0.6);
+
+  /* ── Spacing Scale (4px base, refined) ── */
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 40px;
+  --space-5xl: 48px;
+  --space-6xl: 60px;
+
+  /* ── Border Radius ── */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows — Sophisticated depth system ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+  --shadow-glow-amber: 0 0 25px rgba(245, 158, 11, 0.15), 0 0 50px rgba(245, 158, 11, 0.05);
+  --shadow-glow-fuchsia: 0 0 25px rgba(217, 70, 239, 0.12), 0 0 50px rgba(217, 70, 239, 0.04);
+  --shadow-glow-cyan: 0 0 25px rgba(6, 182, 212, 0.12), 0 0 50px rgba(6, 182, 212, 0.04);
+  --shadow-glow-emerald: 0 0 25px rgba(16, 185, 129, 0.12), 0 0 50px rgba(16, 185, 129, 0.04);
+  --shadow-glow-danger: 0 0 25px rgba(239, 68, 68, 0.12), 0 0 50px rgba(239, 68, 68, 0.04);
+  --shadow-glow-green: 0 0 25px rgba(16, 185, 129, 0.15), 0 0 50px rgba(16, 185, 129, 0.06);
+  --shadow-glow-green-intense: 0 0 35px rgba(16, 185, 129, 0.25), 0 0 70px rgba(16, 185, 129, 0.1);
+
+  /* ── Typography — Premium font stack ── */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Satoshi', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'DM Mono', 'Fira Code', ui-monospace, monospace;
+
+  --text-2xs: 0.625rem;
+  --text-xs: 0.675rem;
+  --text-sm: 0.775rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.25rem;
+  --text-3xl: 1.5rem;
+  --text-4xl: 1.875rem;
+  --text-5xl: 2.25rem;
+  --text-6xl: 3rem;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* ── Transitions — Refined easing ── */
+  --duration-instant: 80ms;
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 320ms;
+  --duration-slower: 450ms;
+  --duration-slowest: 600ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* ── Z-Index Scale ── */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-tooltip: 600;
+  --z-toast: 700;
+
+  /* ── Layout ── */
+  --sidebar-width: 288px;
+  --header-height: 64px;
+  --ticker-height: 36px;
+  --wall-carousel-duration: 45s;
+
+  /* ── Streamlit Overrides ── */
+  --st-bg-color: var(--bg-deep);
+  --st-secondary-bg: var(--bg-base);
+  --st-text-color: var(--text-primary);
+  --st-primary-color: var(--color-primary-light);
+  --st-font: var(--font-sans);
+}

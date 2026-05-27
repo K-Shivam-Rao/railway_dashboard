@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+:root {
+  /* Surfaces - Midnight Express v3 */
+  --bg-deepest: #060a17;
+  --bg-deep: #0a0f24;
+  --bg-base: #0f1530;
+  --bg-surface: #161d3a;
+  --bg-elevated: #1e2647;
+  --bg-glass: rgba(15, 21, 48, 0.55);
+
+  /* Brand — Amber → Fuchsia gradient */
+  --color-primary: #f59e0b;
+  --color-primary-light: #fbbf24;
+  --color-primary-dark: #d97706;
+
+  /* Secondary — Cyan → Blue */
+  --color-secondary: #06b6d4;
+  --color-secondary-light: #22d3ee;
+
+  /* Accent */
+  --color-fuchsia: #d946ef;
+  --color-blue: #3b82f6;
+
+  /* Status */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  /* Text */
+  --text-primary: #f1f0f5;
+  --text-secondary: #b8b6cc;
+  --text-muted: #7a7891;
+  --text-tertiary: #5c5a72;
+
+  /* Borders */
+  --border-subtle: rgba(241, 240, 245, 0.05);
+  --border-default: rgba(241, 240, 245, 0.09);
+  --border-strong: rgba(241, 240, 245, 0.15);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Midnight Express Colors */
+  --color-bg-deepest: var(--bg-deepest);
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-base: var(--bg-base);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-glass: var(--bg-glass);
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-light: var(--color-secondary-light);
+  --color-accent-fuchsia: var(--color-fuchsia);
+  --color-accent-blue: var(--color-blue);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-tertiary: var(--text-tertiary);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+@layer base {
+  body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: #000;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-deep);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.5);
+    outline-offset: 2px;
+  }
+
+  button, a, input, select, textarea {
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+}
+
+@layer utilities {
+  .text-shadow-glow {
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  }
+
+  .shadow-glow-amber {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.12);
+  }
+
+  .shadow-glow-fuchsia {
+    box-shadow: 0 0 20px rgba(217, 70, 239, 0.1);
+  }
+
+  .shadow-glow-cyan {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+
+  .shadow-glow-emerald {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+  }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-12px); }
+  }
+
+  .animate-pulse-ring {
+    animation: pulse-ring 2s infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s infinite;
+  }
+
+  .animate-shimmer-slow {
+    animation: shimmer 3s infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

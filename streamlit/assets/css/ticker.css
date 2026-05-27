@@ -1,0 +1,349 @@
+/* ═══════════════════════════════════════════════════════════════════
+   KPI TICKER STRIP — Infinite seamless carousel
+   Uses content duplication + translateX(-50%) for the loop.
+   Spacer (HTML-level) keeps content past the LIVE badge while
+   guaranteeing the offset is part of the animated content.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Outer container ──────────────────────────────────────────────── */
+.kpi-ticker-strip {
+  position: relative;
+  width: 100%;
+  height: var(--ticker-height, 44px);
+  overflow: hidden;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: center;
+  contain: layout paint;
+}
+
+/* ── Left edge fade (responsive) ── */
+.kpi-ticker-strip::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: max(40px, min(80px, 6vw));
+  background: linear-gradient(90deg, var(--bg-deep) 0%, transparent 100%);
+  z-index: 2;
+  pointer-events: none;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+/* ── Right edge fade (responsive) ── */
+.kpi-ticker-strip::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: max(40px, min(80px, 6vw));
+  background: linear-gradient(270deg, var(--bg-deep) 0%, transparent 100%);
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+/* ── Scrolling track — GPU accelerated, seamless ── */
+@keyframes tickerScroll {
+  0%   { transform: translateX(0) translateZ(0); }
+  100% { transform: translateX(-50%) translateZ(0); }
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  transform: translateZ(0);
+  animation: tickerScroll 35s linear infinite;
+  /* margin-left removed — spacer element in HTML handles LIVE-badge offset */
+}
+
+/* Pause on hover — gives users time to read any item */
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Duplicated content wrapper ── */
+.ticker-content {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: var(--space-xl);
+  flex-shrink: 0;
+}
+
+/* ── Invisible spacer — pushes content past the LIVE badge ── */
+.ticker-spacer {
+  display: inline-block;
+  width: clamp(60px, 10vw, 90px);
+  flex-shrink: 0;
+}
+
+/* ── Generic ticker item ── */
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 2px clamp(6px, 1.5vw, 14px);
+  border-radius: var(--radius-full);
+  font-size: clamp(9px, 1.2vw, 11px);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--duration-base) var(--ease-out);
+  line-height: 1.4;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INCIDENT VARIANTS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ticker-item.ticker-incident {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  animation: tickerItemEnter 0.5s ease-out;
+  border-left: 3px solid var(--border-subtle);
+}
+
+.ticker-item.ticker-incident.ticker-critical {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+  color: #f87171;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.12);
+  border-left-color: #ef4444;
+}
+
+.ticker-item.ticker-incident.ticker-warning {
+  border-color: rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.08);
+  color: #fbbf24;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.1);
+  border-left-color: #f59e0b;
+}
+
+.ticker-item.ticker-incident.ticker-info {
+  border-color: var(--color-accent-border);
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-light);
+}
+
+/* ── Incident dot ── */
+.ticker-incident-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ticker-critical .ticker-incident-dot {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+  animation: tickerDotPulse 1.2s ease-in-out infinite;
+}
+
+.ticker-warning .ticker-incident-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+@keyframes tickerDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+@keyframes tickerItemEnter {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Incident text (with truncation) ── */
+.ticker-incident-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(420px, 40vw);
+}
+
+.ticker-station {
+  font-weight: 700;
+  margin-right: 2px;
+  cursor: help;
+}
+
+.ticker-gate {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 1vw, 10px);
+  font-weight: 600;
+  opacity: 0.7;
+  margin-right: 4px;
+}
+
+/* ── Sensor pills inside incidents ── */
+.ticker-sensor-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: clamp(8px, 1vw, 10px);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-wide);
+  cursor: help;
+}
+
+.ticker-sensor-pill.temp-pill {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.ticker-sensor-pill.vib-pill {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+}
+
+.ticker-sensor-pill.risk-pill {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.ticker-timestamp {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 1vw, 10px);
+  color: var(--text-tertiary);
+  margin-left: 4px;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   KPI ITEMS (non-incident)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ticker-item.ticker-kpi {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: clamp(9px, 1.1vw, 10px);
+  letter-spacing: var(--tracking-wide);
+  gap: 4px;
+}
+
+.ticker-kpi-label {
+  opacity: 0.5;
+  font-weight: 400;
+}
+
+.ticker-kpi-value {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIVE BADGE
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ticker-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(3px, 0.6vw, 6px);
+  padding: 2px clamp(6px, 1.2vw, 12px);
+  font-size: clamp(8px, 1vw, 10px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 999px;
+  position: absolute;
+  left: clamp(6px, 1.5vw, 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  flex-shrink: 0;
+}
+
+.ticker-live-badge::before {
+  content: '';
+  width: clamp(4px, 0.6vw, 6px);
+  height: clamp(4px, 0.6vw, 6px);
+  border-radius: 50%;
+  background: #34d399;
+  animation: liveDotPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes liveDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.5); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE — mobile adjustment
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .kpi-ticker-strip {
+    height: var(--ticker-height, 38px);
+    margin-bottom: var(--space-lg);
+  }
+
+  .ticker-track {
+    animation-duration: 25s; /* slightly faster on narrow screens */
+  }
+
+  .ticker-spacer {
+    width: clamp(40px, 8vw, 60px);
+  }
+
+  .ticker-incident-text {
+    max-width: 40vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-ticker-strip {
+    height: var(--ticker-height, 34px);
+    border-radius: var(--radius-md);
+  }
+
+  .ticker-track {
+    animation-duration: 20s; /* faster on very small screens */
+  }
+
+  .ticker-spacer {
+    width: clamp(36px, 6vw, 48px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   REDUCED MOTION — accessibility
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  .ticker-live-badge::before {
+    animation: none;
+  }
+
+  .ticker-critical .ticker-incident-dot {
+    animation: none;
+  }
+}

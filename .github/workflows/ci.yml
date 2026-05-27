@@ -1,0 +1,169 @@
+# ════════════════════════════════════════════════════════════════
+# SicherGleis Railway Dashboard — CI Pipeline (Streamlit)
+# ────────────────────────────────────────────────────────────────
+# Runs on push/PR to main branches.  Tests the Streamlit app
+# with a Python matrix, enforces pytest-cov fail-under thresholds,
+# and uploads coverage reports.
+#
+# Deployment: Connect the streamlit/ directory to
+# https://share.streamlit.io for one-click deployment.
+# ════════════════════════════════════════════════════════════════
+
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop, "release/*"]
+  pull_request:
+    branches: [main, master, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  test-streamlit:
+    name: Streamlit Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: streamlit
+
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: streamlit/requirements.txt
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends \
+            libgl1-mesa-dev \
+            2>&1 | tail -5
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov pytest-json-report
+
+      - name: Lint with ruff
+        run: |
+          pip install ruff
+          ruff check . --target-version py310 --line-length 120 || true
+
+      - name: Run tests with coverage
+        run: |
+          python -m pytest tests/ \
+            --cov=core --cov=data --cov=utils --cov=reports \
+            --cov-branch \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html:coverage_html \
+            -q --tb=short
+        continue-on-error: false
+
+      - name: Check per-module coverage thresholds
+        id: per_module_check
+        run: |
+          python -c "
+import xml.etree.ElementTree as ET
+import sys
+
+tree = ET.parse('coverage.xml')
+root = tree.getroot()
+
+# Per-module minimum thresholds
+thresholds = {
+    'core':   80.0,
+    'data':   95.0,
+    'utils':  95.0,
+    'reports':88.0,
+}
+
+failures = []
+for pkg in root.findall('.//package'):
+    name = pkg.get('name', '')
+    # Map coverage package names to our module names
+    for module, threshold in thresholds.items():
+        if name.startswith(module) or name == module:
+            line_rate = float(pkg.get('line-rate', 0)) * 100
+            status = '✅' if line_rate >= threshold else '❌'
+            print(f'  {status} {name}: {line_rate:.1f}% (threshold: {threshold:.0f}%)')
+            if line_rate < threshold:
+                failures.append(f'{name}: {line_rate:.1f}% < {threshold:.0f}%')
+            break
+
+if failures:
+    print('\n❌ Per-module coverage check FAILED:')
+    for f in failures:
+        print(f'  - {f}')
+    sys.exit(1)
+else:
+    print('\n✅ All per-module coverage thresholds met!')
+"
+
+      - name: Upload coverage report (XML)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-xml-${{ matrix.python-version }}
+          path: streamlit/coverage.xml
+          if-no-files-found: ignore
+
+      - name: Upload coverage report (HTML)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-html-${{ matrix.python-version }}
+          path: streamlit/coverage_html/
+          if-no-files-found: ignore
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-cli-action@v1
+        if: matrix.python-version == '3.12' && github.event_name != 'pull_request'
+        continue-on-error: true
+        with:
+          files: streamlit/coverage.xml
+          flags: streamlit
+          name: sichergleis-streamlit
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  coverage-badge:
+    name: Generate Coverage Summary
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test-streamlit]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download coverage XML
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-xml-3.12
+          path: coverage-report
+
+      - name: Generate summary
+        run: |
+          python -c "
+import xml.etree.ElementTree as ET
+tree = ET.parse('coverage-report/coverage.xml')
+total = float(tree.getroot().attrib['line-rate']) * 100
+print(f'Overall coverage: {total:.1f}%')
+"
+        continue-on-error: true

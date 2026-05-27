@@ -1,0 +1,307 @@
+/* ═══════════════════════════════════════════════════════════════
+   TOOLTIP SYSTEM — Rich HTML Tooltips
+   Midnight Express v5 Design System Compatible
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Attribute-based simple tooltip (text only) ── */
+[data-tip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  padding: 5px 10px;
+  background: var(--bg-elevated, #192045);
+  border: 1px solid var(--border-default, rgba(241,240,245,0.09));
+  border-radius: var(--radius-lg, 8px);
+  font-size: var(--text-xs, 0.675rem);
+  font-weight: 500;
+  color: var(--text-secondary, #c4c2d2);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: all var(--duration-base, 220ms) var(--ease-out, cubic-bezier(0.16,1,0.3,1));
+  z-index: var(--z-tooltip, 600);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.45));
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  letter-spacing: var(--tracking-wide, 0.025em);
+}
+
+[data-tip]::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border: 5px solid transparent;
+  border-top-color: var(--border-default, rgba(241,240,245,0.09));
+  pointer-events: none;
+  opacity: 0;
+  transition: all var(--duration-base, 220ms) var(--ease-out, cubic-bezier(0.16,1,0.3,1));
+  z-index: var(--z-tooltip, 600);
+}
+
+[data-tip]:hover::after,
+[data-tip]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-tip]:hover::before {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Rich HTML tooltip wrapper ── */
+.tt-wrap {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tt-wrap .tt-box {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  min-width: 200px;
+  max-width: 320px;
+  padding: 12px 14px;
+  background: var(--bg-elevated, #192045);
+  border: 1px solid var(--border-default, rgba(241,240,245,0.09));
+  border-radius: var(--radius-xl, 12px);
+  pointer-events: none;
+  opacity: 0;
+  transition: all var(--duration-base, 220ms) var(--ease-out, cubic-bezier(0.16,1,0.3,1));
+  z-index: var(--z-tooltip, 600);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-xl, 0 20px 25px -5px rgba(0,0,0,0.5));
+}
+
+.tt-wrap .tt-box::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: var(--bg-elevated, #192045);
+  border-right: 1px solid var(--border-default, rgba(241,240,245,0.09));
+  border-bottom: 1px solid var(--border-default, rgba(241,240,245,0.09));
+  border-radius: 0 0 2px 0;
+}
+
+.tt-wrap:hover .tt-box {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Tooltip variants ── */
+.tt-wrap.tt-left .tt-box {
+  left: auto;
+  right: calc(100% + 10px);
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+}
+
+.tt-wrap.tt-left:hover .tt-box {
+  transform: translateY(-50%) translateX(0);
+}
+
+.tt-wrap.tt-left .tt-box::after {
+  left: auto;
+  right: -6px;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.tt-wrap.tt-right .tt-box {
+  left: calc(100% + 10px);
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+}
+
+.tt-wrap.tt-right:hover .tt-box {
+  transform: translateY(-50%) translateX(0);
+}
+
+.tt-wrap.tt-right .tt-box::after {
+  left: -6px;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  border-left: 1px solid var(--border-default, rgba(241,240,245,0.09));
+  border-top: 1px solid var(--border-default, rgba(241,240,245,0.09));
+  border-right: none;
+  border-bottom: none;
+}
+
+/* ── Tooltip content components ── */
+.tt-title {
+  font-size: var(--text-xs, 0.675rem);
+  font-weight: 700;
+  color: var(--text-muted, #848298);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider, 0.05em);
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle, rgba(241,240,245,0.055));
+}
+
+.tt-value {
+  font-size: var(--text-lg, 1rem);
+  font-weight: 800;
+  color: var(--text-primary, #f1f0f5);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  letter-spacing: var(--tracking-tight, -0.02em);
+  margin-bottom: 8px;
+}
+
+.tt-full-value {
+  font-size: var(--text-xs, 0.675rem);
+  color: var(--text-muted, #848298);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  margin-bottom: 8px;
+}
+
+.tt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border-subtle, rgba(241,240,245,0.055));
+}
+
+.tt-row:last-child {
+  border-bottom: none;
+}
+
+.tt-label {
+  font-size: var(--text-xs, 0.675rem);
+  color: var(--text-muted, #848298);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide, 0.025em);
+}
+
+.tt-val {
+  font-size: var(--text-xs, 0.675rem);
+  font-weight: 600;
+  color: var(--text-primary, #f1f0f5);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  text-align: right;
+}
+
+/* ── Tooltip badges ── */
+.tt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: var(--radius-full, 9999px);
+  letter-spacing: var(--tracking-wider, 0.05em);
+  text-transform: uppercase;
+}
+
+.tt-badge.up {
+  background: var(--color-emerald-subtle, rgba(16,185,129,0.09));
+  color: var(--color-emerald, #10b981);
+  border: 1px solid var(--color-emerald-border, rgba(16,185,129,0.22));
+}
+
+.tt-badge.down {
+  background: var(--color-danger-subtle, rgba(239,68,68,0.09));
+  color: var(--color-danger, #ef4444);
+  border: 1px solid var(--color-danger-border, rgba(239,68,68,0.22));
+}
+
+.tt-badge.warn {
+  background: var(--color-warning-subtle, rgba(245,158,11,0.09));
+  color: var(--color-warning, #f59e0b);
+  border: 1px solid var(--color-warning-border, rgba(245,158,11,0.22));
+}
+
+.tt-badge.info {
+  background: var(--color-accent-subtle, rgba(59,130,246,0.09));
+  color: var(--color-accent-light, #60a5fa);
+  border: 1px solid var(--color-accent-border, rgba(59,130,246,0.22));
+}
+
+/* ── Tooltip with icon ── */
+.tt-icon {
+  font-size: 1.1rem;
+  margin-right: 4px;
+}
+
+/* ── Tooltip grid (2-column data display) ── */
+.tt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  margin-top: 6px;
+}
+
+.tt-grid-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tt-grid-label {
+  font-size: 0.55rem;
+  color: var(--text-tertiary, #5e5c72);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider, 0.05em);
+}
+
+.tt-grid-value {
+  font-size: var(--text-sm, 0.775rem);
+  font-weight: 700;
+  color: var(--text-primary, #f1f0f5);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+/* ── Tooltip divider ── */
+.tt-divider {
+  height: 1px;
+  background: var(--border-subtle, rgba(241,240,245,0.055));
+  margin: 6px 0;
+}
+
+/* ── Responsive: smaller tooltips on mobile ── */
+@media (max-width: 768px) {
+  [data-tip]::after {
+    font-size: 0.6rem;
+    padding: 4px 8px;
+    max-width: 160px;
+    white-space: normal;
+  }
+
+  .tt-wrap .tt-box {
+    min-width: 160px;
+    max-width: 240px;
+    padding: 10px 12px;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  [data-tip]::after,
+  [data-tip]::before,
+  .tt-wrap .tt-box {
+    transition: none;
+  }
+}
