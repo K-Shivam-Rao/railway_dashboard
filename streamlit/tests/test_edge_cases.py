@@ -2,26 +2,28 @@
 Edge case tests for Railway Dashboard
 Tests for zero/empty data prevention and breakproofing - simplified and corrected
 """
-import pytest
-import pandas as pd
-import sys
 import os
+import sys
+
+import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
-from data.sample_data import (
-    get_customer_df, get_operator_profile, get_support_tickets,
-    get_engagement_timeline, get_operator_monthly_stats,
-    get_operator_history, get_contract_amendments,
-    get_financial_projections, get_high_value_customers_df,
-    get_at_risk_df, get_contract_health_df, get_renewal_forecast_df,
-    get_customer_insights, get_renewal_health_summary,
-)
 from core.logic import (
-    get_customer_data, get_customer_business_insights,
-    get_operator_profile as logic_get_operator_profile,
     get_support_tickets as logic_get_support_tickets,
+)
+from data.sample_data import (
+    get_at_risk_df,
+    get_contract_health_df,
+    get_customer_df,
+    get_customer_insights,
+    get_high_value_customers_df,
+    get_operator_profile,
+    get_renewal_forecast_df,
+    get_renewal_health_summary,
+    get_support_tickets,
 )
 
 

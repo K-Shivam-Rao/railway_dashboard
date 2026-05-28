@@ -1,21 +1,20 @@
 """Tests for core/visualization_engine.py — Architecture hub, loopholes, recommendations."""
-import pytest
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
 from core.visualization_engine import (
+    ARCHITECTURE_EDGES,
+    ARCHITECTURE_NODES,
+    OPERATIONAL_LOOPHOLES,
+    TECHNICAL_LOOPHOLES,
     ArchitectureNode,
     Loophole,
     Recommendation,
-    ARCHITECTURE_NODES,
-    ARCHITECTURE_EDGES,
-    TECHNICAL_LOOPHOLES,
-    OPERATIONAL_LOOPHOLES,
-    generate_live_metrics,
-    build_architecture_flow_html,
     analyze_loopholes,
+    build_architecture_flow_html,
+    generate_live_metrics,
     generate_recommendations,
     get_station_vulnerability_scores,
 )
@@ -174,7 +173,7 @@ class TestRecommendationEngine:
         recs = generate_recommendations(metrics={"success_rate": 70})
         priorities = [r.priority for r in recs]
         assert "critical" in priorities  # R008 added
-    
+
     def test_with_root_causes(self):
         recs = generate_recommendations(root_causes={"gate_jam": 5, "temp_spike": 2})
         ids = [r.id for r in recs]
@@ -188,7 +187,6 @@ class TestRecommendationEngine:
             assert r.priority in ("critical", "high", "medium", "info")
 
     def test_with_personas(self):
-        from core.visualization_engine import Recommendation
         class MockPersona:
             def __init__(self, name, role, success_rate_computed):
                 self.name = name

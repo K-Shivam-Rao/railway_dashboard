@@ -1,19 +1,26 @@
 """Extended tests for core/tv_renderer.py — covering additional edge cases and
 _all_stations_bar, _chart_info_bar, _render_kpi_row (mock-free) helpers."""
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
-from core.tv_renderer import (
-    DOMAINS, DOMAIN_META,
-    _make_domain_gauge, _make_radar_chart, _make_bar_chart,
-    _make_all_stations_bar, _make_correlation_heatmap, _chart_info_bar,
+from core.totalvision import (
+    STATIONS,
 )
-from core.totalvision import STATIONS, SecurityData, SustainabilityData, PassengerData, AssetData, ClimateData, TotalVisionData
-
+from core.tv_renderer import (
+    DOMAIN_META,
+    DOMAINS,
+    _chart_info_bar,
+    _make_all_stations_bar,
+    _make_bar_chart,
+    _make_correlation_heatmap,
+    _make_domain_gauge,
+    _make_radar_chart,
+)
 
 # ── Mock helpers ────────────────────────────────────────────────────────────
 

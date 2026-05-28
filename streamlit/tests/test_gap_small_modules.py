@@ -1,15 +1,12 @@
 """Gap-filler tests for small modules: logging_config, simulation_db, loader, sample_data, budget_tracker, visualization_engine."""
 
-import os
-import sys
-import json
-import tempfile
 import logging
-from unittest.mock import patch, MagicMock
-import pandas as pd
-import numpy as np
-import pytest
+import os
+import tempfile
+from unittest.mock import MagicMock, patch
 
+import pandas as pd
+import pytest
 
 # ═══════════════════════════════════════════════════
 # utils/logging_config.py  (79% → 95%)
@@ -37,7 +34,6 @@ class TestLoggingConfigGaps:
 
     def test_main_block_execution(self):
         """Cover the if __name__ == '__main__' block (lines 66-70)."""
-        import importlib
         # Simulate running logging_config.py as main
         import utils.logging_config as lc_module
         with patch.object(lc_module, "__name__", "__main__"):
@@ -149,7 +145,7 @@ class TestSimulationDbGaps:
 
     def test_save_session_full_flow(self):
         """Full save + retrieve session flow."""
-        from utils.simulation_db import save_session, get_session_summary
+        from utils.simulation_db import get_session_summary, save_session
         save_session("test-flow-1", {
             "total_incidents": 10,
             "critical": 3,
@@ -180,6 +176,7 @@ class TestLoaderGaps:
     def test_validate_data_temp_out_of_range(self):
         """Cover temperature range warning (lines 90-91)."""
         import polars as pl
+
         from data.loader import _validate_data
         df = pl.DataFrame({
             "station": ["A"], "platform": ["1"], "gate_id": ["G1"],
@@ -192,6 +189,7 @@ class TestLoaderGaps:
     def test_validate_data_vib_out_of_range(self):
         """Cover vibration range warning."""
         import polars as pl
+
         from data.loader import _validate_data
         df = pl.DataFrame({
             "station": ["A"], "platform": ["1"], "gate_id": ["G1"],
@@ -204,6 +202,7 @@ class TestLoaderGaps:
     def test_validate_data_negative_people(self):
         """Cover negative people count warning."""
         import polars as pl
+
         from data.loader import _validate_data
         df = pl.DataFrame({
             "station": ["A"], "platform": ["1"], "gate_id": ["G1"],
@@ -215,6 +214,7 @@ class TestLoaderGaps:
     def test_validate_data_invalid_door_state(self):
         """Cover invalid door state warning."""
         import polars as pl
+
         from data.loader import _validate_data
         df = pl.DataFrame({
             "station": ["A"], "platform": ["1"], "gate_id": ["G1"],
@@ -255,8 +255,9 @@ class TestLoaderGaps:
 
     def test_module_level_functions(self):
         """Cover module-level wrappers."""
-        from data import loader
         import polars as pl
+
+        from data import loader
         df_pl = pl.DataFrame({
             "station": ["A"], "platform": ["1"], "gate_id": ["G1"],
             "door_state": ["open"], "sensor_temp": [25.0],
@@ -271,8 +272,9 @@ class TestLoaderGaps:
 
     def test_transform_creates_derived_columns(self):
         """Verify transform_data_fast creates all derived columns."""
-        from data.loader import DataLoader
         import polars as pl
+
+        from data.loader import DataLoader
         df = pl.DataFrame({
             "station": ["A"], "platform": ["1"], "gate_id": ["G1"],
             "door_state": ["open"], "sensor_temp": [25.0],

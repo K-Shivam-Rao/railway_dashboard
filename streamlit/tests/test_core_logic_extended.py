@@ -1,29 +1,37 @@
 """
 Extended unit tests for core/logic.py - simplified and corrected
 """
-import pytest
-import pandas as pd
-import sys
 import os
+import sys
+
+import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
 from core.logic import (
-    SaaSModelConfig, run_simulation, get_metrics, get_psd_analytics,
-    get_network_summary, get_maintenance_forecast, get_passenger_heatmap,
-    get_incident_log, get_leadership_data, get_tech_stack,
-    get_financial_model_data, get_customer_data, get_rfm_analysis,
-    get_high_value_customers, get_customer_business_insights,
-    get_contract_health_score, get_renewal_forecast, get_at_risk_accounts,
-    get_renewal_health_summary, get_operator_history,
-    get_contract_amendments, get_support_tickets, get_engagement_timeline,
-    get_operator_health_trend, get_support_ticket_trend,
-    get_financial_projections, get_operator_comparison_benchmarks,
-    get_operator_monthly_stats, get_business_map_data,
-    StationAnalytics, FinancialModel
+    FinancialModel,
+    SaaSModelConfig,
+    StationAnalytics,
+    get_contract_health_score,
+    get_customer_business_insights,
+    get_customer_data,
+    get_financial_model_data,
+    get_high_value_customers,
+    get_incident_log,
+    get_leadership_data,
+    get_maintenance_forecast,
+    get_metrics,
+    get_network_summary,
+    get_operator_history,
+    get_operator_monthly_stats,
+    get_passenger_heatmap,
+    get_psd_analytics,
+    get_renewal_health_summary,
+    get_rfm_analysis,
+    get_tech_stack,
 )
-from utils.exceptions import ConfigurationError
 
 
 class TestGetMetrics:

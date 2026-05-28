@@ -1,9 +1,9 @@
 """Extended tests for data/loader.py — covers error paths and edge cases."""
-import os
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
 import polars as pl
 import pytest
-from unittest.mock import patch, MagicMock
 
 # ── Comprehensive streamlit mock (compatible across test files) ──
 # Must be set up before importing data.loader
@@ -35,12 +35,12 @@ patcher.start()
 
 from data.loader import (
     DataLoader,
+    DataLoadError,
+    DataValidationError,
+    _get_csv_path,
+    _get_parquet_path,
     _validate_data,
-    _get_parquet_path, _get_csv_path,
-    REQUIRED_COLUMNS, VALID_DOOR_STATES,
-    DataValidationError, DataLoadError,
 )
-
 
 # ── Fixtures ────────────────────────────────────────────────────────────────
 

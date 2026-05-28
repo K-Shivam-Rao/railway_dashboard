@@ -1,17 +1,17 @@
 """Tests for utils/chart_styles.py — Plotly chart styling utilities."""
-import pytest
-import sys
 import os
+import sys
+
 import plotly.graph_objects as go
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
 from utils.chart_styles import (
-    style_chart,
-    style_pie,
-    style_indicator,
-    style_df,
     COLOR_SCHEMES,
+    style_chart,
+    style_df,
+    style_indicator,
+    style_pie,
 )
 
 

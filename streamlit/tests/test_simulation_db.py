@@ -1,9 +1,9 @@
 """Tests for utils/simulation_db.py — Simulation persistence database."""
-import pytest
-import sys
 import os
-import json
+import sys
 import tempfile
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
@@ -20,10 +20,9 @@ def _temp_db():
     tmp.close()
     db_mod.DB_PATH = tmp.name
     # Reinitialize with temp db
-    from utils.simulation_db import init_simulation_db
     if os.path.exists(tmp.name):
         os.unlink(tmp.name)
-    init_simulation_db()
+    db_mod.init_simulation_db()
     yield
     # Cleanup
     if os.path.exists(tmp.name):
@@ -32,21 +31,20 @@ def _temp_db():
 
 
 from utils.simulation_db import (
-    get_db_connection,
-    init_simulation_db,
-    save_session,
-    save_incidents,
-    save_achievement,
-    get_recent_sessions,
-    get_session_summary,
-    get_session_incidents,
+    delete_scenario_template,
     get_achievements,
     get_all_time_stats,
-    save_scenario_template,
+    get_db_connection,
+    get_recent_sessions,
     get_scenario_templates,
-    delete_scenario_template,
-    save_competency_scores,
     get_session_competency_scores,
+    get_session_incidents,
+    get_session_summary,
+    save_achievement,
+    save_competency_scores,
+    save_incidents,
+    save_scenario_template,
+    save_session,
 )
 
 

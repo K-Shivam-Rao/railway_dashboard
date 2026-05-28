@@ -10,14 +10,14 @@ Data patterns match `core/logic.py` conventions: deterministic seeds per
 station name, numpy/pandas for data generation, structured logging.
 """
 
-import pandas as pd
-import numpy as np
-import logging
 import json
+import logging
 import sqlite3
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
+from typing import Any
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -79,8 +79,8 @@ class SecurityData:
     incident_response: float = 70.0
     compliance_score: float = 70.0
     training_coverage: float = 70.0
-    daily_threats: List[Dict] = field(default_factory=list)
-    station_threat_matrix: Dict[str, Dict[str, int]] = field(default_factory=dict)
+    daily_threats: list[dict] = field(default_factory=list)
+    station_threat_matrix: dict[str, dict[str, int]] = field(default_factory=dict)
 
 
 @dataclass
@@ -93,7 +93,7 @@ class SustainabilityData:
     green_energy_pct: float = 30.0
     recycling_rate: float = 50.0
     efficiency_score: float = 60.0
-    monthly_carbon: List[float] = field(default_factory=list)
+    monthly_carbon: list[float] = field(default_factory=list)
     regenerative_braking: float = 0.0
     solar_panels: float = 0.0
     led_retrofit: float = 0.0
@@ -108,8 +108,8 @@ class PassengerData:
     crowding_index: float = 50.0
     accessibility_score: float = 70.0
     dwell_time_avg: float = 45.0
-    sentiment_keywords: List[Dict] = field(default_factory=list)
-    crowding_matrix: List[Dict] = field(default_factory=list)
+    sentiment_keywords: list[dict] = field(default_factory=list)
+    crowding_matrix: list[dict] = field(default_factory=list)
     ramp_access: float = 70.0
     audio_announcements: float = 70.0
     visual_displays: float = 70.0
@@ -134,7 +134,7 @@ class AssetData:
     firmware_uptodate: int = 0
     firmware_pending: int = 0
     firmware_critical: int = 0
-    depreciation_schedule: List[Dict] = field(default_factory=list)
+    depreciation_schedule: list[dict] = field(default_factory=list)
 
     # Maintenance backlog (added for Ch5 rebuild)
     backlog_total: int = 0                    # Total overdue maintenance tasks
@@ -162,7 +162,7 @@ class ClimateData:
     storm_risk: float = 30.0
     snow_risk: float = 30.0
     adaptation_readiness_pct: float = 40.0
-    weather_events: List[Dict] = field(default_factory=list)
+    weather_events: list[dict] = field(default_factory=list)
     flood_barriers: float = 30.0
     heat_mitigation: float = 30.0
     storm_proofing: float = 30.0
@@ -188,7 +188,7 @@ class TotalVisionData:
     asset: AssetData = field(default_factory=AssetData)
     climate: ClimateData = field(default_factory=ClimateData)
 
-    def scores_dict(self) -> Dict[str, float]:
+    def scores_dict(self) -> dict[str, float]:
         return {
             "security":      self.security.threat_level * -1 + 100,  # invert so higher = better
             "sustain":       self.sustainability.efficiency_score,
@@ -204,7 +204,7 @@ class TotalVisionData:
 # ── Domain Data Generators ─────────────────────────────────────────────────
 
 
-def generate_security_data(station: str, df: Optional[pd.DataFrame] = None) -> SecurityData:
+def generate_security_data(station: str, df: pd.DataFrame | None = None) -> SecurityData:
     """
     Generate synthetic security & threat intelligence data for a station.
 
@@ -214,8 +214,8 @@ def generate_security_data(station: str, df: Optional[pd.DataFrame] = None) -> S
     rng = _rng_for(station, 100)
     gates = 0
     if df is not None and not df.empty:
-        gates = int((df[df.get("station", "") == station]["gate_id"].nunique()
-                      if "gate_id" in df.columns else 0))
+        gates = int(df[df.get("station", "") == station]["gate_id"].nunique()
+                      if "gate_id" in df.columns else 0)
     gates = max(gates, rng.randint(15, 45))
 
     # Threat level derived from station gate count + randomness
@@ -279,7 +279,7 @@ def generate_security_data(station: str, df: Optional[pd.DataFrame] = None) -> S
     )
 
 
-def generate_sustainability_data(station: str, df: Optional[pd.DataFrame] = None) -> SustainabilityData:
+def generate_sustainability_data(station: str, df: pd.DataFrame | None = None) -> SustainabilityData:
     """
     Generate synthetic sustainability & energy data for a station.
 
@@ -288,8 +288,8 @@ def generate_sustainability_data(station: str, df: Optional[pd.DataFrame] = None
     rng = _rng_for(station, 200)
     gates = 0
     if df is not None and not df.empty:
-        gates = int((df[df.get("station", "") == station]["gate_id"].nunique()
-                      if "gate_id" in df.columns else 0))
+        gates = int(df[df.get("station", "") == station]["gate_id"].nunique()
+                      if "gate_id" in df.columns else 0)
     gates = max(gates, rng.randint(15, 45))
 
     scale = gates * rng.uniform(0.9, 1.1)
@@ -330,7 +330,7 @@ def generate_sustainability_data(station: str, df: Optional[pd.DataFrame] = None
     )
 
 
-def generate_passenger_data(station: str, df: Optional[pd.DataFrame] = None) -> PassengerData:
+def generate_passenger_data(station: str, df: pd.DataFrame | None = None) -> PassengerData:
     """
     Generate synthetic passenger experience & sentiment data.
 
@@ -403,7 +403,7 @@ def generate_passenger_data(station: str, df: Optional[pd.DataFrame] = None) -> 
     )
 
 
-def generate_asset_health_data(station: str, df: Optional[pd.DataFrame] = None) -> AssetData:
+def generate_asset_health_data(station: str, df: pd.DataFrame | None = None) -> AssetData:
     """
     Generate synthetic asset lifecycle & IoT health data.
 
@@ -603,7 +603,7 @@ def generate_climate_resilience_data(station: str) -> ClimateData:
 # ── Master Generator ───────────────────────────────────────────────────────
 
 
-def generate_all_domains(station: str, df: Optional[pd.DataFrame] = None) -> TotalVisionData:
+def generate_all_domains(station: str, df: pd.DataFrame | None = None) -> TotalVisionData:
     """Generate all 5 domain data for a single station."""
     return TotalVisionData(
         station=station,
@@ -615,7 +615,7 @@ def generate_all_domains(station: str, df: Optional[pd.DataFrame] = None) -> Tot
     )
 
 
-def generate_all_stations(df: Optional[pd.DataFrame] = None) -> Dict[str, TotalVisionData]:
+def generate_all_stations(df: pd.DataFrame | None = None) -> dict[str, TotalVisionData]:
     """Generate TotalVision data for all 15 stations."""
     return {s: generate_all_domains(s, df) for s in STATIONS}
 
@@ -623,11 +623,11 @@ def generate_all_stations(df: Optional[pd.DataFrame] = None) -> Dict[str, TotalV
 # ── Correlation Engine ────────────────────────────────────────────────────
 
 
-def _domain_score_vector(all_data: Dict[str, TotalVisionData], domain: str) -> np.ndarray:
+def _domain_score_vector(all_data: dict[str, TotalVisionData], domain: str) -> np.ndarray:
     return np.array([d.score(domain) for d in all_data.values()])
 
 
-def compute_cross_correlations(all_data: Dict[str, TotalVisionData]) -> Dict[str, Any]:
+def compute_cross_correlations(all_data: dict[str, TotalVisionData]) -> dict[str, Any]:
     """
     Compute Pearson correlation matrix across all 5 domains.
 
@@ -783,9 +783,9 @@ def _generate_finding_story(d1: str, d2: str, r: float, strength: str, direction
 
 
 def run_sandbox_projection(
-    params: Dict[str, float],
-    all_data: Dict[str, TotalVisionData],
-) -> Dict[str, Any]:
+    params: dict[str, float],
+    all_data: dict[str, TotalVisionData],
+) -> dict[str, Any]:
     """
     Run the weighted-multiplier sandbox projection model across all 5 domains.
 
@@ -912,7 +912,7 @@ def _init_totalvision_table():
         logger.warning(f"Cannot initialize totalvision_scenarios table: {e}")
 
 
-def save_scenario(name: str, params: Dict, results: Dict, notes: str = "") -> bool:
+def save_scenario(name: str, params: dict, results: dict, notes: str = "") -> bool:
     """Persist a sandbox scenario to the SQLite database."""
     try:
         def _do(conn):
@@ -929,7 +929,7 @@ def save_scenario(name: str, params: Dict, results: Dict, notes: str = "") -> bo
         return False
 
 
-def load_scenario(scenario_id: int) -> Optional[Dict[str, Any]]:
+def load_scenario(scenario_id: int) -> dict[str, Any] | None:
     """Load a saved scenario from the SQLite database."""
     try:
         def _do(conn):
@@ -952,7 +952,7 @@ def load_scenario(scenario_id: int) -> Optional[Dict[str, Any]]:
         return None
 
 
-def list_saved_scenarios() -> List[Dict[str, Any]]:
+def list_saved_scenarios() -> list[dict[str, Any]]:
     """List all saved TotalVision scenarios as summaries."""
     try:
         def _do(conn):
@@ -995,35 +995,35 @@ class TotalVisionDataEngine:
         engine.save("My Scenario", params, projection)
     """
 
-    def __init__(self, df: Optional[pd.DataFrame] = None):
+    def __init__(self, df: pd.DataFrame | None = None):
         self.df = df  # Existing station gate sensor DataFrame (optional)
 
     def generate(self, station: str) -> TotalVisionData:
         """Generate all 5 domain data for a single station."""
         return generate_all_domains(station, self.df)
 
-    def generate_all(self) -> Dict[str, TotalVisionData]:
+    def generate_all(self) -> dict[str, TotalVisionData]:
         """Generate TotalVision data for all 15 stations."""
         return generate_all_stations(self.df)
 
-    def correlate(self, all_data: Dict[str, TotalVisionData]) -> Dict[str, Any]:
+    def correlate(self, all_data: dict[str, TotalVisionData]) -> dict[str, Any]:
         """Compute cross-domain correlation matrix + auto-findings."""
         return compute_cross_correlations(all_data)
 
-    def project(self, params: Dict[str, float], all_data: Dict[str, TotalVisionData]) -> Dict[str, Any]:
+    def project(self, params: dict[str, float], all_data: dict[str, TotalVisionData]) -> dict[str, Any]:
         """Run sandbox projection model."""
         return run_sandbox_projection(params, all_data)
 
     @staticmethod
-    def save(name: str, params: Dict, results: Dict, notes: str = "") -> bool:
+    def save(name: str, params: dict, results: dict, notes: str = "") -> bool:
         return save_scenario(name, params, results, notes)
 
     @staticmethod
-    def load(scenario_id: int) -> Optional[Dict[str, Any]]:
+    def load(scenario_id: int) -> dict[str, Any] | None:
         return load_scenario(scenario_id)
 
     @staticmethod
-    def list_scenarios() -> List[Dict[str, Any]]:
+    def list_scenarios() -> list[dict[str, Any]]:
         return list_saved_scenarios()
 
     @staticmethod
@@ -1031,17 +1031,17 @@ class TotalVisionDataEngine:
         return delete_scenario(scenario_id)
 
     @staticmethod
-    def stations() -> List[str]:
+    def stations() -> list[str]:
         return list(STATIONS)
 
     @staticmethod
-    def domain_colors() -> Dict[str, str]:
+    def domain_colors() -> dict[str, str]:
         return dict(DOMAIN_COLORS)
 
     # ── Convenience: aggregate KPI scores for all stations ────────────────
 
     @staticmethod
-    def aggregate_scores(all_data: Dict[str, TotalVisionData]) -> Dict[str, float]:
+    def aggregate_scores(all_data: dict[str, TotalVisionData]) -> dict[str, float]:
         """Return average score per domain across all stations."""
         domains = ["security", "sustain", "passenger", "asset", "climate"]
         return {
@@ -1050,7 +1050,7 @@ class TotalVisionDataEngine:
         }
 
     @staticmethod
-    def station_scores_df(all_data: Dict[str, TotalVisionData]) -> pd.DataFrame:
+    def station_scores_df(all_data: dict[str, TotalVisionData]) -> pd.DataFrame:
         """Return a DataFrame of (station, domain, score) for charting."""
         rows = []
         for station, data in all_data.items():

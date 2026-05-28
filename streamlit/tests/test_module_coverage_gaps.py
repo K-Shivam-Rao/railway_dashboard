@@ -1,15 +1,12 @@
 """Targeted tests pushing data/loader.py, data/sample_data.py, and utils/simulation_db.py to 95%+ coverage."""
 
 import os
-import sys
-import json
-import logging
 import tempfile
+from unittest.mock import MagicMock, patch
 
-import pytest
 import pandas as pd
 import polars as pl
-from unittest.mock import patch, MagicMock, PropertyMock
+import pytest
 
 # ── Comprehensive streamlit mock ────────────────────────────────────────────
 st_mock = MagicMock()
@@ -32,16 +29,23 @@ patcher = patch.dict("sys.modules", modules)
 patcher.start()
 
 # ── Imports ─────────────────────────────────────────────────────────────────
+from data import sample_data as sd
 from data.loader import (
-    DataLoader, _validate_data,
-    DataValidationError, DataLoadError,
-    load_data_polars as module_load_data_polars,
-    transform_data_fast as module_transform_data_fast,
+    DataLoader,
+    DataLoadError,
+    DataValidationError,
+    _validate_data,
+)
+from data.loader import (
     convert_polars_to_pandas as module_convert_polars_to_pandas,
 )
-from data import sample_data as sd
+from data.loader import (
+    load_data_polars as module_load_data_polars,
+)
+from data.loader import (
+    transform_data_fast as module_transform_data_fast,
+)
 from utils import simulation_db as db_mod
-
 
 # =============================================================================
 # DATA / LOADER.PY
@@ -75,7 +79,6 @@ class TestLoaderLoadDataPolarsPaths:
 
     def test_fallback_parquet_none_csv_succeeds(self, tmp_path):
         """Line 157: parquet returns None → falls back to CSV."""
-        import data.loader as ldr_mod
         csv_path = tmp_path / "stations.csv"
         pl.DataFrame({
             "station": ["Berlin Hbf"], "platform": ["1"], "gate_id": ["G001"],
@@ -316,9 +319,8 @@ class TestSimDbGetDbConnectionError:
         with patch.object(db_mod, "sqlite3") as mock_sqlite3:
             mock_sqlite3.connect.return_value = mock_conn
             mock_sqlite3.Error = sqlite3.Error
-            with pytest.raises(sqlite3.Error, match="Commit failed"):
-                with db_mod.get_db_connection() as conn:
-                    pass
+            with pytest.raises(sqlite3.Error, match="Commit failed"), db_mod.get_db_connection() as conn:
+                pass
             # Verify rollback was called (line 28)
             mock_conn.rollback.assert_called_once()
 

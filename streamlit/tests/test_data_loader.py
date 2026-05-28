@@ -1,17 +1,17 @@
 """
 Unit tests for data/loader.py
 """
-import pytest
-import pandas as pd
-import polars as pl
-from datetime import datetime
 import os
 import sys
+
+import pandas as pd
+import polars as pl
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
-from data.loader import DataLoader, load_data_polars, transform_data_fast, _validate_data
+from data.loader import DataLoader, _validate_data
 from utils.exceptions import DataLoadError, DataValidationError
 
 

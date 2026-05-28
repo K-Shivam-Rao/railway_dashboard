@@ -1,42 +1,57 @@
 """Comprehensive tests for core/totalvision.py — data generators, correlation engine,
 sandbox projection, scenario persistence, and TotalVisionDataEngine class."""
 
-import pytest
-import sys
 import os
-import json
-import math
+import sys
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from core.totalvision import (
+    DB_PATH,
+    DOMAIN_COLORS,
+    SENSITIVITY_MATRIX,
     # Constants
-    STATIONS, DOMAIN_COLORS, SENSITIVITY_MATRIX, DB_PATH,
-    # Helpers
-    _rng_for, _clamp,
+    STATIONS,
+    AssetData,
+    ClimateData,
+    PassengerData,
     # Data structs
-    SecurityData, SustainabilityData, PassengerData, AssetData,
-    ClimateData, TotalVisionData,
-    # Generators
-    generate_security_data, generate_sustainability_data,
-    generate_passenger_data, generate_asset_health_data,
-    generate_climate_resilience_data, generate_all_domains,
-    generate_all_stations,
+    SecurityData,
+    SustainabilityData,
+    TotalVisionData,
+    # Engine
+    TotalVisionDataEngine,
+    _clamp,
     # Correlations
-    _domain_score_vector, compute_cross_correlations, _t_cdf,
+    _domain_score_vector,
     _generate_finding_story,
+    _init_totalvision_table,
+    # Helpers
+    _rng_for,
+    _t_cdf,
+    _with_db,
+    compute_cross_correlations,
+    delete_scenario,
+    generate_all_domains,
+    generate_all_stations,
+    generate_asset_health_data,
+    generate_climate_resilience_data,
+    generate_passenger_data,
+    # Generators
+    generate_security_data,
+    generate_sustainability_data,
+    list_saved_scenarios,
+    load_scenario,
     # Sandbox
     run_sandbox_projection,
     # Persistence
-    save_scenario, load_scenario, list_saved_scenarios,
-    delete_scenario, _init_totalvision_table, _with_db,
-    # Engine
-    TotalVisionDataEngine,
+    save_scenario,
 )
-
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 

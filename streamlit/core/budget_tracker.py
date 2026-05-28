@@ -1,17 +1,15 @@
 """Budget & ROI tracking module for SicherGleis PSD monitoring dashboard."""
 
-import pandas as pd
-import numpy as np
 import logging
 
+import numpy as np
+import pandas as pd
+
 from data.budget_data import (
+    STATION_BUDGET_SUMMARY,
     generate_budget_data,
     generate_roi_data,
-    generate_monthly_spend,
     generate_scenario_projections,
-    generate_optimization_recommendations,
-    STATION_BUDGET_SUMMARY,
-    STATIONS,
 )
 
 logger = logging.getLogger(__name__)

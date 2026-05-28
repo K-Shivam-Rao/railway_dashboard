@@ -1,19 +1,20 @@
 """
 Tests for the Training Simulator module.
 """
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from core.logic import (
+    INCIDENT_TYPES,
+    STATIONS,
     Incident,
     SimulationPersona,
     SimulationSession,
     get_simulation_personas,
-    STATIONS,
-    INCIDENT_TYPES,
 )
 
 
@@ -135,7 +136,7 @@ class TestSimulationSession:
         session.start()
         assert session.is_running is True
         assert session.start_time is not None
-        
+
         session.stop()
         assert session.is_running is False
         assert session.end_time is not None
@@ -153,61 +154,61 @@ class TestSimulationSession:
         """Test generating a single incident."""
         session = SimulationSession(target_incidents=20, seed=42)
         session.start()
-        
+
         # Generate one incident
         incident = session.generate_single()
         assert incident is not None
         assert len(session.incidents) == 1
-        
+
         session.stop()
 
     def test_assign_incident(self):
         """Test assigning incidents to personas."""
         session = SimulationSession(target_incidents=10, seed=42)
         session.start()
-        
+
         # Generate and assign incidents
         for _ in range(3):
             inc = session.generate_single()
-        
+
         for incident in session.incidents:
             result = session.assign_incident(incident)
             assert result is True
             assert incident.assigned_persona is not None
-        
+
         session.stop()
 
     def test_resolve_incident(self):
         """Test resolving incidents."""
         session = SimulationSession(target_incidents=5, seed=42)
         session.start()
-        
+
         for _ in range(3):
             session.generate_single()
-        
+
         # Assign and resolve all
         for incident in session.incidents:
             session.assign_incident(incident)
             success = True
             session.resolve_incident(incident, success)
             assert incident.status == "resolved"
-        
+
         session.stop()
 
     def test_metrics_calculation(self):
         """Test that metrics are calculated correctly."""
         session = SimulationSession(target_incidents=10, seed=42)
         session.start()
-        
+
         for _ in range(10):
             session.generate_single()
-        
+
         for inc in session.incidents:
             session.assign_incident(inc)
             session.resolve_incident(inc, True)
-        
+
         session.stop()
-        
+
         metrics = session.metrics
         assert metrics["total_incidents"] == 10
         assert metrics["resolved"] == 10
@@ -222,7 +223,7 @@ class TestSimulationSession:
         for _ in range(5):
             session.generate_single()
         session.stop()
-        
+
         df = session.to_dataframe()
         assert len(df) >= 1
         assert len(df.columns) > 0

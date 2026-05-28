@@ -1,15 +1,16 @@
 """Tests for utils/logging_config.py — covering setup_logging, get_logger,
 custom levels, and module-level initialization."""
 
-import pytest
-import sys
-import os
 import logging
+import os
+import sys
 import tempfile
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
-from utils.logging_config import setup_logging, get_logger
+from utils.logging_config import get_logger, setup_logging
 
 
 class TestSetupLogging:
@@ -43,7 +44,7 @@ class TestSetupLogging:
             for h in logger.handlers[:]:
                 h.close()
                 logger.removeHandler(h)
-            with open(log_path, "r") as f:
+            with open(log_path) as f:
                 content = f.read()
             assert "Test message to custom file" in content
         finally:
@@ -112,7 +113,7 @@ class TestSetupLoggingScenarios:
             logger = setup_logging(log_file=log_path, level=logging.DEBUG)
             logger.debug("This is a debug message")
             self._close_handlers(logger)
-            with open(log_path, "r") as f:
+            with open(log_path) as f:
                 content = f.read()
             assert "debug" in content.lower() or "DEBUG" in content
         finally:
@@ -127,7 +128,7 @@ class TestSetupLoggingScenarios:
             logger.debug("This should NOT appear")
             logger.info("This should appear")
             self._close_handlers(logger)
-            with open(log_path, "r") as f:
+            with open(log_path) as f:
                 content = f.read()
             assert "This should NOT appear" not in content
             assert "This should appear" in content
@@ -144,7 +145,7 @@ class TestSetupLoggingScenarios:
             logger.warning("Should appear")
             logger.error("Should appear too")
             self._close_handlers(logger)
-            with open(log_path, "r") as f:
+            with open(log_path) as f:
                 content = f.read()
             assert "Should not appear" not in content
             assert "Should appear" in content
@@ -159,7 +160,6 @@ class TestModuleLevelInit:
 
     def test_logger_configured_on_import(self):
         # The module calls setup_logging() at import time
-        import utils.logging_config
         root_logger = logging.getLogger()
         handlers = root_logger.handlers
         assert len(handlers) >= 1  # At least some handlers configured

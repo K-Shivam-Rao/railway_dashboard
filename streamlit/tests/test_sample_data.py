@@ -1,22 +1,37 @@
 """
 Unit tests for data/sample_data.py
 """
-import pytest
-import pandas as pd
-import sys
 import os
+import sys
+
+import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
 from data.sample_data import (
-    get_station_df, get_customer_df, get_rfm_df, get_customer_insights,
-    get_operator_profile, get_contract_health_df, get_renewal_forecast_df,
-    get_at_risk_df, get_renewal_health_summary, get_high_value_customers_df,
-    get_operator_history, get_support_tickets, get_engagement_timeline,
-    get_operator_monthly_stats, get_contract_amendments, get_financial_projections,
-    get_operator_comparison_benchmarks, get_support_ticket_trend,
-    get_business_map_data, get_leadership_data, get_operator_health_trend
+    get_at_risk_df,
+    get_business_map_data,
+    get_contract_amendments,
+    get_contract_health_df,
+    get_customer_df,
+    get_customer_insights,
+    get_engagement_timeline,
+    get_financial_projections,
+    get_high_value_customers_df,
+    get_leadership_data,
+    get_operator_comparison_benchmarks,
+    get_operator_health_trend,
+    get_operator_history,
+    get_operator_monthly_stats,
+    get_operator_profile,
+    get_renewal_forecast_df,
+    get_renewal_health_summary,
+    get_rfm_df,
+    get_station_df,
+    get_support_ticket_trend,
+    get_support_tickets,
 )
 
 

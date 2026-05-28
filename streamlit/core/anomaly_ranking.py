@@ -6,7 +6,7 @@ Part of the Midnight Express v5 UI/UX upgrade.
 """
 
 from datetime import datetime
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 ANOMALY_RANKING_PRESETS = {
@@ -177,8 +177,8 @@ def get_recommended_action(row) -> str:
 def rank_anomalies(
     anomalies_df,
     preset_name: str = "balanced",
-    custom_weights: Optional[Dict] = None,
-) -> List[Dict]:
+    custom_weights: dict | None = None,
+) -> list[dict]:
     """
     Rank anomalies by composite score using configurable weights.
 
@@ -270,7 +270,7 @@ def rank_anomalies(
     return ranked
 
 
-def get_anomaly_ranking_matrix() -> Dict:
+def get_anomaly_ranking_matrix() -> dict:
     """Return the full ranking matrix configuration for the settings editor."""
     return {
         "presets": dict(ANOMALY_RANKING_PRESETS),

@@ -1,30 +1,51 @@
 """Targeted tests for logic.py uncovered areas (51% → 95%)."""
-import pytest
+from datetime import datetime
+from unittest.mock import patch
+
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock
+import pytest
 
 from core.logic import (
-    SaaSModelConfig, run_simulation, print_summary,
-    visualize_results, visualize_dashboard_1, visualize_dashboard_2,
-    visualize_comparison,
-    get_financial_model_data,
-    get_customer_data, get_rfm_analysis, get_high_value_customers,
-    get_customer_business_insights, get_contract_health_score,
-    get_renewal_forecast, get_at_risk_accounts,
-    get_renewal_health_summary, get_operator_history,
-    get_contract_amendments, get_support_tickets,
-    get_engagement_timeline, get_operator_health_trend,
-    get_support_ticket_trend, get_financial_projections,
-    get_operator_comparison_benchmarks, get_operator_monthly_stats,
+    ROOT_CAUSES,
+    SCENARIO_PRESETS,
+    CompetencyScore,
+    CustomerSegmenter,
+    FinancialModel,
+    Incident,
+    SaaSModelConfig,
+    Scenario,
+    ScenarioStep,
+    SimulationPersona,
+    SimulationSession,
+    StationAnalytics,
+    get_at_risk_accounts,
     get_business_map_data,
-    StationAnalytics, FinancialModel, CustomerSegmenter,
-    Incident, SimulationPersona, CompetencyScore, Scenario,
-    ScenarioStep, SimulationSession, ROOT_CAUSES, SCENARIO_PRESETS,
+    get_contract_amendments,
+    get_contract_health_score,
+    get_customer_business_insights,
+    get_customer_data,
+    get_engagement_timeline,
+    get_financial_model_data,
+    get_financial_projections,
+    get_high_value_customers,
+    get_operator_comparison_benchmarks,
+    get_operator_health_trend,
+    get_operator_history,
+    get_operator_monthly_stats,
+    get_renewal_forecast,
+    get_renewal_health_summary,
+    get_rfm_analysis,
     get_simulation_personas,
+    get_support_ticket_trend,
+    get_support_tickets,
+    print_summary,
+    run_simulation,
+    visualize_comparison,
+    visualize_dashboard_1,
+    visualize_dashboard_2,
+    visualize_results,
 )
-from utils.exceptions import ConfigurationError, SimulationError
+from utils.exceptions import ConfigurationError
 
 # ── SaaSModelConfig ──
 
@@ -834,7 +855,7 @@ class TestSimulationSessionFullCycle:
         if inc2:
             session.assign_incident(inc2)
             session.resolve_incident(inc2, success=False)
-        
+
         inc3 = session.generate_single()
         if inc3:
             session.assign_incident(inc3)

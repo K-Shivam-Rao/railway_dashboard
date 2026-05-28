@@ -1,28 +1,28 @@
 """
 Unit tests for reports/pdf_generator.py
 """
-import pytest
-import pandas as pd
-import sys
-import os
 import io
+import os
+import sys
+
+import pandas as pd
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
 from reports.pdf_generator import (
-    get_company_data,
-    get_leadership_team,
-    get_services,
-    get_case_studies,
-    get_report_bytes,
+    COLORS,
+    generate_charts_only_pdf_report,
     generate_client_report,
     generate_complete_pdf_report,
-    generate_charts_only_pdf_report,
-    generate_tables_only_pdf_report,
     generate_simulation_report,
-    COLORS,
+    generate_tables_only_pdf_report,
+    get_case_studies,
+    get_company_data,
+    get_leadership_team,
+    get_report_bytes,
+    get_services,
 )
-
 
 # ── get_company_data ──
 
@@ -261,8 +261,9 @@ class TestGenerateCompletePdfReport:
         """Create dummy image bytes for chart slots."""
         import matplotlib
         matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
         from io import BytesIO
+
+        import matplotlib.pyplot as plt
         bytes_list = []
         for _ in range(4):
             fig, ax = plt.subplots(figsize=(4, 3))
@@ -338,8 +339,9 @@ class TestGenerateChartsOnlyPdfReport:
     def _make_minimal_bytes_list(self):
         import matplotlib
         matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
         from io import BytesIO
+
+        import matplotlib.pyplot as plt
         bytes_list = []
         for _ in range(4):
             fig, ax = plt.subplots(figsize=(4, 3))

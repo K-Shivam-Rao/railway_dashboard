@@ -6,16 +6,13 @@ Run:
 from __future__ import annotations
 
 import json
-import math
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-from plotly.subplots import make_subplots
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(

@@ -3,17 +3,24 @@ formatting functions: format_euro, format_compact, format_score,
 format_full, smart_format, get_status_color, convert_to_csv,
 format_breakeven."""
 
-import pytest
-import sys
 import os
+import sys
+
 import pandas as pd
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
 from utils.helpers import (
-    format_euro, get_status_color, smart_format, format_compact,
-    format_full, format_score, convert_to_csv, show_loading_spinner,
+    convert_to_csv,
     format_breakeven,
+    format_compact,
+    format_euro,
+    format_full,
+    format_score,
+    get_status_color,
+    show_loading_spinner,
+    smart_format,
 )
 
 

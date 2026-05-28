@@ -1,9 +1,10 @@
 """
 Unit tests for core/narrative_html.py
 """
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
@@ -13,7 +14,6 @@ from core.narrative_html import (
     build_mini_ranking,
     build_org_tree,
 )
-
 
 # ── build_green_state_banner ──
 

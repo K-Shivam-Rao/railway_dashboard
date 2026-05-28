@@ -2,12 +2,11 @@
 Database utilities for Training Simulator persistence.
 Stores simulation sessions, incidents, and user achievements.
 """
-import sqlite3
 import json
 import logging
-from datetime import datetime
-from typing import Optional, List, Dict
+import sqlite3
 from contextlib import contextmanager
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 DB_PATH = "simulation_history.db"
@@ -128,11 +127,11 @@ def init_simulation_db():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_competency_session ON competency_scores(session_id)")
 
 
-def save_session(session_id: str, metrics: Dict, config: Dict) -> None:
+def save_session(session_id: str, metrics: dict, config: dict) -> None:
     """Save a simulation session to the database."""
     try:
         init_simulation_db()
-        
+
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -161,11 +160,11 @@ def save_session(session_id: str, metrics: Dict, config: Dict) -> None:
         logger.error(f"Failed to save session {session_id}: {e}")
 
 
-def save_incidents(session_id: str, incidents: List) -> None:
+def save_incidents(session_id: str, incidents: list) -> None:
     """Save incident records to the database using batch insert."""
     try:
         init_simulation_db()
-        
+
         with get_db_connection() as conn:
             cursor = conn.cursor()
             incident_rows = [
@@ -199,7 +198,7 @@ def save_achievement(session_id: str, badge_id: str, badge_name: str) -> None:
     """Save an earned achievement."""
     try:
         init_simulation_db()
-        
+
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -212,10 +211,10 @@ def save_achievement(session_id: str, badge_id: str, badge_name: str) -> None:
         logger.error(f"Failed to save achievement {badge_id}: {e}")
 
 
-def get_recent_sessions(limit: int = 10) -> List[Dict]:
+def get_recent_sessions(limit: int = 10) -> list[dict]:
     """Get recent simulation sessions."""
     init_simulation_db()
-    
+
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
@@ -223,28 +222,28 @@ def get_recent_sessions(limit: int = 10) -> List[Dict]:
             ORDER BY created_at DESC
             LIMIT ?
         """, (limit,))
-        
+
         return [dict(row) for row in cursor.fetchall()]
 
 
-def get_session_summary(session_id: str) -> Optional[Dict]:
+def get_session_summary(session_id: str) -> dict | None:
     """Get summary stats for a specific session."""
     init_simulation_db()
-    
+
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
             SELECT * FROM simulation_sessions WHERE session_id = ?
         """, (session_id,))
-        
+
         row = cursor.fetchone()
         return dict(row) if row else None
 
 
-def get_session_incidents(session_id: str) -> List[Dict]:
+def get_session_incidents(session_id: str) -> list[dict]:
     """Get all incidents for a session."""
     init_simulation_db()
-    
+
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
@@ -252,14 +251,14 @@ def get_session_incidents(session_id: str) -> List[Dict]:
             WHERE session_id = ?
             ORDER BY timestamp ASC
         """, (session_id,))
-        
+
         return [dict(row) for row in cursor.fetchall()]
 
 
-def get_achievements(session_id: Optional[str] = None) -> List[Dict]:
+def get_achievements(session_id: str | None = None) -> list[dict]:
     """Get earned achievements, optionally filtered by session."""
     init_simulation_db()
-    
+
     with get_db_connection() as conn:
         cursor = conn.cursor()
         if session_id:
@@ -270,11 +269,11 @@ def get_achievements(session_id: Optional[str] = None) -> List[Dict]:
             """, (session_id,))
         else:
             cursor.execute("SELECT * FROM user_achievements ORDER BY earned_at DESC LIMIT 50")
-        
+
         return [dict(row) for row in cursor.fetchall()]
 
 
-def get_all_time_stats() -> Dict:
+def get_all_time_stats() -> dict:
     """Get all-time statistics across all sessions."""
     init_simulation_db()
 
@@ -296,7 +295,7 @@ def get_all_time_stats() -> Dict:
         return dict(row) if row else {}
 
 
-def save_scenario_template(name: str, config: Dict, description: str = "", tags: List[str] = None) -> bool:
+def save_scenario_template(name: str, config: dict, description: str = "", tags: list[str] = None) -> bool:
     """Save a custom scenario template."""
     try:
         init_simulation_db()
@@ -323,7 +322,7 @@ def save_scenario_template(name: str, config: Dict, description: str = "", tags:
         return False
 
 
-def get_scenario_templates() -> List[Dict]:
+def get_scenario_templates() -> list[dict]:
     """Get all saved scenario templates."""
     init_simulation_db()
     import json as json_module
@@ -357,7 +356,7 @@ def delete_scenario_template(name: str) -> bool:
         return False
 
 
-def save_competency_scores(session_id: str, scores: List[Dict]) -> None:
+def save_competency_scores(session_id: str, scores: list[dict]) -> None:
     """Save competency scores for a session."""
     try:
         init_simulation_db()
@@ -389,7 +388,7 @@ def save_competency_scores(session_id: str, scores: List[Dict]) -> None:
         logger.error(f"Failed to save competency scores: {e}")
 
 
-def get_session_competency_scores(session_id: str) -> List[Dict]:
+def get_session_competency_scores(session_id: str) -> list[dict]:
     """Get competency scores for a specific session."""
     init_simulation_db()
 

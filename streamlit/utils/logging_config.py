@@ -3,8 +3,6 @@ Logging configuration for SicherGleis Railway Dashboard.
 Configures structured logging with both file and console output.
 """
 import logging
-import os
-from datetime import datetime
 
 
 def setup_logging(
@@ -23,18 +21,18 @@ def setup_logging(
     # Create logger
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    
+
     # Clear existing handlers
     logger.handlers.clear()
-    
+
     # File handler - logs everything from level and above
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(level)
-    
+
     # Console handler - logs warnings and above by default
     console_handler = logging.StreamHandler()
     console_handler.setLevel(console_level)
-    
+
     # Formatter
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -42,11 +40,11 @@ def setup_logging(
     )
     file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
-    
+
     # Add handlers
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
-    
+
     return logger
 
 

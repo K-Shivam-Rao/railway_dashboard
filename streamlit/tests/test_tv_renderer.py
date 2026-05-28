@@ -3,14 +3,14 @@ Unit tests for core/tv_renderer.py — pure helper functions only.
 The Streamlit-dependent render functions (_render_kpi_row, render_tv)
 require mocking streamlit and are tested via integration tests.
 """
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
 # Mock streamlit before importing tv_renderer
-import streamlit as st
 
 
 class TestTVRendererConstants:
@@ -145,7 +145,7 @@ class TestMakeAllStationsBar:
     """Test tv_renderer._make_all_stations_bar()."""
 
     def test_returns_figure(self):
-        from core.tv_renderer import _make_all_stations_bar, STATIONS
+        from core.tv_renderer import STATIONS, _make_all_stations_bar
         # Create mock TotalVisionData objects
         all_data = {}
         for s in STATIONS[:3]:
@@ -208,7 +208,7 @@ class TestChartInfoBar:
     """Test tv_renderer._chart_info_bar()."""
 
     def test_returns_string(self):
-        from core.tv_renderer import _chart_info_bar, DOMAINS
+        from core.tv_renderer import _chart_info_bar
         mock_tv = _make_mock_tv_data()
         html = _chart_info_bar("security", mock_tv)
         assert isinstance(html, str)

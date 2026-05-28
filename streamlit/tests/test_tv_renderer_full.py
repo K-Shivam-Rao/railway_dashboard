@@ -1,11 +1,13 @@
 """Tests for core/tv_renderer.py — covers render_tv, _render_kpi_row, _chart_info_bar."""
 from unittest.mock import MagicMock, patch
+
 import pandas as pd
 import pytest
 
 from core.tv_renderer import (
-    _chart_info_bar, _render_kpi_row,
-    DOMAINS, DOMAIN_META, DOMAIN_COLORS,
+    DOMAINS,
+    _chart_info_bar,
+    _render_kpi_row,
 )
 
 
@@ -194,72 +196,69 @@ class TestRenderTv:
     def test_engine_handling(self):
         """Test engine.generate_all is called."""
         st = _make_st_mock()
-        with patch("core.tv_renderer.st", st):
-            with patch("core.tv_renderer.TotalVisionDataEngine") as eng_cls:
-                eng = MagicMock()
-                tv = _make_mock_tv_data()
-                eng.generate_all.return_value = {"Berlin Hbf": tv}
-                eng.correlate.return_value = {"matrix": {}, "findings": []}
-                eng.project.return_value = {
-                    "projected_scores": {}, "baseline_scores": {},
-                    "deltas": {}, "timeline": [], "station_projections": {},
-                }
-                eng_cls.return_value = eng
-                eng_cls.aggregate_scores.return_value = {}
-                eng.list_scenarios.return_value = []
+        with patch("core.tv_renderer.st", st), patch("core.tv_renderer.TotalVisionDataEngine") as eng_cls:
+            eng = MagicMock()
+            tv = _make_mock_tv_data()
+            eng.generate_all.return_value = {"Berlin Hbf": tv}
+            eng.correlate.return_value = {"matrix": {}, "findings": []}
+            eng.project.return_value = {
+                "projected_scores": {}, "baseline_scores": {},
+                "deltas": {}, "timeline": [], "station_projections": {},
+            }
+            eng_cls.return_value = eng
+            eng_cls.aggregate_scores.return_value = {}
+            eng.list_scenarios.return_value = []
 
-                from core.tv_renderer import render_tv
-                render_tv(df=pd.DataFrame({"station": ["Berlin Hbf"]}))
-                assert eng.generate_all.called
+            from core.tv_renderer import render_tv
+            render_tv(df=pd.DataFrame({"station": ["Berlin Hbf"]}))
+            assert eng.generate_all.called
 
     def test_scenario_project_flow(self):
         """Test what-if scenario projection flow uses eng.project with correct params."""
         st = _make_st_mock()
         st.slider.return_value = 1.0
-        with patch("core.tv_renderer.st", st):
-            with patch("core.tv_renderer.TotalVisionDataEngine") as eng_cls:
-                eng = MagicMock()
-                tv = _make_mock_tv_data()
-                eng.generate_all.return_value = {"Berlin Hbf": tv}
-                eng.correlate.return_value = {"matrix": {}, "findings": []}
-                expected_project = {
-                    "projected_scores": {}, "baseline_scores": {},
-                    "deltas": {}, "timeline": [], "station_projections": {},
-                }
-                eng.project.return_value = expected_project
-                eng_cls.return_value = eng
-                eng_cls.aggregate_scores.return_value = {}
+        with patch("core.tv_renderer.st", st), patch("core.tv_renderer.TotalVisionDataEngine") as eng_cls:
+            eng = MagicMock()
+            tv = _make_mock_tv_data()
+            eng.generate_all.return_value = {"Berlin Hbf": tv}
+            eng.correlate.return_value = {"matrix": {}, "findings": []}
+            expected_project = {
+                "projected_scores": {}, "baseline_scores": {},
+                "deltas": {}, "timeline": [], "station_projections": {},
+            }
+            eng.project.return_value = expected_project
+            eng_cls.return_value = eng
+            eng_cls.aggregate_scores.return_value = {}
 
-                from core.tv_renderer import render_tv
-                render_tv(df=pd.DataFrame({"station": ["Berlin Hbf"]}))
-                # Verify eng.project was called (what-if scenario path)
-                eng.project.assert_called()
-                # Verify plotly charts rendered
-                assert st.plotly_chart.called
+            from core.tv_renderer import render_tv
+            render_tv(df=pd.DataFrame({"station": ["Berlin Hbf"]}))
+            # Verify eng.project was called (what-if scenario path)
+            eng.project.assert_called()
+            # Verify plotly charts rendered
+            assert st.plotly_chart.called
 
     def test_with_correlation_findings(self):
         """Test correlation findings are rendered."""
         st = _make_st_mock()
-        with patch("core.tv_renderer.st", st):
-            with patch("core.tv_renderer.TotalVisionDataEngine") as eng_cls:
-                eng = MagicMock()
-                tv = _make_mock_tv_data()
-                eng.generate_all.return_value = {"Berlin Hbf": tv}
-                eng.correlate.return_value = {
-                    "matrix": {"security": {"sustain": 0.5}},
-                    "findings": [{
-                        "direction": "positive", "strength": "strong",
-                        "story": "Correlation found", "r_value": 0.85,
-                        "p_value": 0.01,
-                    }],
-                }
-                eng.project.return_value = {
-                    "projected_scores": {}, "baseline_scores": {},
-                    "deltas": {}, "timeline": [], "station_projections": {},
-                }
-                eng_cls.return_value = eng
-                eng_cls.aggregate_scores.return_value = {}
+        with patch("core.tv_renderer.st", st), patch("core.tv_renderer.TotalVisionDataEngine") as eng_cls:
+            eng = MagicMock()
+            tv = _make_mock_tv_data()
+            eng.generate_all.return_value = {"Berlin Hbf": tv}
+            eng.correlate.return_value = {
+                "matrix": {"security": {"sustain": 0.5}},
+                "findings": [{
+                    "direction": "positive", "strength": "strong",
+                    "story": "Correlation found", "r_value": 0.85,
+                    "p_value": 0.01,
+                }],
+            }
+            eng.project.return_value = {
+                "projected_scores": {}, "baseline_scores": {},
+                "deltas": {}, "timeline": [], "station_projections": {},
+            }
+            eng_cls.return_value = eng
+            eng_cls.aggregate_scores.return_value = {}
 
-                from core.tv_renderer import render_tv
-                render_tv(df=pd.DataFrame({"station": ["Berlin Hbf"]}))
-                assert st.markdown.called
+            from core.tv_renderer import render_tv
+            render_tv(df=pd.DataFrame({"station": ["Berlin Hbf"]}))
+            assert st.markdown.called

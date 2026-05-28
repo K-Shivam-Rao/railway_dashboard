@@ -2,12 +2,12 @@
 Covers: wrapper classes, SimulationSession lifecycle, anomaly detection,
 time series, network summary branches, run_simulation edge cases."""
 
-import pytest
-import pandas as pd
-import numpy as np
 from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
+import numpy as np
+import pandas as pd
+import pytest
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ class TestPrintSummary:
     """Cover both breakeven branches and the warning paths."""
 
     def test_print_summary_breakeven_reached(self, sample_simulation_df, caplog):
-        from core.logic import print_summary, SaaSModelConfig
+        from core.logic import SaaSModelConfig, print_summary
         config = SaaSModelConfig(10, 0.2, 0.03, 100, 2000, 5)
         # Make the middle column cumulative cash positive to force breakeven
         df = sample_simulation_df.copy()
@@ -37,7 +37,7 @@ class TestPrintSummary:
         assert "MRR" in caplog.text
 
     def test_print_summary_no_breakeven(self, caplog):
-        from core.logic import print_summary, SaaSModelConfig, run_simulation
+        from core.logic import SaaSModelConfig, print_summary, run_simulation
         config = SaaSModelConfig(100, 0.01, 0.05, 50, 50000, 20)
         df = run_simulation(config, months=6)
         import logging
@@ -183,7 +183,7 @@ class TestSimulationSessionFull:
     """Cover SimulationSession methods not yet tested."""
 
     def test_generate_single_with_scenario(self):
-        from core.logic import SimulationSession, Scenario
+        from core.logic import Scenario, SimulationSession
         s = Scenario.from_preset("weather_event")
         session = SimulationSession(seed=42, scenario=s)
         session.start()
@@ -199,8 +199,7 @@ class TestSimulationSessionFull:
         assert inc is None
 
     def test_assign_incident_no_personas(self):
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.personas = []
         inc = Incident(id="INC-TEST", timestamp=datetime.now(), station="Berlin",
@@ -231,8 +230,7 @@ class TestSimulationSessionFull:
         assert inc.status in ("resolved", "failed")
 
     def test_resolve_incident_not_assigned(self):
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         inc = Incident(id="INC-TEST", timestamp=datetime.now(), station="Berlin",
                        incident_type="gate_jam", severity="CRITICAL",
@@ -279,7 +277,6 @@ class TestIncidentToDict:
 
     def test_to_dict_basic(self):
         from core.logic import Incident
-        from datetime import datetime
         inc = Incident(id="INC-001", timestamp=datetime(2025, 1, 15, 10, 30),
                         station="Berlin Hbf", incident_type="gate_jam",
                         severity="CRITICAL", description="Gate jammed",
@@ -423,7 +420,7 @@ class TestAnomalyDetection:
         assert "is_anomaly" in result.columns
 
     def test_evaluate_detection_method(self, sensor_series):
-        from core.logic import evaluate_detection_method, detect_anomalies_zscore
+        from core.logic import detect_anomalies_zscore, evaluate_detection_method
         pred_df = detect_anomalies_zscore(sensor_series, threshold=2.0)
         true_labels = pd.Series(np.zeros(100, dtype=bool))
         true_labels.iloc[10] = True
@@ -813,8 +810,7 @@ class TestRunSimulationError:
 
     def test_run_simulation_raises_error(self):
         """Invalid config causes exception, which is wrapped in SimulationError."""
-        from core.logic import run_simulation, SimulationError
-        from utils.exceptions import ConfigurationError
+        from core.logic import SimulationError, run_simulation
         # An invalid starting_customers value causes ConfigurationError
         # which is NOT caught by run_simulation's except (it happens in __init__)
         # Instead, force an error by passing a malformed config
@@ -948,15 +944,14 @@ class TestSimulationSessionLifecycle:
         assert not session.is_running
 
     def test_set_scenario(self):
-        from core.logic import SimulationSession, Scenario
+        from core.logic import Scenario, SimulationSession
         s = Scenario.from_preset("quick_drill")
         session = SimulationSession(seed=42)
         session.set_scenario(s)
         assert session.target_incidents == 20
 
     def test_add_annotation_and_bookmark(self):
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         inc = session.generate_single()
@@ -1250,7 +1245,6 @@ class TestRenewalHealthSummaryExceptions:
     def test_renewal_health_summary_exception(self):
         import core.logic as lm
         import data.sample_data as sd
-        from unittest.mock import MagicMock
         orig = sd.get_contract_health_df
         try:
             sd.get_contract_health_df = MagicMock(side_effect=Exception("DB error"))
@@ -1265,7 +1259,6 @@ class TestRenewalHealthSummaryExceptions:
         succeeds but get_customer_df raises)."""
         import core.logic as lm
         import data.sample_data as sd
-        from unittest.mock import MagicMock
         orig = sd.get_customer_df
         try:
             sd.get_customer_df = MagicMock(side_effect=Exception("Customers unavailable"))
@@ -1311,7 +1304,7 @@ class TestSimulationSeverityWeights:
         assert severity_counts["INFO"] > severity_counts["CRITICAL"]
 
     def test_severity_override_high_critical(self):
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="high_crit", description="",
             steps=[ScenarioStep(step_id="s1", step_type="trigger",
@@ -1326,7 +1319,7 @@ class TestSimulationSeverityWeights:
         assert weights["INFO"] == 0.1
 
     def test_severity_override_low_info(self):
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="low_info", description="",
             steps=[ScenarioStep(step_id="s1", step_type="trigger",
@@ -1341,7 +1334,7 @@ class TestSimulationSeverityWeights:
         assert weights["INFO"] == 0.7
 
     def test_severity_override_critical_only(self):
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="crit_only", description="",
             steps=[ScenarioStep(step_id="s1", step_type="trigger",
@@ -1363,7 +1356,7 @@ class TestSimulationScenarioSteps:
 
     def test_stress_event_step(self):
         """stress_event step triggers stress on assigned personas."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="stress", description="",
             steps=[ScenarioStep(step_id="s1", step_type="stress_event",
@@ -1383,7 +1376,7 @@ class TestSimulationScenarioSteps:
         assert total_stress > 0
 
     def test_rest_interval_step(self):
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="rest", description="",
             steps=[ScenarioStep(step_id="r1", step_type="rest_interval", delay_sec=0)],
@@ -1395,7 +1388,7 @@ class TestSimulationScenarioSteps:
         assert session.rest_interval_counter == 1
 
     def test_weather_change_step(self):
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="weather", description="",
             steps=[ScenarioStep(step_id="w1", step_type="weather_change",
@@ -1443,10 +1436,9 @@ class TestAssignResolveBranches:
 
     def test_assign_incident_no_timestamp(self):
         """Incident with no timestamp: time_to_assign stays None."""
-        from core.logic import SimulationSession, Incident
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
-        from datetime import datetime
         inc = Incident(id="INC-NO-TS", timestamp=None, station="Berlin",
                        incident_type="gate_jam", severity="WARNING",
                        description="Test")
@@ -1457,8 +1449,7 @@ class TestAssignResolveBranches:
     def test_resolve_incident_no_matching_persona(self):
         """resolve_incident when assigned_persona doesn't match any persona:
         the for loop completes without entering the if block."""
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         inc = Incident(id="INC-TEST", timestamp=datetime.now(), station="Berlin",
@@ -1472,7 +1463,7 @@ class TestAssignResolveBranches:
 
     def test_resolve_incident_no_timestamp(self):
         """Incident with timestamp=None -> time_to_resolve stays None."""
-        from core.logic import SimulationSession, Incident
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         inc = Incident(id="INC-NO-TS", timestamp=None, station="Berlin",
@@ -1485,8 +1476,7 @@ class TestAssignResolveBranches:
 
     def test_escalated_incident_in_metrics(self):
         """Incident that's escalated should appear in persona_stats escalated count."""
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         inc = Incident(id="INC-ESC", timestamp=datetime.now(), station="Berlin",
@@ -1639,8 +1629,7 @@ class TestCalculateMetricsPersonaStats:
 
     def test_calculate_metrics_escalated_and_critical(self):
         """Mix of resolved, failed, and escalated incidents."""
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         # Create a resolved incident with was_escalated=True
@@ -1696,8 +1685,7 @@ class TestAssignIncidentCriticalSeverity:
     sets escalation_level = 0."""
 
     def test_critical_severity_sets_escalation_level(self):
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         inc = Incident(id="INC-CRIT", timestamp=datetime.now(), station="Berlin",
@@ -1715,8 +1703,7 @@ class TestResolveIncidentSeverityMult:
 
     def test_resolve_critical_uses_0_8_mult(self):
         """CRITICAL severity -> severity_mult = 0.8 (faster response)."""
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         inc = Incident(id="INC-CRIT", timestamp=datetime.now(), station="Berlin",
@@ -1729,8 +1716,7 @@ class TestResolveIncidentSeverityMult:
 
     def test_resolve_info_uses_1_2_mult(self):
         """INFO severity -> severity_mult = 1.2 (slower response)."""
-        from core.logic import SimulationSession, Incident
-        from datetime import datetime
+        from core.logic import Incident, SimulationSession
         session = SimulationSession(seed=42)
         session.start()
         inc = Incident(id="INC-INFO", timestamp=datetime.now(), station="Berlin",
@@ -1765,7 +1751,7 @@ class TestApplyScenarioStepEffectsFull:
 
     def test_stress_event_no_assigned_no_stress(self):
         """stress_event when no persona has current_assigned > 0: no stress applied."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="stress", description="",
             steps=[ScenarioStep(step_id="s1", step_type="stress_event",
@@ -1781,7 +1767,7 @@ class TestApplyScenarioStepEffectsFull:
 
     def test_weather_change_normal_to_storm(self):
         """weather_change step with weather_override should change session.weather."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="weather", description="",
             steps=[ScenarioStep(step_id="w1", step_type="weather_change",
@@ -1798,7 +1784,7 @@ class TestApplyScenarioStepEffectsFull:
     def test_severity_override_in_generate_single(self):
         """Using a scenario with CRITICAL override should generate
         more CRITICAL incidents."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="crit", description="",
             steps=[ScenarioStep(step_id="s1", step_type="trigger",
@@ -1824,7 +1810,7 @@ class TestGetRootCause:
 
     def test_get_root_cause_default(self):
         """_get_root_cause should return a valid root cause from ROOT_CAUSES."""
-        from core.logic import SimulationSession, ROOT_CAUSES
+        from core.logic import ROOT_CAUSES, SimulationSession
         session = SimulationSession(seed=42)
         root_cause, label, preventable = session._get_root_cause()
         assert root_cause in ROOT_CAUSES
@@ -2047,7 +2033,7 @@ class TestScenarioStepBeforeDelay:
 
     def test_scenario_step_not_yet_triggered(self):
         """Step with delay_sec=100, call with elapsed=5: step not triggered."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="delayed", description="",
             steps=[ScenarioStep(step_id="d1", step_type="stress_event",
@@ -2086,9 +2072,9 @@ class TestModuleLevelImportError:
         """Reload module blocking imports matching *blocked_prefixes*.
         Returns (reloaded_module, saved_dict).
         Caller MUST restore via ``lm.__dict__.clear(); lm.__dict__.update(saved_dict)``."""
+        import builtins
         import importlib
         import sys
-        import builtins
 
         saved_dict = dict(module.__dict__)
         saved_sys_modules = {}
@@ -2124,6 +2110,7 @@ class TestModuleLevelImportError:
     def test_data_sample_data_import_fails_logs_error(self, caplog):
         """The except handler logs both an error and a warning."""
         import logging
+
         import core.logic as lm
         with caplog.at_level(logging.WARNING):
             lm_reloaded, saved_dict = self._reload_with_blocked_prefix(lm, ['data.'])
@@ -2148,9 +2135,9 @@ class TestSklearnImportError:
     def _reload_with_blocked_sklearn(module):
         """Reload module blocking sklearn imports.
         Returns (reloaded_module, saved_dict)."""
+        import builtins
         import importlib
         import sys
-        import builtins
 
         saved_dict = dict(module.__dict__)
         saved_sys_modules = {}
@@ -2266,7 +2253,7 @@ class TestUnknownSeverityOverride:
     def test_unknown_override_falls_through(self):
         """severity_override="RANDOM" -> none of the elif branches match
         -> falls through to `return weights` with baseline weights unchanged."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="unknown_override", description="",
             steps=[ScenarioStep(step_id="s1", step_type="trigger",
@@ -2295,7 +2282,7 @@ class TestStepTypeWithoutMatchingElif:
         """step_type="trigger" with elapsed >= delay_sec: enters the if block
         but "trigger" doesn't match stress_event, rest_interval, or weather_change.
         -> falls through to next iteration without adding to triggered_steps."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="trigger_only", description="",
             steps=[ScenarioStep(step_id="s1", step_type="trigger", delay_sec=0)],
@@ -2312,7 +2299,7 @@ class TestStepTypeWithoutMatchingElif:
 
     def test_cascade_step_type_falls_through(self):
         """step_type="cascade" with elapsed >= delay_sec: same fall-through."""
-        from core.logic import SimulationSession, Scenario, ScenarioStep
+        from core.logic import Scenario, ScenarioStep, SimulationSession
         scenario = Scenario(
             name="cascade_only", description="",
             steps=[ScenarioStep(step_id="s1", step_type="cascade", delay_sec=0)],

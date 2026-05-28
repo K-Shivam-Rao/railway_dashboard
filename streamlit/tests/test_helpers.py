@@ -1,15 +1,24 @@
 """
 Unit tests for utils/helpers.py
 """
-import pytest
-import sys
 import os
+import sys
+
 import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
-from utils.helpers import format_euro, get_status_color, format_compact, format_score, convert_to_csv, smart_format, format_full
+from utils.helpers import (
+    convert_to_csv,
+    format_compact,
+    format_euro,
+    format_full,
+    format_score,
+    get_status_color,
+    smart_format,
+)
 
 
 class TestHelpers:

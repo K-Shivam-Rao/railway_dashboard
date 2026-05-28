@@ -6,12 +6,11 @@ extraction). Also exposes ``extract_chart_data`` and ``chart_to_csv`` for
 standalone use.
 """
 
-import io
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from utils.helpers import convert_to_csv
 
+from utils.helpers import convert_to_csv
 
 # ── Public API ────────────────────────────────────────────────────────────
 
@@ -112,7 +111,7 @@ def extract_chart_data(fig: go.Figure) -> pd.DataFrame:
         if trace.type == "pie":
             labels = list(trace.labels) if trace.labels is not None else []
             values = list(trace.values) if trace.values is not None else []
-            for label, value in zip(labels, values):
+            for label, value in zip(labels, values, strict=False):
                 rows.append({"label": label, "value": value, "series": trace.name or ""})
         else:
             # Use getattr for safety — indicator, table, sankey, etc.

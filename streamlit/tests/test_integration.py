@@ -1,32 +1,55 @@
 """
 Integration tests for Railway Dashboard - simplified and corrected
 """
-import pytest
-import pandas as pd
-import sys
 import os
+import sys
+
+import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
 # Import from both sample_data and core.logic to verify consistency
-from data.sample_data import (
-    get_customer_df as sd_get_customer_df,
-    get_customer_insights as sd_get_customer_insights,
-    get_operator_profile as sd_get_operator_profile,
-    get_support_tickets as sd_get_support_tickets,
-    get_engagement_timeline as sd_get_engagement_timeline,
-    get_operator_monthly_stats as sd_get_operator_monthly_stats,
-    get_operator_history as sd_get_operator_history,
+from core.logic import (
+    get_customer_business_insights,
+    get_customer_data,
 )
 from core.logic import (
-    get_customer_data,
-    get_customer_business_insights,
-    get_operator_profile as logic_get_operator_profile,
-    get_support_tickets as logic_get_support_tickets,
     get_engagement_timeline as logic_get_engagement_timeline,
-    get_operator_monthly_stats as logic_get_operator_monthly_stats,
+)
+from core.logic import (
     get_operator_history as logic_get_operator_history,
+)
+from core.logic import (
+    get_operator_monthly_stats as logic_get_operator_monthly_stats,
+)
+from core.logic import (
+    get_operator_profile as logic_get_operator_profile,
+)
+from core.logic import (
+    get_support_tickets as logic_get_support_tickets,
+)
+from data.sample_data import (
+    get_customer_df as sd_get_customer_df,
+)
+from data.sample_data import (
+    get_customer_insights as sd_get_customer_insights,
+)
+from data.sample_data import (
+    get_engagement_timeline as sd_get_engagement_timeline,
+)
+from data.sample_data import (
+    get_operator_history as sd_get_operator_history,
+)
+from data.sample_data import (
+    get_operator_monthly_stats as sd_get_operator_monthly_stats,
+)
+from data.sample_data import (
+    get_operator_profile as sd_get_operator_profile,
+)
+from data.sample_data import (
+    get_support_tickets as sd_get_support_tickets,
 )
 
 

@@ -4,10 +4,9 @@ Contains sample budget data, ROI projections, and financial scenarios
 for German railway station PSD (Platform Screen Door) monitoring.
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Dict
 
+import numpy as np
+import pandas as pd
 
 STATIONS = [
     "Berlin Hbf",
@@ -27,7 +26,7 @@ STATIONS = [
     "Frankfurt Flughafen",
 ]
 
-_BASE_CAPEX: Dict[str, int] = {
+_BASE_CAPEX: dict[str, int] = {
     "Berlin Hbf": 28_000_000,
     "München Hbf": 24_000_000,
     "Hamburg Hbf": 22_000_000,
@@ -160,7 +159,7 @@ def generate_scenario_projections() -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def generate_optimization_recommendations() -> List[Dict]:
+def generate_optimization_recommendations() -> list[dict]:
     """Return list of 10 optimization recommendation dicts.
 
     Each has: id, title, description, category, potential_savings_eur,
@@ -283,7 +282,7 @@ def generate_optimization_recommendations() -> List[Dict]:
 _BUDGET_DF = generate_budget_data()
 _ROI_DF = generate_roi_data()
 
-STATION_BUDGET_SUMMARY: Dict[str, float] = {
+STATION_BUDGET_SUMMARY: dict[str, float] = {
     "total_capex": int(_BUDGET_DF["capex"].sum()),
     "total_opex": int(_BUDGET_DF["opex"].sum()),
     "avg_roi": round(float(_ROI_DF["roi_pct"].mean()), 1),

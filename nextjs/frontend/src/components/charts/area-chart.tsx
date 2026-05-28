@@ -16,7 +16,7 @@ interface AreaChartProps {
   height?: number;
 }
 
-const defaultTooltip = ({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) => {
+const defaultTooltip = ({ active, payload, label }: { active?: boolean; payload?: readonly { name: string; value: number; color: string }[]; label?: string }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-border-default bg-bg-surface px-3 py-2 shadow-lg">

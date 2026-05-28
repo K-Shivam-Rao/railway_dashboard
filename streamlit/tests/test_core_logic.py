@@ -1,17 +1,17 @@
 """
 Unit tests for core/logic.py
 """
-import pytest
-import pandas as pd
-import numpy as np
-import sys
 import os
+import sys
+
+import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
-from core.logic import SaaSModelConfig, run_simulation, StationAnalytics, FinancialModel
-from utils.exceptions import ConfigurationError, SimulationError
+from core.logic import FinancialModel, SaaSModelConfig, run_simulation
+from utils.exceptions import ConfigurationError
 
 
 class TestSaaSModelConfig:

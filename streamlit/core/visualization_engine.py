@@ -1,7 +1,5 @@
 """Visualization engine for the Architecture Hub tab."""
 import random
-from datetime import datetime
-from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
 
 # ── Architecture Topology ──
@@ -13,8 +11,8 @@ class ArchitectureNode:
     icon: str
     type: str
     status: str = "operational"
-    metrics: Dict = field(default_factory=dict)
-    connections: List[str] = field(default_factory=list)
+    metrics: dict = field(default_factory=dict)
+    connections: list[str] = field(default_factory=list)
 
 ARCHITECTURE_NODES = [
     ArchitectureNode("stations", "Rail Stations", "🚉", "station",
@@ -64,7 +62,7 @@ ARCHITECTURE_EDGES = [
 ]
 
 
-def generate_live_metrics() -> Dict[str, Dict]:
+def generate_live_metrics() -> dict[str, dict]:
     """Generate simulated real-time metrics for each component."""
     uptime_base = 99.97
     return {
@@ -432,7 +430,7 @@ OPERATIONAL_LOOPHOLES = [
 ]
 
 
-def analyze_loopholes(history: Optional[Dict] = None) -> Tuple[List[Loophole], List[Loophole]]:
+def analyze_loopholes(history: dict | None = None) -> tuple[list[Loophole], list[Loophole]]:
     """Return technical and operational loopholes, optionally filtered by session history."""
     import copy
     tech = copy.deepcopy(TECHNICAL_LOOPHOLES)
@@ -513,9 +511,9 @@ class Recommendation:
     actionable: str
 
 
-def generate_recommendations(metrics: Optional[Dict] = None,
-                             root_causes: Optional[Dict] = None,
-                             personas: Optional[List] = None) -> List[Recommendation]:
+def generate_recommendations(metrics: dict | None = None,
+                             root_causes: dict | None = None,
+                             personas: list | None = None) -> list[Recommendation]:
     """Generate prioritized recommendations based on simulation metrics and personas."""
     recs = []
 
@@ -523,7 +521,7 @@ def generate_recommendations(metrics: Optional[Dict] = None,
     recs.extend([
         Recommendation("R001", "critical", "Deploy Redundant Gate Controller at Leipzig",
                        "Leipzig Hbf is the single busiest station without controller redundancy. A single hardware fault disables 100% of PSD operations.",
-                       "system", "Prevents ~45min service disruption, protects 12 platforms", 
+                       "system", "Prevents ~45min service disruption, protects 12 platforms",
                        "Budget and deploy secondary controller within next maintenance cycle"),
         Recommendation("R002", "high", "Implement Edge Processing for Low-Latency Stations",
                        "Satellite stations experience latency spikes due to centralized processing. Edge nodes can reduce p99 latency from 200ms to <15ms.",
@@ -586,12 +584,12 @@ def generate_recommendations(metrics: Optional[Dict] = None,
                          f"Support: {worst.name} ({worst.role})",
                          f"{worst.name} has the lowest success rate ({worst.success_rate_computed:.0f}%). Additional training or workload adjustment needed.",
                          "team", "Improving weakest performer lifts overall team capability",
-                         f"Assign mentor, reduce active load by 30%, and retrain on weakness areas"))
+                         "Assign mentor, reduce active load by 30%, and retrain on weakness areas"))
 
     return sorted(recs, key=lambda r: ["critical", "high", "medium", "info"].index(r.priority))
 
 
-def get_station_vulnerability_scores() -> List[Dict]:
+def get_station_vulnerability_scores() -> list[dict]:
     """Return per-station vulnerability scores for heatmap visualization."""
     return [
         {"station": "Berlin Hbf", "score": 12, "critical": 1, "high": 2, "medium": 4, "low": 5},

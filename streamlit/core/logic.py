@@ -1,16 +1,16 @@
-import pandas as pd
-import numpy as np
-import streamlit as st
-from datetime import datetime, timedelta
-import logging
 import dataclasses
-import uuid
+import logging
 import random
+from datetime import datetime, timedelta
+from typing import Optional
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-from typing import Dict, List, Tuple, Optional
+import numpy as np
+import pandas as pd
+import streamlit as st
 
-from utils.exceptions import DataValidationError, SimulationError, ConfigurationError
+from utils.exceptions import ConfigurationError, SimulationError
 
 logger = logging.getLogger(__name__)
 
@@ -18,16 +18,26 @@ logger = logging.getLogger(__name__)
 SAMPLE_DATA_AVAILABLE = False
 try:
     from data.sample_data import (
-        get_customer_df, get_rfm_df, get_customer_insights,
-        get_station_df, get_operator_profile,
-        get_contract_health_df, get_renewal_forecast_df,
-        get_at_risk_df, get_renewal_health_summary,
-        get_high_value_customers_df, get_operator_history,
-        get_support_tickets, get_engagement_timeline,
-        get_operator_monthly_stats, get_contract_amendments,
-        get_financial_projections, get_operator_comparison_benchmarks,
-        get_support_ticket_trend, get_business_map_data,
+        get_at_risk_df,
+        get_business_map_data,
+        get_contract_amendments,
+        get_contract_health_df,
+        get_customer_df,
+        get_customer_insights,
+        get_engagement_timeline,
+        get_financial_projections,
+        get_high_value_customers_df,
         get_leadership_data,
+        get_operator_comparison_benchmarks,
+        get_operator_history,
+        get_operator_monthly_stats,
+        get_operator_profile,
+        get_renewal_forecast_df,
+        get_renewal_health_summary,
+        get_rfm_df,
+        get_station_df,
+        get_support_ticket_trend,
+        get_support_tickets,
     )
     SAMPLE_DATA_AVAILABLE = True
     logger.info("Successfully loaded sample data functions")
@@ -1016,27 +1026,27 @@ def get_tech_stack():
 
 class StationAnalytics:
     """Station analytics OOP wrapper."""
-    
+
     @staticmethod
     def get_metrics(df, station_name):
         return get_metrics(df, station_name)
-    
+
     @staticmethod
     def get_psd_analytics(station_name):
         return get_psd_analytics(station_name)
-    
+
     @staticmethod
     def get_network_summary(df):
         return get_network_summary(df)
-    
+
     @staticmethod
     def get_maintenance_forecast(station_name):
         return get_maintenance_forecast(station_name)
-    
+
     @staticmethod
     def get_passenger_heatmap(station_name):
         return get_passenger_heatmap(station_name)
-    
+
     @staticmethod
     def get_incident_log(df):
         return get_incident_log(df)
@@ -1044,27 +1054,27 @@ class StationAnalytics:
 
 class FinancialModel:
     """Financial model OOP wrapper."""
-    
+
     @staticmethod
     def run_simulation(config, months=24):
         return run_simulation(config, months)
-    
+
     @staticmethod
     def print_summary(df, config):
         return print_summary(df, config)
-    
+
     @staticmethod
     def visualize_results(df, title_suffix=""):
         return visualize_results(df, title_suffix)
-    
+
     @staticmethod
     def visualize_dashboard_1(df, title_suffix=""):
         return visualize_dashboard_1(df, title_suffix)
-    
+
     @staticmethod
     def visualize_dashboard_2(df, title_suffix=""):
         return visualize_dashboard_2(df, title_suffix)
-    
+
     @staticmethod
     def visualize_comparison(df_base, df_churn):
         return visualize_comparison(df_base, df_churn)
@@ -1072,31 +1082,31 @@ class FinancialModel:
 
 class CustomerSegmenter:
     """Customer segmentation OOP wrapper (placeholder)."""
-    
+
     @staticmethod
     def get_customer_data():
         return []  # Placeholder
-    
+
     @staticmethod
     def get_rfm_analysis():
         return {}  # Placeholder
-    
+
     @staticmethod
     def get_high_value_customers():
         return []  # Placeholder
-    
+
     @staticmethod
     def get_customer_business_insights():
         return {}  # Placeholder
-    
+
     @staticmethod
     def get_contract_health_score():
         return {}  # Placeholder
-    
+
     @staticmethod
     def get_renewal_forecast():
         return {}  # Placeholder
-    
+
     @staticmethod
     def get_at_risk_accounts():
         return []  # Placeholder
@@ -1113,15 +1123,15 @@ def get_financial_model_data(months=24, starting_customers=5000, monthly_growth_
     """Return (df_base, df_high_churn) for Financial Model tab."""
     if churn_rate_high is None:
         churn_rate_high = churn_rate * 2
-    
+
     config_base = SaaSModelConfig(starting_customers, monthly_growth_rate, churn_rate,
                                    price_per_customer, fixed_costs, variable_cost_per_customer, cac_simplified)
     df_base = run_simulation(config_base, months)
-    
+
     config_high = SaaSModelConfig(starting_customers, monthly_growth_rate, churn_rate_high,
                                    price_per_customer, fixed_costs, variable_cost_per_customer, cac_simplified)
     df_churn = run_simulation(config_high, months)
-    
+
     return df_base, df_churn
 
 
@@ -1240,30 +1250,30 @@ def get_at_risk_accounts(customer_df=None):
 def get_renewal_health_summary(customer_df=None):
     """Return renewal health summary from sample data."""
     try:
-        from data.sample_data import get_customer_df, get_contract_health_df
+        from data.sample_data import get_contract_health_df, get_customer_df
         health_df = get_contract_health_df()
         customer_df = get_customer_df()
-        
+
         avg_health = health_df["health_score"].mean()
         healthy_count = len(health_df[health_df["health_score"] >= 70])
         critical_count = len(health_df[health_df["health_score"] < 50])
-        
+
         # At-risk high (High Risk)
         at_risk_high = len(customer_df[customer_df["risk_level"] == "High Risk"])
         # At-risk counts
         at_risk_customers = customer_df[customer_df["risk_level"].isin(["High Risk", "Medium Risk"])]
         contract_value_at_risk = at_risk_customers["total_contract_value_eur"].sum()
-        
+
         # Renewal counts
         renewal_critical = len(customer_df[customer_df["days_to_renewal"] <= 30])
         renewal_urgent = len(customer_df[(customer_df["days_to_renewal"] > 30) & (customer_df["days_to_renewal"] <= 60)])
         renewal_upcoming = len(customer_df[(customer_df["days_to_renewal"] > 60) & (customer_df["days_to_renewal"] <= 90)])
-        
+
         # Upcoming renewals value
         upcoming_30d = customer_df[customer_df["days_to_renewal"] <= 30]["total_contract_value_eur"].sum()
         upcoming_60d = customer_df[customer_df["days_to_renewal"] <= 60]["total_contract_value_eur"].sum()
         upcoming_90d = customer_df[customer_df["days_to_renewal"] <= 90]["total_contract_value_eur"].sum()
-        
+
         return {
             "avg_health_score": avg_health,
             "healthy_pct": (healthy_count / len(health_df)) * 100 if len(health_df) > 0 else 0,
@@ -1527,26 +1537,26 @@ class Incident:
     incident_type: str
     severity: str  # CRITICAL, WARNING, INFO
     description: str
-    assigned_persona: Optional[str] = None
-    assigned_role: Optional[str] = None
+    assigned_persona: str | None = None
+    assigned_role: str | None = None
     status: str = "pending"  # pending, assigned, resolved, failed, escalated
     response_time_min: float = 0.0
     resolution_time_min: float = 0.0
-    outcome: Optional[str] = None
-    cascade_parent_id: Optional[str] = None
+    outcome: str | None = None
+    cascade_parent_id: str | None = None
     is_compound: bool = False
-    sub_incidents: List[str] = dataclasses.field(default_factory=list)
+    sub_incidents: list[str] = dataclasses.field(default_factory=list)
     weather_modified: bool = False
     # New fields for lifecycle & accountability
-    root_cause: Optional[str] = None
-    improvement_area: Optional[str] = None
-    preventable: Optional[str] = None
+    root_cause: str | None = None
+    improvement_area: str | None = None
+    preventable: str | None = None
     time_to_assign: float = 0.0  # seconds from creation to assignment
     time_to_resolve: float = 0.0  # seconds from creation to resolution
     escalation_count: int = 0
     was_escalated: bool = False
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "id": self.id,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
@@ -1579,7 +1589,7 @@ class SimulationPersona:
     """Represents a persona in the training simulator."""
     name: str
     role: str
-    specialties: List[str]
+    specialties: list[str]
     avg_response_min: float
     success_rate: float
     assigned_count: int = 0
@@ -1664,7 +1674,7 @@ class SimulationPersona:
             self.current_resolved += 1
         self.total_response_time += response_time
 
-    def to_competency_score(self, benchmark: Dict) -> "CompetencyScore":
+    def to_competency_score(self, benchmark: dict) -> "CompetencyScore":
         all_incidents = self.assigned_count
         resolved = self.resolved_count
 
@@ -1778,15 +1788,15 @@ class ScenarioStep:
     step_id: str
     step_type: str
     delay_sec: float = 0.0
-    severity_override: Optional[str] = None
-    station_filter: Optional[str] = None
-    incident_type_override: Optional[str] = None
-    weather_override: Optional[str] = None
+    severity_override: str | None = None
+    station_filter: str | None = None
+    incident_type_override: str | None = None
+    weather_override: str | None = None
     stress_amount: float = 0.0
-    next_steps: List[str] = dataclasses.field(default_factory=list)
-    config: Dict = dataclasses.field(default_factory=dict)
+    next_steps: list[str] = dataclasses.field(default_factory=list)
+    config: dict = dataclasses.field(default_factory=dict)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "step_id": self.step_id,
             "step_type": self.step_type,
@@ -1801,7 +1811,7 @@ class ScenarioStep:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict) -> "ScenarioStep":
+    def from_dict(cls, data: dict) -> "ScenarioStep":
         return cls(
             step_id=data.get("step_id", ""),
             step_type=data.get("step_type", "trigger"),
@@ -1820,13 +1830,13 @@ class ScenarioStep:
 class Scenario:
     name: str
     description: str = ""
-    steps: List[ScenarioStep] = dataclasses.field(default_factory=list)
+    steps: list[ScenarioStep] = dataclasses.field(default_factory=list)
     base_incidents: int = 20
     rate_per_sec: int = 1
-    tags: List[str] = dataclasses.field(default_factory=list)
+    tags: list[str] = dataclasses.field(default_factory=list)
     is_custom: bool = False
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "name": self.name,
             "description": self.description,
@@ -1838,7 +1848,7 @@ class Scenario:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict) -> "Scenario":
+    def from_dict(cls, data: dict) -> "Scenario":
         return cls(
             name=data.get("name", ""),
             description=data.get("description", ""),
@@ -1875,7 +1885,7 @@ class Scenario:
             tags=p["tags"],
         )
 
-    def get_active_step(self, elapsed_sec: float) -> Optional[ScenarioStep]:
+    def get_active_step(self, elapsed_sec: float) -> ScenarioStep | None:
         active = None
         for step in sorted(self.steps, key=lambda s: s.delay_sec, reverse=True):
             if elapsed_sec >= step.delay_sec:
@@ -1895,7 +1905,7 @@ class CompetencyScore:
     balance_score: float = 0.0
     overall_score: float = 0.0
 
-    def to_radar_dict(self) -> Dict:
+    def to_radar_dict(self) -> dict:
         labels = ["Speed", "Accuracy", "Critical\nHandling", "Specialty\nMatch", "Escalation\nControl", "Workload\nBalance"]
         values = [
             self.speed_score,
@@ -1907,7 +1917,7 @@ class CompetencyScore:
         ]
         return {"labels": labels, "values": values}
 
-    def get_weakest_area(self) -> Tuple[str, float]:
+    def get_weakest_area(self) -> tuple[str, float]:
         areas = [
             ("Speed", self.speed_score),
             ("Accuracy", self.accuracy_score),
@@ -1918,7 +1928,7 @@ class CompetencyScore:
         ]
         return min(areas, key=lambda x: x[1])
 
-    def get_strengths(self) -> List[str]:
+    def get_strengths(self) -> list[str]:
         return [name for name, score in [
             ("Speed", self.speed_score),
             ("Accuracy", self.accuracy_score),
@@ -1979,7 +1989,7 @@ SCENARIO_MODES = {
 }
 
 
-def get_simulation_personas() -> List[SimulationPersona]:
+def get_simulation_personas() -> list[SimulationPersona]:
     """Return the 12 personas for the training simulator."""
     return [
         SimulationPersona("Khushboo Patil", "CEO", ["Strategic", "Crisis"], 5.0, 95.0),
@@ -2000,9 +2010,9 @@ def get_simulation_personas() -> List[SimulationPersona]:
 class SimulationSession:
     """Manages a training simulation session."""
 
-    def __init__(self, target_incidents: int = 20, rate_per_sec: int = 1, 
-                 seed: Optional[int] = None, duration_minutes: int = 0,
-                 scenario: Optional[Scenario] = None):
+    def __init__(self, target_incidents: int = 20, rate_per_sec: int = 1,
+                 seed: int | None = None, duration_minutes: int = 0,
+                 scenario: Scenario | None = None):
         self.target_incidents = target_incidents
         self.rate_per_sec = 1
         self.duration_minutes = duration_minutes
@@ -2010,18 +2020,18 @@ class SimulationSession:
         self.rng = random.Random(seed)
         self.is_running = False
         self.is_paused = False
-        self.incidents: List[Incident] = []
+        self.incidents: list[Incident] = []
         self.personas = get_simulation_personas()
-        self.start_time: Optional[datetime] = None
-        self.end_time: Optional[datetime] = None
-        self.last_incident_time: Optional[datetime] = None
+        self.start_time: datetime | None = None
+        self.end_time: datetime | None = None
+        self.last_incident_time: datetime | None = None
         self.mode = "quick_drill"
         self.weather = "normal"
-        self.metrics: Dict = {}
+        self.metrics: dict = {}
         self._incident_counter = 0
-        self.scenario: Optional[Scenario] = scenario
-        self.annotations: Dict[str, str] = {}
-        self.bookmarks: List[Dict] = []
+        self.scenario: Scenario | None = scenario
+        self.annotations: dict[str, str] = {}
+        self.bookmarks: list[dict] = []
         self.rest_interval_counter: int = 0
 
     @property
@@ -2029,7 +2039,7 @@ class SimulationSession:
         return self.duration_minutes > 0
 
     @property
-    def competency_scores(self) -> List[CompetencyScore]:
+    def competency_scores(self) -> list[CompetencyScore]:
         scores = []
         for p in self.personas:
             score = p.to_competency_score(COMPETENCY_BENCHMARKS)
@@ -2037,7 +2047,7 @@ class SimulationSession:
         return scores
 
     @property
-    def team_fatigue_summary(self) -> Dict:
+    def team_fatigue_summary(self) -> dict:
         return {
             p.name: {
                 "fatigue": p.fatigue,
@@ -2049,7 +2059,7 @@ class SimulationSession:
         }
 
     @property
-    def replay_timeline(self) -> List[Dict]:
+    def replay_timeline(self) -> list[dict]:
         timeline = []
         for inc in self.incidents:
             timeline.append({
@@ -2122,7 +2132,7 @@ class SimulationSession:
         self._incident_counter += 1
         return f"INC-{datetime.now().strftime('%Y%m%d')}-{self._incident_counter:04d}"
 
-    def _get_severity_weights(self) -> Dict[str, float]:
+    def _get_severity_weights(self) -> dict[str, float]:
         weights = {"CRITICAL": 0.2, "WARNING": 0.35, "INFO": 0.45}
         if self.mode == "critical_hours":
             weights = {"CRITICAL": 0.35, "WARNING": 0.4, "INFO": 0.25}
@@ -2168,19 +2178,19 @@ class SimulationSession:
         cause_info = ROOT_CAUSES[root_cause]
         return root_cause, cause_info["label"], cause_info["preventable"]
 
-    def generate_single(self) -> Optional[Incident]:
+    def generate_single(self) -> Incident | None:
         if not self.is_running or self.is_paused:
             return None
-        
+
         if self.is_duration_mode and self.start_time:
             elapsed = (datetime.now() - self.start_time).total_seconds()
             self._apply_scenario_step_effects(elapsed)
             if elapsed >= self.duration_minutes * 60:
                 return None
-        
+
         if not self.is_duration_mode and len(self.incidents) >= self.target_incidents:
             return None
-        
+
         incident = self._create_incident()
         self.incidents.append(incident)
         self.last_incident_time = datetime.now()
@@ -2190,22 +2200,22 @@ class SimulationSession:
         incident_id = self._generate_incident_id()
         timestamp = datetime.now()
         station = self.rng.choice(STATIONS[:5])
-        
+
         severity_weights = self._get_severity_weights()
         severity = self.rng.choices(
             list(severity_weights.keys()),
             weights=list(severity_weights.values())
         )[0]
-        
+
         incident_def = self.rng.choice(INCIDENT_TYPES[severity])
         incident_type, desc_template, eligible_roles = incident_def
-        
+
         weather_mods = WEATHER_MODIFIERS.get(self.weather, {"temp_high": 1.0, "vibration": 1.0, "gate_jam": 1.0, "sync_failure": 1.0})
         weather_modified = weather_mods.get(incident_type, 1.0) > 1.0
-        
+
         root_cause, cause_label, preventable = self._get_root_cause()
         improvement_area = IMPROVEMENT_AREAS.get(root_cause, "General")
-        
+
         return Incident(
             id=incident_id,
             timestamp=timestamp,
@@ -2222,10 +2232,10 @@ class SimulationSession:
     def assign_incident(self, incident: Incident) -> bool:
         if not self.personas:
             return False
-        
+
         incident_type = incident.incident_type.lower()
         severity = incident.severity
-        
+
         specialty_map = {
             "gate_jam": ["Maintenance Engineer", "Gate Technician", "Shift Supervisor"],
             "sync_failure": ["Network Controller", "CTO", "Shift Supervisor"],
@@ -2243,54 +2253,54 @@ class SimulationSession:
             "cleaning_alert": ["Shift Supervisor", "Security Lead"],
             "access_issue": ["Security Lead", "Shift Supervisor"],
         }
-        
+
         matching_personas = specialty_map.get(incident_type, ["Shift Supervisor"])
         eligible = [p for p in self.personas if p.role in matching_personas]
-        
+
         if not eligible:
             eligible = list(self.personas)
-        
+
         eligible.sort(key=lambda p: (p.fatigue * 0.3 + p.current_assigned * 10))
         persona = eligible[0]
-        
+
         incident.assigned_persona = persona.name
         incident.assigned_role = persona.role
         incident.status = "assigned"
         persona.record_assignment()
-        
+
         if incident.timestamp:
             incident.time_to_assign = (datetime.now() - incident.timestamp).total_seconds()
-        
+
         if severity == "CRITICAL":
             incident.escalation_level = 0
-        
+
         return True
 
     def resolve_incident(self, incident: Incident, success: bool = True):
         if incident.status not in ["assigned", "escalated"]:
             return
         incident.status = "resolved" if success else "failed"
-        
+
         for p in self.personas:
             if p.name == incident.assigned_persona:
                 base_rt = p.avg_response_min
                 variance = self.rng.gauss(0, 0.2)
                 severity_mult = 0.8 if incident.severity == "CRITICAL" else 1.2 if incident.severity == "INFO" else 1.0
                 response_time = max(0.1, p.apply_fatigue_to_response(base_rt * severity_mult + variance))
-                
+
                 eff_success = success
                 if success and p.fatigue > 50:
                     recovery_chance = p.apply_fatigue_to_success(1.0)
                     eff_success = self.rng.random() < recovery_chance
                     if not eff_success:
                         incident.status = "failed"
-                
+
                 p.record_resolution(eff_success, response_time)
                 incident.resolution_time_min = response_time
-                
+
                 if incident.timestamp:
                     incident.time_to_resolve = (datetime.now() - incident.timestamp).total_seconds()
-                
+
                 incident.was_escalated = incident.escalation_count > 0
                 break
 
@@ -2302,22 +2312,22 @@ class SimulationSession:
         critical = len([i for i in self.incidents if i.severity == "CRITICAL"])
         warning = len([i for i in self.incidents if i.severity == "WARNING"])
         info = len([i for i in self.incidents if i.severity == "INFO"])
-        
+
         avg_response = 0
         resolution_times = [i.resolution_time_min for i in self.incidents if i.resolution_time_min > 0]
         if resolution_times:
             avg_response = sum(resolution_times) / len(resolution_times)
-        
+
         root_causes = {}
         for inc in self.incidents:
             cause = inc.root_cause or "Unknown"
             root_causes[cause] = root_causes.get(cause, 0) + 1
-        
+
         improvement_areas = {}
         for inc in self.incidents:
             area = inc.improvement_area or "General"
             improvement_areas[area] = improvement_areas.get(area, 0) + 1
-        
+
         persona_stats = {}
         for inc in self.incidents:
             if inc.assigned_persona:
@@ -2330,19 +2340,19 @@ class SimulationSession:
                     persona_stats[inc.assigned_persona]["failed"] += 1
                 if inc.was_escalated:
                     persona_stats[inc.assigned_persona]["escalated"] += 1
-        
+
         for p in self.personas:
             if p.name in persona_stats:
                 persona_stats[p.name]["fatigue_end"] = p.fatigue
                 persona_stats[p.name]["stress_events"] = p.stress_events
-        
+
         worst_performer = max(persona_stats.items(), key=lambda x: x[1]["failed"])[0] if persona_stats else None
-        
+
         competency_scores = {
             p.name: p.to_competency_score(COMPETENCY_BENCHMARKS).to_radar_dict()
             for p in self.personas
         }
-        
+
         self.metrics = {
             "total_incidents": total,
             "resolved": resolved,

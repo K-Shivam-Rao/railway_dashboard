@@ -1,87 +1,70 @@
+import os
+import sys
+
 import streamlit as st
 import streamlit.components.v1 as components
-import sys, os
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import pandas as pd
 import json
+import logging
+from datetime import datetime
+
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from datetime import datetime
-from data.loader import load_and_transform_data
-from core.logic import (
-    # Analytics functions
-    get_metrics,
-    get_psd_analytics,
-    get_network_summary,
-    get_maintenance_forecast,
-    get_incident_log,
-    get_leadership_data,
-    # Financial model
-    visualize_dashboard_1,
-    visualize_dashboard_2,
-    # OOP classes
-    StationAnalytics,
-    # Simulation engine
-    SimulationSession,
-    get_simulation_personas,
-    # Placeholder functions (defined later)
-    get_financial_model_data,
-    get_customer_data,
-    get_rfm_analysis,
-    get_high_value_customers,
-    get_customer_business_insights,
-    get_contract_health_score,
-    get_renewal_forecast,
-    get_at_risk_accounts,
-    get_renewal_health_summary,
-    get_operator_history,
-    get_contract_amendments,
-    get_support_tickets,
-    get_engagement_timeline,
-    get_operator_profile,
-    get_operator_health_trend,
-    get_support_ticket_trend,
-    get_financial_projections,
-    get_operator_comparison_benchmarks,
-    get_operator_monthly_stats,
-    get_business_map_data,
-    # Analytics Lab
-    detect_anomalies_zscore,
-    detect_anomalies_iqr,
-    detect_anomalies_moving_average,
-    detect_anomalies_isolation_forest,
-    evaluate_detection_method,
-    decompose_timeseries,
-    compute_sensor_correlations,
-    analyze_sensor_health_profile,
-    _SKLEARN_AVAILABLE,
-)
-from core.visualization_engine import (
-    build_architecture_flow_html,
-    generate_live_metrics,
-    analyze_loopholes,
-    generate_recommendations,
-    get_station_vulnerability_scores,
-    ARCHITECTURE_NODES,
+
+from core.anomaly_ranking import (
+    rank_anomalies,
 )
 from core.budget_tracker import (
     get_budget_overview,
     get_station_comparison_table,
 )
-from data.budget_data import (
-    generate_budget_data,
-    generate_roi_data,
-    generate_monthly_spend,
-    generate_scenario_projections,
-    generate_optimization_recommendations,
-)
-from core.anomaly_ranking import (
-    rank_anomalies,
-    get_anomaly_ranking_matrix,
-    ANOMALY_RANKING_PRESETS,
-    DEFAULT_ANOMALY_PRESET,
+from core.logic import (
+    _SKLEARN_AVAILABLE,
+    # Simulation engine
+    SimulationSession,
+    # OOP classes
+    analyze_sensor_health_profile,
+    compute_sensor_correlations,
+    decompose_timeseries,
+    detect_anomalies_iqr,
+    detect_anomalies_isolation_forest,
+    detect_anomalies_moving_average,
+    # Analytics Lab
+    detect_anomalies_zscore,
+    evaluate_detection_method,
+    get_at_risk_accounts,
+    get_business_map_data,
+    get_contract_amendments,
+    get_contract_health_score,
+    get_customer_business_insights,
+    get_customer_data,
+    get_engagement_timeline,
+    # Placeholder functions (defined later)
+    get_financial_model_data,
+    get_financial_projections,
+    get_high_value_customers,
+    get_incident_log,
+    get_leadership_data,
+    get_maintenance_forecast,
+    # Analytics functions
+    get_metrics,
+    get_network_summary,
+    get_operator_comparison_benchmarks,
+    get_operator_health_trend,
+    get_operator_history,
+    get_operator_monthly_stats,
+    get_operator_profile,
+    get_psd_analytics,
+    get_renewal_forecast,
+    get_renewal_health_summary,
+    get_rfm_analysis,
+    get_simulation_personas,
+    get_support_ticket_trend,
+    get_support_tickets,
 )
 from core.narrative_html import (
     build_green_state_banner,
@@ -89,29 +72,35 @@ from core.narrative_html import (
     build_mini_ranking,
     build_org_tree,
 )
-
-from utils.chart_styles import style_chart, style_pie, style_indicator, style_df, COLOR_SCHEMES
-from utils.chart_export import render_chart
-from utils.helpers import (
-    format_euro,
-    get_status_color,
-
-    format_score,
-    smart_format,
-    format_full,
-    convert_to_csv,
-    show_loading_spinner,
-    format_breakeven,
+from core.visualization_engine import (
+    ARCHITECTURE_NODES,
+    analyze_loopholes,
+    build_architecture_flow_html,
+    generate_live_metrics,
+    generate_recommendations,
+    get_station_vulnerability_scores,
 )
+from data.budget_data import (
+    generate_budget_data,
+    generate_monthly_spend,
+    generate_optimization_recommendations,
+    generate_roi_data,
+    generate_scenario_projections,
+)
+from data.loader import load_and_transform_data
 from reports.pdf_generator import (
     generate_client_report,
-    get_report_bytes,
-    generate_complete_pdf_report,
-    generate_charts_only_pdf_report,
-    generate_tables_only_pdf_report,
+)
+from utils.chart_export import render_chart
+from utils.chart_styles import COLOR_SCHEMES, style_chart, style_indicator, style_pie
+from utils.helpers import (
+    convert_to_csv,
+    format_euro,
+    format_full,
+    format_score,
+    smart_format,
 )
 
-import logging
 logger = logging.getLogger(__name__)
 
 # ═══════════════════════════════════════════════════
@@ -414,7 +403,7 @@ elif active_tab == "forecast":
     display_sub = "NETWORK-WIDE MAINTENANCE FORECASTING // ALL STATIONS"
 elif active_tab == "ops":
     display_title = st.session_state.get("current_station", "Operations")
-    display_sub = f"PLATFORM SAFETY MONITOR // SURAKSHA PROTOCOL ACTIVE"
+    display_sub = "PLATFORM SAFETY MONITOR // SURAKSHA PROTOCOL ACTIVE"
 elif active_tab == "network":
     display_title = "Network Overview"
     display_sub = "ALL STATIONS // LIVE STATUS"
@@ -2292,28 +2281,27 @@ if active_tab == "ops":
     # ── Main Split with Glassmorphism Design ──
     left, right = st.columns([65, 35], gap="large")
 
-    with left:
-        with st.container(key="panel-left"):
-            st.html(
-                '<div class="panel-header-modern">'
-                '<div class="header-left">'
-                '<span class="pulse-dot"></span>'
-                '<span class="panel-title">Live Platform Simulation</span>'
-                '</div>'
-                '<div class="header-right">'
-                '<span class="live-badge">LIVE</span>'
-                '<span class="refresh-indicator">↻</span>'
-                '</div>'
-                '</div>'
-            )
+    with left, st.container(key="panel-left"):
+        st.html(
+            '<div class="panel-header-modern">'
+            '<div class="header-left">'
+            '<span class="pulse-dot"></span>'
+            '<span class="panel-title">Live Platform Simulation</span>'
+            '</div>'
+            '<div class="header-right">'
+            '<span class="live-badge">LIVE</span>'
+            '<span class="refresh-indicator">↻</span>'
+            '</div>'
+            '</div>'
+        )
 
-            station_data = df[df["station"] == current_station].copy()
-            num_platforms = station_data["platform"].nunique()
-            anim_html = build_train_animation(current_station, station_data)
-            anim_height = num_platforms * 295 + 80
+        station_data = df[df["station"] == current_station].copy()
+        num_platforms = station_data["platform"].nunique()
+        anim_html = build_train_animation(current_station, station_data)
+        anim_height = num_platforms * 295 + 80
 
-            st.components.v1.html(
-                anim_html, height=anim_height, scrolling=False)
+        st.components.v1.html(
+            anim_html, height=anim_height, scrolling=False)
 
     with right:
         cycles_df, temp_df = get_psd_analytics(current_station)
@@ -2944,76 +2932,74 @@ elif active_tab == "network":
 
     col_a, col_b, col_c = st.columns(3)
 
-    with col_a:
-        with st.container():
-            st.markdown('<div class="panel">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="panel-header">'
-                '<span class="panel-icon">👥</span>'
-                '<span class="panel-title">Passengers by Station</span>'
-                '</div>'
-                '<div class="panel-content">',
-                unsafe_allow_html=True,
-            )
-            fig_pass = px.bar(
-                net["station_summary"].sort_values("Passengers", ascending=True),
-                x="Passengers",
-                y="Station",
-                orientation="h",
-                color="Avg Risk",
-                color_continuous_scale=["var(--color-emerald)", "var(--color-warning)", "var(--color-danger)"],
-                range_color=[0, 100],
-                title="",
-            )
-            style_chart(fig_pass, hovermode="y unified",
-                        coloraxis_colorbar=dict(
-                            title=dict(text="Risk", font=dict(
-                                color="var(--text-secondary)", size=10)),
-                            tickfont=dict(color="var(--text-secondary)", size=9), thickness=6, len=0.7,
-                        ))
-            fig_pass.update_traces(customdata=net["station_summary"][["Avg Risk"]].values)
-            fig_pass.update_layout(height=320)
-            render_chart(fig_pass, key="fig_pass_L2827", use_container_width=True)
-            st.html('</div></div>')
+    with col_a, st.container():
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="panel-header">'
+            '<span class="panel-icon">👥</span>'
+            '<span class="panel-title">Passengers by Station</span>'
+            '</div>'
+            '<div class="panel-content">',
+            unsafe_allow_html=True,
+        )
+        fig_pass = px.bar(
+            net["station_summary"].sort_values("Passengers", ascending=True),
+            x="Passengers",
+            y="Station",
+            orientation="h",
+            color="Avg Risk",
+            color_continuous_scale=["var(--color-emerald)", "var(--color-warning)", "var(--color-danger)"],
+            range_color=[0, 100],
+            title="",
+        )
+        style_chart(fig_pass, hovermode="y unified",
+                    coloraxis_colorbar=dict(
+                        title=dict(text="Risk", font=dict(
+                            color="var(--text-secondary)", size=10)),
+                        tickfont=dict(color="var(--text-secondary)", size=9), thickness=6, len=0.7,
+                    ))
+        fig_pass.update_traces(customdata=net["station_summary"][["Avg Risk"]].values)
+        fig_pass.update_layout(height=320)
+        render_chart(fig_pass, key="fig_pass_L2827", use_container_width=True)
+        st.html('</div></div>')
 
-    with col_b:
-        with st.container():
-            st.markdown('<div class="panel">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="panel-header">'
-                '<span class="panel-icon">🔧</span>'
-                '<span class="panel-title">Maintenance Status</span>'
-                '</div>'
-                '<div class="panel-content">',
-                unsafe_allow_html=True,
-            )
-            color_map = {
-                "OPTIMAL": "var(--color-emerald)",
-                "MONITOR": "#60a5fa",
-                "WARNING": "var(--color-warning)",
-                "CRITICAL": "var(--color-danger)",
-            }
-            fig_pie = px.pie(
-                net["status_dist"],
-                names="maintenance_status",
-                values="Count",
-                color="maintenance_status",
-                color_discrete_map=color_map,
-                hole=0.5,
-            )
-            style_pie(fig_pie)
-            fig_pie.update_traces(
-                textposition="inside",
-                textinfo="percent",
-                textfont_size=10,
-                textfont_color="#f1f5f9",
-                marker_line_color="rgba(30, 41, 59, 0.3)",
-                marker_line_width=1,
-                hovertemplate="<b>%{label}</b><br>Gates: %{value}<br>Share: %{percent}<extra></extra>",
-            )
-            fig_pie.update_layout(height=320)
-            render_chart(fig_pie, key="fig_pie_L2866", use_container_width=True)
-            st.html('</div></div>')
+    with col_b, st.container():
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="panel-header">'
+            '<span class="panel-icon">🔧</span>'
+            '<span class="panel-title">Maintenance Status</span>'
+            '</div>'
+            '<div class="panel-content">',
+            unsafe_allow_html=True,
+        )
+        color_map = {
+            "OPTIMAL": "var(--color-emerald)",
+            "MONITOR": "#60a5fa",
+            "WARNING": "var(--color-warning)",
+            "CRITICAL": "var(--color-danger)",
+        }
+        fig_pie = px.pie(
+            net["status_dist"],
+            names="maintenance_status",
+            values="Count",
+            color="maintenance_status",
+            color_discrete_map=color_map,
+            hole=0.5,
+        )
+        style_pie(fig_pie)
+        fig_pie.update_traces(
+            textposition="inside",
+            textinfo="percent",
+            textfont_size=10,
+            textfont_color="#f1f5f9",
+            marker_line_color="rgba(30, 41, 59, 0.3)",
+            marker_line_width=1,
+            hovertemplate="<b>%{label}</b><br>Gates: %{value}<br>Share: %{percent}<extra></extra>",
+        )
+        fig_pie.update_layout(height=320)
+        render_chart(fig_pie, key="fig_pie_L2866", use_container_width=True)
+        st.html('</div></div>')
 
     with col_c:
         with st.container():
@@ -3076,38 +3062,37 @@ elif active_tab == "network":
 
     col_d, col_e, col_f = st.columns(3)
 
-    with col_d:
-        with st.container():
-            st.markdown('<div class="panel">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="panel-header">'
-                '<span class="panel-icon">🚪</span>'
-                '<span class="panel-title">Door State Distribution</span>'
-                '</div>'
-                '<div class="panel-content">',
-                unsafe_allow_html=True,
-            )
-            door_color = {
-                "closed": "#1565c0",
-                "open": "var(--color-emerald)",
-                "jammed": "var(--color-danger)",
-                "closing": "#0288d1",
-            }
-            fig_door = px.bar(
-                net["door_dist"],
-                x="door_state",
-                y="Count",
-                color="door_state",
-                color_discrete_map=door_color,
-                category_orders={"door_state": ["closed", "open", "closing", "jammed"]},
-            )
-            style_chart(fig_door,
-                        xaxis=dict(title="", categoryorder="array",
-                                   categoryarray=["closed", "open", "closing", "jammed"]),
-                        yaxis=dict(title=""))
-            fig_door.update_layout(height=320)
-            render_chart(fig_door, key="fig_door_L2960", use_container_width=True)
-            st.html('</div></div>')
+    with col_d, st.container():
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="panel-header">'
+            '<span class="panel-icon">🚪</span>'
+            '<span class="panel-title">Door State Distribution</span>'
+            '</div>'
+            '<div class="panel-content">',
+            unsafe_allow_html=True,
+        )
+        door_color = {
+            "closed": "#1565c0",
+            "open": "var(--color-emerald)",
+            "jammed": "var(--color-danger)",
+            "closing": "#0288d1",
+        }
+        fig_door = px.bar(
+            net["door_dist"],
+            x="door_state",
+            y="Count",
+            color="door_state",
+            color_discrete_map=door_color,
+            category_orders={"door_state": ["closed", "open", "closing", "jammed"]},
+        )
+        style_chart(fig_door,
+                    xaxis=dict(title="", categoryorder="array",
+                               categoryarray=["closed", "open", "closing", "jammed"]),
+                    yaxis=dict(title=""))
+        fig_door.update_layout(height=320)
+        render_chart(fig_door, key="fig_door_L2960", use_container_width=True)
+        st.html('</div></div>')
 
     with col_e:
         if not net["operator_stats"].empty:
@@ -6426,7 +6411,7 @@ elif active_tab == "portfolio":
                 )
             else:
                 st.markdown(
-                    f"""
+                    """
                     <div class="profile-metric">
                         <div class="profile-metric-label">Remaining Value</div>
                         <div class="profile-metric-value">N/A</div>
@@ -7110,7 +7095,7 @@ elif active_tab == "kpi":
         runway = 122
         revenue_per_cust = mrr / total_customers if total_customers > 0 else 0
         expansion_rev = mrr * 0.15
-    except Exception as e:
+    except Exception:
         pass
 
     st.markdown(
@@ -8637,7 +8622,7 @@ elif active_tab == "company":
             </div>
             """, unsafe_allow_html=True)
 
-            if st.button(f"👤 View Profile", key=f"btn_{i}", use_container_width=True):
+            if st.button("👤 View Profile", key=f"btn_{i}", use_container_width=True):
                 st.session_state.team_selected = member["name"]
                 st.rerun()
 
@@ -8647,7 +8632,7 @@ elif active_tab == "company":
             img_url = member.get("img") or f"https://ui-avatars.com/api/?name={member['name'].replace(' ', '+')}&background=1a365d&color=fff&size=200"
             role_color = role_colors.get(member["role"], "#f59e0b")
 
-            st.markdown(f'<div style="margin-top:1rem;padding:1.5rem;border-radius:var(--radius-2xl);background:var(--bg-glass);backdrop-filter:blur(14px);border:1px solid var(--border-default);">', unsafe_allow_html=True)
+            st.markdown('<div style="margin-top:1rem;padding:1.5rem;border-radius:var(--radius-2xl);background:var(--bg-glass);backdrop-filter:blur(14px);border:1px solid var(--border-default);">', unsafe_allow_html=True)
 
             col_l, col_r = st.columns([1, 2.2])
             with col_l:
@@ -8709,7 +8694,7 @@ elif active_tab == "company":
                 mime="application/pdf",
                 use_container_width=True,
             )
-        except Exception as e:
+        except Exception:
             st.warning("PDF not available")
 
     # Close company section
@@ -9197,7 +9182,7 @@ elif active_tab == "analytics":
                 **Analytics application**: If the residual shows patterns (not random), your model is missing structure.
                 Large residuals often correspond to anomaly events.
                 """)
-    
+
             # ── Enhanced Decomposition: Summary Stats ──
             st.html('<div class="gradient-divider"></div>')
             st.html(
@@ -9928,8 +9913,8 @@ elif active_tab == "viz":
                                f'<div class="viz-comp-secondary-value">{s2v}</div>'
                                f'<div class="viz-comp-secondary-label">{s2l}</div>'
                                f'</div>' if s2v else '')
-                            + f'</div>'
-                            f'</div>',
+                            + '</div>'
+                            '</div>',
                             unsafe_allow_html=True,
                         )
 
@@ -10317,13 +10302,13 @@ elif active_tab == "viz":
                 sts_label = sts.upper()
                 feed_html += f'<div class="viz-incident-card severity-{sev} status-{sts}">'
                 feed_html += f'<div class="viz-incident-time">{sev_label}</div>'
-                feed_html += f'<div class="viz-incident-body">'
+                feed_html += '<div class="viz-incident-body">'
                 feed_html += f'<div class="viz-incident-type">{inc.incident_type} @ {inc.station}</div>'
                 feed_html += f'<div class="viz-incident-desc">{inc.description[:60]}</div>'
-                feed_html += f'</div>'
+                feed_html += '</div>'
                 feed_html += f'<div class="viz-incident-persona">{inc.assigned_persona or "—"}</div>'
                 feed_html += f'<div class="viz-incident-status">{sts_label}</div>'
-                feed_html += f'</div>'
+                feed_html += '</div>'
             feed_html += '</div>'
             st.markdown(feed_html, unsafe_allow_html=True)
 
@@ -10454,7 +10439,7 @@ elif active_tab == "viz":
                         cum_sum = inc.resolution_time_min
                         cum_times.append((i, inc.resolution_time_min))
                 if cum_times:
-                    x_vals, y_vals = zip(*cum_times)
+                    x_vals, y_vals = zip(*cum_times, strict=False)
                     fig_rt.add_trace(go.Scatter(
                         x=x_vals, y=y_vals, mode="lines+markers",
                         name="Response Time",

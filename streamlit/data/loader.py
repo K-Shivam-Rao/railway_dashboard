@@ -1,12 +1,9 @@
-import pandas as pd
-import numpy as np
-import polars as pl
-from datetime import datetime, timedelta
-import functools
-import streamlit as st
-from typing import Dict, List, Tuple, Optional, Union
 import os
-import logging
+from datetime import datetime
+
+import pandas as pd
+import polars as pl
+import streamlit as st
 
 from utils.exceptions import DataLoadError, DataValidationError
 from utils.logging_config import get_logger
@@ -63,30 +60,30 @@ def _validate_data(df: pl.DataFrame) -> None:
     missing_required = REQUIRED_COLUMNS - available
     if missing_required:
         raise DataValidationError(f"Missing required columns: {missing_required}")
-    
+
     # Validate numeric ranges
     try:
         # Check temperature range
         temp_col = df["sensor_temp"]
         if temp_col.min() < MIN_TEMP or temp_col.max() > MAX_TEMP:
             logger.warning(f"Temperature values outside valid range [{MIN_TEMP}, {MAX_TEMP}]")
-        
+
         # Check vibration range
         vib_col = df["sensor_vib"]
         if vib_col.min() < 0 or vib_col.max() > MAX_VIB:
             logger.warning(f"Vibration values outside valid range [0, {MAX_VIB}]")
-        
+
         # Check people count
         people_col = df["people"]
         if people_col.min() < 0:
             logger.warning("Negative people count detected, filling with 0")
-        
+
         # Validate door states
         door_states = set(df["door_state"].unique())
         invalid_states = door_states - VALID_DOOR_STATES
         if invalid_states:
             logger.warning(f"Invalid door states found: {invalid_states}")
-    
+
     except Exception as e:
         raise DataValidationError(f"Data validation error: {e}")
 
@@ -110,11 +107,11 @@ class DataLoader:
         """Convert CSV to Parquet format. Returns True if successful."""
         parquet_path = DataLoader._get_parquet_path()
         csv_path = DataLoader._get_csv_path()
-        
+
         if not os.path.exists(csv_path):
             logger.warning(f"CSV file not found: {csv_path}")
             return False
-        
+
         try:
             df_pl = pl.read_csv(csv_path)
             df_pl.write_parquet(parquet_path, compression="zstd")
@@ -125,7 +122,7 @@ class DataLoader:
             return False
 
     @staticmethod
-    def _load_parquet() -> Optional[pl.DataFrame]:
+    def _load_parquet() -> pl.DataFrame | None:
         """Try loading from Parquet. Returns None if not available."""
         parquet_path = DataLoader._get_parquet_path()
         if not os.path.exists(parquet_path):
@@ -155,13 +152,13 @@ class DataLoader:
             df = DataLoader._load_parquet()
             if df is None:
                 df = DataLoader._load_csv()
-            
+
             if df is None:
                 raise DataLoadError("Failed to load data from both Parquet and CSV")
-            
+
             # Validate data
             _validate_data(df)
-            
+
             return df
         except (DataLoadError, DataValidationError) as e:
             # Re-raise custom exceptions
@@ -186,9 +183,9 @@ class DataLoader:
             current_hour = now.hour
             is_weekend = now.weekday() >= 5
             peak_hours = [6, 7, 8, 9, 16, 17, 18, 19]
-            
+
             df = df_pl.clone()
-            
+
             # Get numeric columns with defaults filled
             temp = df["sensor_temp"].fill_null(25.0)
             vib = df["sensor_vib"].fill_null(0.0)
@@ -199,12 +196,12 @@ class DataLoader:
             delay = df["delay"].fill_null(0.0)
             people = df["people"]
             door_state = df["door_state"]
-            
+
             # Sync score
             humidity_penalty = (humidity - 70).clip(0) * 0.2
             motor_penalty = (motor - 2.5).clip(0) * 10
             sync_score = (100 - (temp - 25) * 0.5 - vib * 2 - humidity_penalty - motor_penalty).clip(0, 100)
-            
+
             # Maintenance status - inline expression
             maintenance_status = (
                 pl.when(door_state == "jammed").then(pl.lit("CRITICAL"))
@@ -213,7 +210,7 @@ class DataLoader:
                 .when(vib > 2.5).then(pl.lit("WARNING"))
                 .otherwise(pl.lit("OPTIMAL"))
             )
-            
+
             # Risk score - inline expression
             risk = (
                 pl.when(door_state == "jammed").then(60).otherwise(0) +
@@ -227,11 +224,11 @@ class DataLoader:
                 pl.when(humidity > 80).then(5).otherwise(0) +
                 pl.when(delay.abs() > 10).then(10).otherwise(0)
             ).clip(0, 100)
-            
+
             # Congestion score
             capacity_safe = capacity.replace(0, 200.0)
             congestion = (people / capacity_safe * 100).clip(0, 100)
-            
+
             # Energy rating - inline
             energy_rating = (
                 pl.when(power <= 12).then(pl.lit("A"))
@@ -241,7 +238,7 @@ class DataLoader:
                 .when(power > 35).then(pl.lit("E"))
                 .otherwise(pl.lit("F"))
             )
-            
+
             # Service reliability - inline
             delay_penalty = (
                 pl.when(delay.abs() > 5).then(20)
@@ -249,7 +246,7 @@ class DataLoader:
                 .otherwise(0)
             )
             reliability = (100 - delay_penalty).clip(0, 100)
-            
+
             # Door health - inline
             door_penalty = (
                 pl.when(door_state == "jammed").then(50)
@@ -257,7 +254,7 @@ class DataLoader:
                 .otherwise(0)
             )
             door_health = (100 - door_penalty).clip(0, 100)
-            
+
             # Add all derived columns at once
             df = df.with_columns([
                 sync_score.cast(pl.Int32).alias("sync_score"),
@@ -270,7 +267,7 @@ class DataLoader:
                 pl.lit(current_hour in peak_hours).alias("is_peak_hour"),
                 pl.lit(is_weekend).alias("is_weekend"),
             ])
-            
+
             return df
         except Exception as e:
             raise DataLoadError(f"Failed to transform data: {e}")

@@ -1,6 +1,5 @@
 """Gap-filler tests for core/narrative_html.py — cover edge cases and missed branches."""
 
-import pytest
 from core.narrative_html import (
     build_green_state_banner,
     build_kpi_ticker,

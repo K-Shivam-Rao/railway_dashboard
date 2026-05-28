@@ -8,8 +8,6 @@ Part of the Midnight Express v5 UI/UX upgrade.
 """
 
 import logging
-from datetime import datetime
-from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -188,7 +186,7 @@ def build_kpi_ticker(
 # MINI-RANKING CARD — sidebar incident summary
 # ═══════════════════════════════════════════════════
 
-def build_mini_ranking(ranked_anomalies: List[Dict]) -> str:
+def build_mini_ranking(ranked_anomalies: list[dict]) -> str:
     """Build a compact mini-ranking card for the sidebar."""
     if not ranked_anomalies:
         return ""
@@ -224,7 +222,7 @@ def build_mini_ranking(ranked_anomalies: List[Dict]) -> str:
 # ORG TREE NAVIGATOR
 # ═══════════════════════════════════════════════════
 
-def build_org_tree(customers_data: List[Dict], search_query: str = "") -> str:
+def build_org_tree(customers_data: list[dict], search_query: str = "") -> str:
     """
     Build HTML for the Customer → Contract → Station org tree navigator.
     """

@@ -3,9 +3,10 @@ Sample data module for SicherGleis Railway Dashboard.
 Contains realistic German railway stations, operators, and business data.
 """
 
-import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
 
 # ═══════════════════════════════════════════════════
 # GERMAN RAILWAY STATIONS
@@ -1048,8 +1049,9 @@ def get_leadership_data():
 
 def get_operator_health_trend(customer_id, months_back=12):
     """Return operator health trend (mock data)."""
-    import numpy as np
     from datetime import datetime
+
+    import numpy as np
 
     # Ensure months_back is a valid integer
     if not isinstance(months_back, int) or months_back < 1:

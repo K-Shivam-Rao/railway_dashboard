@@ -1,11 +1,8 @@
 """Gap-filler tests for core/logic.py — cover edge cases, error paths, lifecycle methods."""
 
-import pytest
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from unittest.mock import patch, MagicMock
 
+import pandas as pd
+import pytest
 
 # ── SaaSModelConfig validation ──
 
@@ -13,37 +10,37 @@ class TestSaaSModelConfigValidation:
     """Cover __init__ validation error paths."""
 
     def test_negative_starting_customers(self):
-        from core.logic import SaaSModelConfig, ConfigurationError
+        from core.logic import ConfigurationError, SaaSModelConfig
         with pytest.raises(ConfigurationError, match="starting_customers"):
             SaaSModelConfig(-1, 0.1, 0.05, 100, 5000, 10)
 
     def test_invalid_growth_rate_too_high(self):
-        from core.logic import SaaSModelConfig, ConfigurationError
+        from core.logic import ConfigurationError, SaaSModelConfig
         with pytest.raises(ConfigurationError, match="monthly_growth_rate"):
             SaaSModelConfig(50, 1.5, 0.05, 100, 5000, 10)
 
     def test_invalid_growth_rate_negative(self):
-        from core.logic import SaaSModelConfig, ConfigurationError
+        from core.logic import ConfigurationError, SaaSModelConfig
         with pytest.raises(ConfigurationError, match="monthly_growth_rate"):
             SaaSModelConfig(50, -0.1, 0.05, 100, 5000, 10)
 
     def test_invalid_churn_rate(self):
-        from core.logic import SaaSModelConfig, ConfigurationError
+        from core.logic import ConfigurationError, SaaSModelConfig
         with pytest.raises(ConfigurationError, match="churn_rate"):
             SaaSModelConfig(50, 0.1, 1.5, 100, 5000, 10)
 
     def test_negative_price(self):
-        from core.logic import SaaSModelConfig, ConfigurationError
+        from core.logic import ConfigurationError, SaaSModelConfig
         with pytest.raises(ConfigurationError, match="price_per_customer"):
             SaaSModelConfig(50, 0.1, 0.05, -100, 5000, 10)
 
     def test_negative_fixed_costs(self):
-        from core.logic import SaaSModelConfig, ConfigurationError
+        from core.logic import ConfigurationError, SaaSModelConfig
         with pytest.raises(ConfigurationError, match="fixed_costs"):
             SaaSModelConfig(50, 0.1, 0.05, 100, -5000, 10)
 
     def test_negative_variable_cost(self):
-        from core.logic import SaaSModelConfig, ConfigurationError
+        from core.logic import ConfigurationError, SaaSModelConfig
         with pytest.raises(ConfigurationError, match="variable_cost_per_customer"):
             SaaSModelConfig(50, 0.1, 0.05, 100, 5000, -10)
 
@@ -135,7 +132,7 @@ class TestSimulationSessionLifecycle:
         assert len(session.bookmarks) == 1
 
     def test_set_scenario(self):
-        from core.logic import SimulationSession, Scenario
+        from core.logic import Scenario, SimulationSession
         scenario = Scenario.from_preset("quick_drill")
         assert scenario is not None
         session = SimulationSession(seed=42)
@@ -195,7 +192,7 @@ class TestScenarioMethods:
         assert step.step_type == "trigger"
 
     def test_get_active_step_no_steps(self):
-        from core.logic import Scenario, ScenarioStep
+        from core.logic import Scenario
         s = Scenario(name="empty", steps=[])
         step = s.get_active_step(10.0)
         assert step is None
@@ -593,7 +590,7 @@ def test_get_simulation_personas_counts():
 # ── SCENARIO_PRESETS constants ──
 
 def test_scenario_presets_defined():
-    from core.logic import SCENARIO_PRESETS, SCENARIO_MODES, INCIDENT_TYPES
+    from core.logic import INCIDENT_TYPES, SCENARIO_PRESETS
     assert "quick_drill" in SCENARIO_PRESETS
     assert "shift_simulation" in SCENARIO_PRESETS
     assert "CRITICAL" in INCIDENT_TYPES

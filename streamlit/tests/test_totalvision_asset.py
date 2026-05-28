@@ -11,20 +11,20 @@ Covers:
   - Empty / None DataFrame edge case
 """
 
-import sys
 import os
+import sys
 
 # Ensure project root is on the path so we can import from core
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from core.totalvision import (
     AssetData,
-    generate_asset_health_data,
     _clamp,
     _rng_for,
+    generate_asset_health_data,
 )
 
 # ═══════════════════════════════════════════════════════════

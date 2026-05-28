@@ -5,14 +5,18 @@ Integrates with TotalVisionDataEngine (totalvision.py) to display 5-domain
 analytics with KPI cards, chart info bars, and a what-if scenario simulator.
 """
 
-import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
 import textwrap
+
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+
 from core.totalvision import (
-    TotalVisionDataEngine, TotalVisionData,
-    STATIONS, DOMAIN_COLORS,
+    DOMAIN_COLORS,
+    STATIONS,
+    TotalVisionData,
+    TotalVisionDataEngine,
 )
 
 # ── Domain icon/short-label map ──
@@ -97,8 +101,8 @@ def _make_bar_chart(data: dict, title: str, color: str, height: int = 200) -> go
     stations = list(data.keys())
     values = list(data.values())
     # Sort by value
-    pairs = sorted(zip(values, stations), reverse=True)
-    values, stations = zip(*pairs) if pairs else ([], [])
+    pairs = sorted(zip(values, stations, strict=False), reverse=True)
+    values, stations = zip(*pairs, strict=False) if pairs else ([], [])
 
     fig = go.Figure(go.Bar(
         x=list(values),
@@ -915,7 +919,7 @@ def render_tv(df: pd.DataFrame = None):
     # ── Charts Row 2: Radar + Comparison (2 cols) ──
     cols = st.columns(2)
     with cols[0]:
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Score Profile — Network Average</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Score Profile — Network Average</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.markdown(_chart_info_bar("security", tv_data), unsafe_allow_html=True)
         radar = _make_radar_chart(agg_scores, "Score Profile")
         st.plotly_chart(radar, use_container_width=True, key="tv_radar")
@@ -966,7 +970,7 @@ def render_tv(df: pd.DataFrame = None):
                 font=dict(size=9, color="#94a3b8"),
             ),
         )
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Station vs Network Average</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Station vs Network Average</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.markdown(_chart_info_bar("passenger", tv_data), unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key="tv_compare_radar")
         st.markdown('</div></div>', unsafe_allow_html=True)
@@ -1048,15 +1052,15 @@ def render_tv(df: pd.DataFrame = None):
     st.markdown('<div class="tv-section-heading">📊 Score Distribution Across Network</div>', unsafe_allow_html=True)
     cols = st.columns(3)
     with cols[0]:
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Box Plot — Score Distribution</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Box Plot — Score Distribution</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.plotly_chart(_make_box_plot(tv_all), use_container_width=True, key="tv_box")
         st.markdown('</div></div>', unsafe_allow_html=True)
     with cols[1]:
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Violin Plot — Density View</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Violin Plot — Density View</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.plotly_chart(_make_violin_plot(tv_all), use_container_width=True, key="tv_violin")
         st.markdown('</div></div>', unsafe_allow_html=True)
     with cols[2]:
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Histogram — Score Frequency</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Histogram — Score Frequency</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.plotly_chart(_make_histogram(tv_all), use_container_width=True, key="tv_hist")
         st.markdown('</div></div>', unsafe_allow_html=True)
 
@@ -1093,25 +1097,25 @@ def render_tv(df: pd.DataFrame = None):
     st.markdown('<div class="tv-section-heading">🔬 Advanced Domain Visualizations</div>', unsafe_allow_html=True)
     cols = st.columns(3)
     with cols[0]:
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Scatter Bubble — Security vs Asset (size = Climate)</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Scatter Bubble — Security vs Asset (size = Climate)</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.plotly_chart(_make_scatter_bubble(tv_all, "security", "asset", "climate"), use_container_width=True, key="tv_bubble")
         st.markdown('</div></div>', unsafe_allow_html=True)
     with cols[1]:
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Treemap — Station Scores by Domain</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Treemap — Station Scores by Domain</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.plotly_chart(_make_treemap(tv_all), use_container_width=True, key="tv_treemap")
         st.markdown('</div></div>', unsafe_allow_html=True)
     with cols[2]:
-        st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Sunburst — Domain Hierarchy</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+        st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">Sunburst — Domain Hierarchy</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
         st.plotly_chart(_make_sunburst(tv_all), use_container_width=True, key="tv_sunburst")
         st.markdown('</div></div>', unsafe_allow_html=True)
 
     # Full-width Parallel Coordinates
-    st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">🔗 Parallel Coordinates — Multi-Domain Station Profile</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+    st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">🔗 Parallel Coordinates — Multi-Domain Station Profile</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
     st.plotly_chart(_make_parallel_coords(tv_all), use_container_width=True, key="tv_parallel")
     st.markdown('</div></div>', unsafe_allow_html=True)
 
     # Full-width Deviation Heatmap
-    st.markdown(f'<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">📊 Station Performance vs Network Average</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
+    st.markdown('<div class="tv-panel"><div class="tv-panel-header"><div class="tv-panel-title">📊 Station Performance vs Network Average</div></div><div class="tv-panel-content">', unsafe_allow_html=True)
     st.plotly_chart(_make_deviation_heatmap(tv_all), use_container_width=True, key="tv_deviation")
     st.markdown('</div></div>', unsafe_allow_html=True)
 

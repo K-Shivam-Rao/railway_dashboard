@@ -3,29 +3,27 @@ PDF Report Generator for SicherGleis Pro
 Merged from report_generator.py and Backend/dashboard.py
 """
 import io
-import tempfile
 from datetime import datetime
-from typing import Dict, List, Optional
+from io import BytesIO
+
+import matplotlib.pyplot as plt
+import pandas as pd
 from reportlab.lib import colors
+from reportlab.lib.colors import HexColor
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
-    SimpleDocTemplate,
+    HRFlowable,
+    Image,
+    PageBreak,
     Paragraph,
+    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
-    PageBreak,
-    Image,
-    HRFlowable,
 )
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
-from reportlab.lib.colors import HexColor
-import pandas as pd
-import matplotlib.pyplot as plt
-from io import BytesIO
-
 
 # ─────────────────────────────────────────────
 # COMPANY PROFILE REPORT FUNCTIONS
@@ -203,7 +201,7 @@ def get_case_studies():
 def create_cover_page(elements, styles):
     """Create the cover page for the PDF report."""
     company = get_company_data()
-    
+
     title_style = ParagraphStyle(
         "CoverTitle",
         parent=styles["Title"],
@@ -212,7 +210,7 @@ def create_cover_page(elements, styles):
         spaceAfter=20,
         alignment=TA_CENTER,
     )
-    
+
     subtitle_style = ParagraphStyle(
         "CoverSubtitle",
         parent=styles["Normal"],
@@ -221,7 +219,7 @@ def create_cover_page(elements, styles):
         spaceAfter=40,
         alignment=TA_CENTER,
     )
-    
+
     tagline_style = ParagraphStyle(
         "Tagline",
         parent=styles["Normal"],
@@ -230,14 +228,14 @@ def create_cover_page(elements, styles):
         spaceAfter=60,
         alignment=TA_CENTER,
     )
-    
+
     elements.append(Spacer(1, 2.5 * inch))
     elements.append(Paragraph("SicherGleis GmbH", title_style))
     elements.append(Paragraph(company["tagline"], subtitle_style))
     elements.append(Paragraph(f"\"{company['vision']}\"", tagline_style))
-    
+
     elements.append(Spacer(1, 1.5 * inch))
-    
+
     report_title = ParagraphStyle(
         "ReportTitle",
         parent=styles["Heading1"],
@@ -247,7 +245,7 @@ def create_cover_page(elements, styles):
         alignment=TA_CENTER,
     )
     elements.append(Paragraph("Company Profile & Services", report_title))
-    
+
     report_subtitle = ParagraphStyle(
         "ReportSubtitle",
         parent=styles["Normal"],
@@ -256,7 +254,7 @@ def create_cover_page(elements, styles):
         alignment=TA_CENTER,
     )
     elements.append(Paragraph("For Prospective Clients", report_subtitle))
-    
+
     elements.append(Spacer(1, 2 * inch))
     elements.append(Paragraph(f"<b>Prepared:</b> {datetime.now().strftime('%B %Y')}", styles["Normal"]))
     elements.append(PageBreak())
@@ -265,7 +263,7 @@ def create_cover_page(elements, styles):
 def create_company_overview(elements, styles):
     """Create the company overview section."""
     company = get_company_data()
-    
+
     section_title = ParagraphStyle(
         "SectionTitle",
         parent=styles["Heading1"],
@@ -274,26 +272,26 @@ def create_company_overview(elements, styles):
         spaceAfter=15,
         pageBreakBefore=False,
     )
-    
+
     elements.append(Paragraph("About SicherGleis", section_title))
     elements.append(Spacer(1, 0.2 * inch))
-    
-    intro_text = f"""
+
+    intro_text = """
     SicherGleis delivers precision-engineered Platform Screen Door (PSD) systems that unite 
     <b>Suraksha</b> (safety-first philosophy) with German engineering excellence to create 
     safe, intelligent, and future-ready urban rail infrastructure.
     """
     elements.append(Paragraph(intro_text, styles["Normal"]))
     elements.append(Spacer(1, 0.3 * inch))
-    
+
     elements.append(Paragraph("<b>Our Vision</b>", styles["Normal"]))
     elements.append(Paragraph(company["vision"], styles["Normal"]))
     elements.append(Spacer(1, 0.2 * inch))
-    
+
     elements.append(Paragraph("<b>Target Markets</b>", styles["Normal"]))
     elements.append(Paragraph(company["markets"], styles["Normal"]))
     elements.append(Spacer(1, 0.2 * inch))
-    
+
     elements.append(Paragraph("<b>Established</b>", styles["Normal"]))
     elements.append(Paragraph(company["established"], styles["Normal"]))
 
@@ -301,7 +299,7 @@ def create_company_overview(elements, styles):
 def create_services_section(elements, styles):
     """Create the services section."""
     services = get_services()
-    
+
     section_title = ParagraphStyle(
         "SectionTitle",
         parent=styles["Heading1"],
@@ -310,10 +308,10 @@ def create_services_section(elements, styles):
         spaceAfter=15,
         pageBreakBefore=False,
     )
-    
+
     elements.append(Paragraph("Our Services", section_title))
     elements.append(Spacer(1, 0.2 * inch))
-    
+
     for i, service in enumerate(services, 1):
         service_title = ParagraphStyle(
             f"ServiceTitle{i}",
@@ -324,10 +322,10 @@ def create_services_section(elements, styles):
         )
         elements.append(Paragraph(f"{i}. {service['title']}", service_title))
         elements.append(Spacer(1, 0.1 * inch))
-        
+
         elements.append(Paragraph(service["description"], styles["Normal"]))
         elements.append(Spacer(1, 0.1 * inch))
-        
+
         features_text = "<b>Key Features:</b> " + ", ".join(service["features"])
         elements.append(Paragraph(features_text, styles["Normal"]))
         elements.append(Spacer(1, 0.3 * inch))
@@ -336,7 +334,7 @@ def create_services_section(elements, styles):
 def create_case_studies_section(elements, styles):
     """Create the case studies/projects section."""
     projects = get_case_studies()
-    
+
     section_title = ParagraphStyle(
         "SectionTitle",
         parent=styles["Heading1"],
@@ -345,10 +343,10 @@ def create_case_studies_section(elements, styles):
         spaceAfter=15,
         pageBreakBefore=False,
     )
-    
+
     elements.append(Paragraph("Projects & Case Studies", section_title))
     elements.append(Spacer(1, 0.2 * inch))
-    
+
     for i, project in enumerate(projects, 1):
         project_title = ParagraphStyle(
             f"ProjectTitle{i}",
@@ -359,10 +357,10 @@ def create_case_studies_section(elements, styles):
         )
         elements.append(Paragraph(f"{i}. {project['title']}", project_title))
         elements.append(Spacer(1, 0.1 * inch))
-        
+
         elements.append(Paragraph(project["description"], styles["Normal"]))
         elements.append(Spacer(1, 0.1 * inch))
-        
+
         results = "<b>Results:</b><br/>" + "<br/>".join([f"• {r}" for r in project["results"]])
         elements.append(Paragraph(results, styles["Normal"]))
         elements.append(Spacer(1, 0.3 * inch))
@@ -371,7 +369,7 @@ def create_case_studies_section(elements, styles):
 def create_team_section(elements, styles):
     """Create the leadership team section."""
     team = get_leadership_team()
-    
+
     team_title = ParagraphStyle(
         "TeamTitle",
         parent=styles["Heading1"],
@@ -380,14 +378,14 @@ def create_team_section(elements, styles):
         spaceAfter=15,
         pageBreakBefore=False,
     )
-    
+
     elements.append(Paragraph("Leadership Team", team_title))
     elements.append(Spacer(1, 0.2 * inch))
-    
+
     team_data = [["Name", "Role"]]
     for member in team:
         team_data.append([member["name"], member["role"]])
-    
+
     team_table = Table(team_data, colWidths=[2.5 * inch, 3 * inch])
     team_table.setStyle(
         TableStyle(
@@ -408,7 +406,7 @@ def create_team_section(elements, styles):
     )
     elements.append(team_table)
     elements.append(Spacer(1, 0.3 * inch))
-    
+
     for member in team:
         member_name = ParagraphStyle(
             "MemberName",
@@ -425,7 +423,7 @@ def create_team_section(elements, styles):
 def create_contact_section(elements, styles):
     """Create the contact section."""
     company = get_company_data()
-    
+
     section_title = ParagraphStyle(
         "SectionTitle",
         parent=styles["Heading1"],
@@ -434,14 +432,14 @@ def create_contact_section(elements, styles):
         spaceAfter=15,
         pageBreakBefore=False,
     )
-    
+
     elements.append(Paragraph("Contact & Next Steps", section_title))
     elements.append(Spacer(1, 0.2 * inch))
-    
+
     elements.append(Paragraph("<b>Website:</b> " + company["website"], styles["Normal"]))
     elements.append(Paragraph("<b>Email:</b> " + company["email"], styles["Normal"]))
     elements.append(Spacer(1, 0.3 * inch))
-    
+
     cta_text = """
     We invite you to connect with us to discuss how SicherGleis can enhance safety and efficiency 
     in your railway infrastructure. Our team is ready to provide consultation, demonstrations, 
@@ -449,7 +447,7 @@ def create_contact_section(elements, styles):
     """
     elements.append(Paragraph(cta_text, styles["Normal"]))
     elements.append(Spacer(1, 0.5 * inch))
-    
+
     elements.append(Paragraph(
         "<i>Thank you for your interest in SicherGleis GmbH</i>",
         styles["Normal"]
@@ -459,7 +457,7 @@ def create_contact_section(elements, styles):
 def generate_client_report():
     """Generate the complete client report PDF."""
     buffer = io.BytesIO()
-    
+
     doc = SimpleDocTemplate(
         buffer,
         pagesize=A4,
@@ -468,10 +466,10 @@ def generate_client_report():
         leftMargin=0.75 * inch,
         rightMargin=0.75 * inch,
     )
-    
+
     elements = []
     styles = getSampleStyleSheet()
-    
+
     styles.add(
         ParagraphStyle(
             name="Justified",
@@ -479,24 +477,24 @@ def generate_client_report():
             alignment=TA_JUSTIFY,
         )
     )
-    
+
     create_cover_page(elements, styles)
     create_company_overview(elements, styles)
     elements.append(PageBreak())
-    
+
     create_services_section(elements, styles)
     elements.append(PageBreak())
-    
+
     create_case_studies_section(elements, styles)
     elements.append(PageBreak())
-    
+
     create_team_section(elements, styles)
     elements.append(PageBreak())
-    
+
     create_contact_section(elements, styles)
-    
+
     doc.build(elements)
-    
+
     buffer.seek(0)
     return buffer
 
@@ -516,27 +514,27 @@ def generate_complete_pdf_report(df_base, scenario_name, simulation_months, star
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.5*inch, leftMargin=0.5*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
     styles = getSampleStyleSheet()
-    
+
     DARK_BLUE = HexColor('#1a237e')
     MEDIUM_BLUE = HexColor('#0277bd')
     TEXT_DARK = HexColor('#263238')
-    
+
     title_s = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=24, spaceAfter=8, alignment=TA_CENTER, textColor=DARK_BLUE, fontName='Helvetica-Bold')
     subtitle_s = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=12, spaceAfter=6, alignment=TA_CENTER, textColor=HexColor('#546e7a'))
     head_s = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=14, spaceAfter=12, spaceBefore=15, textColor=MEDIUM_BLUE, fontName='Helvetica-Bold')
     bullet_s = ParagraphStyle('Bullet', parent=styles['Normal'], fontSize=10, spaceAfter=4, textColor=TEXT_DARK)
     footer_s = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
-    
+
     final_base = df_base.iloc[-1]
     breakeven_text = "Month {int(breakeven_base)}" if pd.notna(breakeven_base) else "Not achieved"
-    
+
     elems = []
     elems.append(HRFlowable(width="100%", thickness=3, color=HexColor('#0d1b3e'), spaceAfter=15))
     elems.append(Paragraph("SaaS Financial Report", title_s))
     elems.append(Paragraph(f"<b>{scenario_name}</b>", subtitle_s))
     elems.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')} | {simulation_months}-Month Forecast", subtitle_s))
     elems.append(HRFlowable(width="100%", thickness=1, color=HexColor('#bdc3c7'), spaceBefore=10, spaceAfter=20))
-    
+
     # Key Highlights
     elems.append(Paragraph("Key Highlights at a Glance", head_s))
     highlights_data = [
@@ -565,7 +563,7 @@ def generate_complete_pdf_report(df_base, scenario_name, simulation_months, star
     ]))
     elems.append(highlights_t)
     elems.append(Spacer(1, 20))
-    
+
     # Charts
     elems.append(Paragraph("Charts & Visual Analysis", head_s))
     chart_info = [
@@ -574,17 +572,17 @@ def generate_complete_pdf_report(df_base, scenario_name, simulation_months, star
         ("Cumulative Cash Position", bytes_list[2], f"Tracks cash flow. Break-even achieved at {breakeven_text}. Final cash position: ${final_base['Cumulative_Cash']:,.0f}."),
         ("LTV:CAC Ratio Trend", bytes_list[3], f"Unit economics metric. Target is 3x. Final ratio: {final_base['LTV_CAC_Ratio']:.2f}x."),
     ]
-    
+
     for title, img_bytes, caption in chart_info:
         elems.append(Paragraph(title, head_s))
         elems.append(Image(BytesIO(img_bytes), width=6.5*inch, height=3.5*inch))
         elems.append(Paragraph(caption, ParagraphStyle('Caption', parent=styles['Normal'], fontSize=9, spaceAfter=15, textColor=TEXT_DARK, alignment=TA_CENTER)))
         elems.append(Spacer(1, 10))
-    
+
     elems.append(Spacer(1, 15))
     elems.append(HRFlowable(width="100%", thickness=3, color=DARK_BLUE, spaceAfter=10))
     elems.append(Paragraph("Generated by BahnSetu SaaS Financial Dashboard | Based on SaaS Financial Plan 2.0", footer_s))
-    
+
     doc.build(elems)
     buf.seek(0)
     return buf.getvalue()
@@ -595,27 +593,27 @@ def generate_charts_only_pdf_report(df_base, scenario_name, simulation_months, s
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.5*inch, leftMargin=0.5*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
     styles = getSampleStyleSheet()
-    
+
     DARK_BLUE = HexColor('#1a237e')
     MEDIUM_BLUE = HexColor('#0277bd')
     TEXT_DARK = HexColor('#263238')
-    
+
     title_s = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=24, spaceAfter=8, alignment=TA_CENTER, textColor=DARK_BLUE, fontName='Helvetica-Bold')
     subtitle_s = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=12, spaceAfter=6, alignment=TA_CENTER, textColor=HexColor('#546e7a'))
     head_s = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=14, spaceAfter=12, spaceBefore=15, textColor=MEDIUM_BLUE, fontName='Helvetica-Bold')
     caption_s = ParagraphStyle('Caption', parent=styles['Normal'], fontSize=9, spaceAfter=15, textColor=TEXT_DARK, alignment=TA_CENTER)
     footer_s = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
-    
+
     final_base = df_base.iloc[-1]
     breakeven_text = "Month {int(breakeven_base)}" if pd.notna(breakeven_base) else "Not achieved"
-    
+
     elems = []
     elems.append(HRFlowable(width="100%", thickness=3, color=HexColor('#0d1b3e'), spaceAfter=15))
     elems.append(Paragraph("Charts & Visual Analysis", title_s))
     elems.append(Paragraph(f"<b>{scenario_name}</b>", subtitle_s))
     elems.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')} | {simulation_months}-Month Forecast", subtitle_s))
     elems.append(HRFlowable(width="100%", thickness=1, color=HexColor('#bdc3c7'), spaceBefore=10, spaceAfter=20))
-    
+
     # Key Highlights
     elems.append(Paragraph("Key Highlights at a Glance", head_s))
     highlights_data = [
@@ -644,7 +642,7 @@ def generate_charts_only_pdf_report(df_base, scenario_name, simulation_months, s
     ]))
     elems.append(highlights_t)
     elems.append(Spacer(1, 20))
-    
+
     # Charts only
     chart_info = [
         ("Customer Growth", bytes_list[0], f"Shows the trajectory of customer acquisition over {simulation_months} months. Net customer growth is {int(final_base['Total_Customers'] - starting_customers):,} customers."),
@@ -652,17 +650,17 @@ def generate_charts_only_pdf_report(df_base, scenario_name, simulation_months, s
         ("Cumulative Cash Position", bytes_list[2], f"Tracks cash flow. Break-even achieved at {breakeven_text}. Final cash position: ${final_base['Cumulative_Cash']:,.0f}."),
         ("LTV:CAC Ratio Trend", bytes_list[3], f"Unit economics metric. Target is 3x. Final ratio: {final_base['LTV_CAC_Ratio']:.2f}x."),
     ]
-    
+
     for title, img_bytes, caption in chart_info:
         elems.append(Paragraph(title, head_s))
         elems.append(Image(BytesIO(img_bytes), width=6.5*inch, height=3.5*inch))
         elems.append(Paragraph(caption, caption_s))
         elems.append(Spacer(1, 10))
-    
+
     elems.append(Spacer(1, 15))
     elems.append(HRFlowable(width="100%", thickness=3, color=DARK_BLUE, spaceAfter=10))
     elems.append(Paragraph("Generated by BahnSetu SaaS Financial Dashboard | Based on SaaS Financial Plan 2.0", footer_s))
-    
+
     doc.build(elems)
     buf.seek(0)
     return buf.getvalue()
@@ -673,7 +671,7 @@ def generate_tables_only_pdf_report(df_base, scenario_name, simulation_months, s
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=0.4*inch, leftMargin=0.4*inch, topMargin=0.4*inch, bottomMargin=0.4*inch)
     styles = getSampleStyleSheet()
-    
+
     DARK_BLUE = HexColor('#1a237e')
     MEDIUM_BLUE = HexColor('#0277bd')
     LIGHT_BLUE = HexColor('#e3f2fd')
@@ -682,21 +680,21 @@ def generate_tables_only_pdf_report(df_base, scenario_name, simulation_months, s
     BORDER = HexColor('#90a4ae')
     TEXT_DARK = HexColor('#263238')
     TEXT_BOLD = HexColor('#1a237e')
-    
+
     title_s = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=24, spaceAfter=8, alignment=TA_CENTER, textColor=DARK_BLUE, fontName='Helvetica-Bold')
     subtitle_s = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=12, spaceAfter=6, alignment=TA_CENTER, textColor=HexColor('#546e7a'))
     head_s = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=14, spaceAfter=12, spaceBefore=15, textColor=MEDIUM_BLUE, fontName='Helvetica-Bold')
     footer_s = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
-    
+
     final_base = df_base.iloc[-1]
-    
+
     elems = []
     elems.append(HRFlowable(width="100%", thickness=3, color=DARK_BLUE, spaceAfter=15))
     elems.append(Paragraph("Data Tables Report", title_s))
     elems.append(Paragraph(f"<b>{scenario_name}</b>", subtitle_s))
     elems.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')} | {simulation_months}-Month Simulation", subtitle_s))
     elems.append(HRFlowable(width="100%", thickness=1, color=BORDER, spaceBefore=10, spaceAfter=15))
-    
+
     # Monthly Financial Summary
     elems.append(Paragraph("Monthly Financial Summary", head_s))
     monthly_data = [["📅 Month", "👥 Customers", "➕ New", "➖ Churned", "💵 MRR", "💰 Revenue", "📊 Costs", "📈 P&L", "💳 Cash"]]
@@ -736,7 +734,7 @@ def generate_tables_only_pdf_report(df_base, scenario_name, simulation_months, s
     ]))
     elems.append(monthly_t)
     elems.append(Spacer(1, 15))
-    
+
     # Key Metrics by Month
     elems.append(Paragraph("Key Metrics by Month", head_s))
     metrics_data = [["📅 Month", "📊 Gross Margin", "💎 LTV:CAC", "⏱️ CAC Payback", "📈 MoM Growth"]]
@@ -767,9 +765,9 @@ def generate_tables_only_pdf_report(df_base, scenario_name, simulation_months, s
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [ROW_WHITE, ROW_ALT]),
     ]))
     elems.append(metrics_t)
-    
+
     elems.append(Spacer(1, 15))
-    
+
     # Departmental Costs
     elems.append(Paragraph("Departmental Costs", head_s))
     dept_data = [["📅 Month", "🏭 COGS", "🔬 R&D", "📣 Sales & Mktg", "📋 G&A", "🤝 Customer Success"]]
@@ -802,11 +800,11 @@ def generate_tables_only_pdf_report(df_base, scenario_name, simulation_months, s
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [ROW_WHITE, ROW_ALT]),
     ]))
     elems.append(dept_t)
-    
+
     elems.append(Spacer(1, 15))
     elems.append(HRFlowable(width="100%", thickness=3, color=DARK_BLUE, spaceAfter=10))
     elems.append(Paragraph("Generated by BahnSetu SaaS Financial Dashboard | Based on SaaS Financial Plan 2.0", footer_s))
-    
+
     doc.build(elems)
     buf.seek(0)
     return buf.getvalue()
@@ -823,7 +821,7 @@ SEVERITY_COLORS = {
 }
 
 
-def generate_simulation_report(session_data: Dict) -> bytes:
+def generate_simulation_report(session_data: dict) -> bytes:
     """Generate an enhanced 5-page PDF report for the training simulation."""
     buf = BytesIO()
     doc = SimpleDocTemplate(
@@ -896,7 +894,7 @@ def generate_simulation_report(session_data: Dict) -> bytes:
     minutes = int(duration_sec // 60)
     seconds = int(duration_sec % 60)
     duration_str = f"{minutes}m {seconds}s" if minutes > 0 else f"{seconds}s"
-    
+
     total_incidents = metrics.get("total_incidents", 0)
     critical = metrics.get("critical", 0)
     warning = metrics.get("warning", 0)
@@ -914,7 +912,7 @@ def generate_simulation_report(session_data: Dict) -> bytes:
     elems.append(Paragraph("Training Simulation Report", title_style))
     elems.append(Paragraph(f"Session: {session_id}", subtitle_style))
     elems.append(Spacer(1, 0.5 * inch))
-    
+
     # Performance Score Card
     score = success_rate
     score_color = SUCCESS_GREEN if score >= 80 else WARNING_AMBER if score >= 50 else DANGER_RED
@@ -942,7 +940,7 @@ def generate_simulation_report(session_data: Dict) -> bytes:
     ]))
     elems.append(score_table)
     elems.append(Spacer(1, 0.3 * inch))
-    
+
     # KPI Grid - 6 metrics
     kpi_data = [
         ["Total", str(total_incidents), "📊"],
@@ -982,13 +980,13 @@ def generate_simulation_report(session_data: Dict) -> bytes:
         highlights.append("⚠️ Moderate performance - room for improvement")
     else:
         highlights.append("❌ Training needed - focus on skill development")
-    
+
     if critical > total_incidents * 0.3:
         highlights.append("⚠️ High volume of critical incidents - review protocols")
-    
+
     if avg_response > 5:
         highlights.append("⏱️ Response times could be improved")
-    
+
     if highlights:
         elems.append(Paragraph("Key Highlights", heading_style))
         for h in highlights:
@@ -996,20 +994,20 @@ def generate_simulation_report(session_data: Dict) -> bytes:
 
     # Skip duplicate page break - keep flow
     # ============== Analytics Charts already on Page 2 ==============
-    
+
     # Severity Distribution Chart
     severity_counts = session_data.get("severity_counts", {"CRITICAL": critical, "WARNING": warning, "INFO": info})
     if severity_counts:
         try:
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-            
+
             # Pie chart
             labels = list(severity_counts.keys())
             values = list(severity_counts.values())
             colors_pie = ["#ef4444", "#f59e0b", "#3b82f6"]
             ax1.pie(values, labels=labels, autopct="%1.1f%%", colors=colors_pie[:len(labels)], startangle=90)
             ax1.set_title("Severity Distribution", fontweight="bold", color="#1e3a5f")
-            
+
             # Bar chart
             bars = ax2.bar(labels, values, color=colors_pie[:len(labels)], edgecolor="#1e3a5f", linewidth=1)
             ax2.set_ylabel("Count", color="#334155")
@@ -1018,25 +1016,25 @@ def generate_simulation_report(session_data: Dict) -> bytes:
             for bar in bars:
                 height = bar.get_height()
                 ax2.text(bar.get_x() + bar.get_width()/2., height, f'{int(height)}', ha='center', va='bottom', fontweight="bold")
-            
+
             plt.tight_layout()
             chart_buf = BytesIO()
             plt.savefig(chart_buf, format="png", dpi=150, facecolor="white")
             plt.close()
             chart_buf.seek(0)
             elems.append(Image(chart_buf, width=6.5 * inch, height=2.5 * inch))
-        except Exception as e:
+        except Exception:
             pass
-    
+
     elems.append(Spacer(1, 0.3 * inch))
-    
+
     # Root Causes Chart
     root_causes = metrics.get("root_causes", {})
     if root_causes:
         try:
             fig, ax = plt.subplots(figsize=(7, 3))
             sorted_causes = dict(sorted(root_causes.items(), key=lambda x: x[1], reverse=True)[:6])
-            bars = ax.barh(list(sorted_causes.keys()), list(sorted_causes.values()), 
+            bars = ax.barh(list(sorted_causes.keys()), list(sorted_causes.values()),
                           color=plt.cm.Blues([0.4 + i*0.1 for i in range(len(sorted_causes))]))
             ax.set_xlabel("Count", color="#334155")
             ax.set_title("Top Root Causes", fontweight="bold", color="#1e3a5f")
@@ -1052,23 +1050,23 @@ def generate_simulation_report(session_data: Dict) -> bytes:
             elems.append(Image(chart_buf, width=6.5 * inch, height=2 * inch))
         except Exception:
             pass
-    
+
     elems.append(PageBreak())
-    
+
     # ============== Page 3: Persona Performance ==============
     elems.append(Paragraph("👥 Team Performance", section_style))
-    
+
     personas = session_data.get("personas", [])
     if personas:
         # Sort by assigned count
         sorted_personas = sorted(personas, key=lambda x: x.get("assigned", 0), reverse=True)[:12]
-        
+
         # Calculate success rates
         for p in sorted_personas:
             assigned = p.get("assigned", 0)
             resolved = p.get("resolved", 0)
             p["success_rate"] = (resolved / assigned * 100) if assigned > 0 else 0
-        
+
         # Team Performance Table
         pers_data = [["Team Member", "Role", "Assigned", "Resolved", "Failed", "Success %"]]
         for p in sorted_personas:
@@ -1082,7 +1080,7 @@ def generate_simulation_report(session_data: Dict) -> bytes:
                 str(p.get("failed", 0)),
                 f"{success_rate:.0f}%"
             ])
-        
+
         # Adjust column widths
         col_widths = [1.8 * inch, 1 * inch, 0.7 * inch, 0.7 * inch, 0.7 * inch, 0.8 * inch]
         pers_table = Table(pers_data, colWidths=col_widths)
@@ -1100,16 +1098,16 @@ def generate_simulation_report(session_data: Dict) -> bytes:
             ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
         ]))
         elems.append(pers_table)
-        
+
         # Top Performer Highlight
         if sorted_personas:
             top_performer = max(sorted_personas, key=lambda x: x.get("success_rate", 0))
             elems.append(Spacer(1, 0.3 * inch))
-            elems.append(Paragraph(f"🏆 <b>Top Performer:</b> {top_performer.get('name', 'N/A')} ({top_performer.get('role', '')}) - {top_performer.get('success_rate', 0):.0f}% success rate", 
+            elems.append(Paragraph(f"🏆 <b>Top Performer:</b> {top_performer.get('name', 'N/A')} ({top_performer.get('role', '')}) - {top_performer.get('success_rate', 0):.0f}% success rate",
                                  body_style))
-    
+
     elems.append(PageBreak())
-    
+
     # ============== Page 4: Incident Log ==============
     elems.append(Paragraph("📋 Incident Log", section_style))
 
@@ -1175,17 +1173,17 @@ def generate_simulation_report(session_data: Dict) -> bytes:
     worst = metrics.get("worst_performer", "")
     if worst and worst != "N/A":
         elems.append(Spacer(1, 0.2 * inch))
-        elems.append(Paragraph(f"⚠️ <b>Needs Improvement:</b> {worst} - Review training requirements", 
+        elems.append(Paragraph(f"⚠️ <b>Needs Improvement:</b> {worst} - Review training requirements",
                              body_style))
 
     elems.append(PageBreak())
-    
+
     # ============== Page 4: Recommendations ==============
     elems.append(Paragraph("💡 Recommendations", section_style))
-    
+
     # Generate recommendations based on data
     recommendations = []
-    
+
     if success_rate < 70:
         recommendations.append("• Focus on team training to improve resolution rate")
     if avg_response > 5:
@@ -1194,28 +1192,28 @@ def generate_simulation_report(session_data: Dict) -> bytes:
         recommendations.append("• Review critical incident protocols and escalation procedures")
     if failed > total_incidents * 0.2:
         recommendations.append("• Provide additional support to team members with high failure rates")
-    
+
     # Add root cause based recommendations
     if root_causes:
         top_cause = max(root_causes.items(), key=lambda x: x[1]) if root_causes else None
         if top_cause and top_cause[1] > 3:
             recommendations.append(f"• Address root cause '{top_cause[0]}' - occurred {top_cause[1]} times")
-    
+
     # Improvement areas
     improvement = metrics.get("improvement_areas", {})
     if improvement:
         top_improvement = max(improvement.items(), key=lambda x: x[1]) if improvement else None
         if top_improvement:
             recommendations.append(f"• Focus on {top_improvement[0]} - identified in {top_improvement[1]} incidents")
-    
+
     if not recommendations:
         recommendations.append("• Continue current practices - team is performing well")
-    
+
     # Display recommendations in styled format
     for i, rec in enumerate(recommendations, 1):
         elems.append(Paragraph(f"<b>{i}.</b> {rec}", body_style))
         elems.append(Spacer(1, 0.1 * inch))
-    
+
     # Leadership Assessment
     elems.append(Spacer(1, 0.3 * inch))
     leadership = session_data.get("leadership_assessment", "")
@@ -1229,7 +1227,7 @@ def generate_simulation_report(session_data: Dict) -> bytes:
 </div>
         """
         elems.append(Paragraph(assessment_box, body_style))
-    
+
     # Footer with branding
     footer_style = ParagraphStyle("Footer", parent=styles["Normal"], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
     elems.append(Spacer(1, 0.5 * inch))
