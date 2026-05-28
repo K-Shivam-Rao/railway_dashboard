@@ -481,6 +481,7 @@ class TestGenerateSimulationReport:
         result = generate_simulation_report(session)
         assert isinstance(result, bytes)
 
+    @pytest.mark.filterwarnings("ignore:invalid value encountered in divide")
     def test_minimal_session_data(self):
         session = {
             "session_id": "SIM-MIN-001",
