@@ -63,7 +63,7 @@ export function AreaChart({ data, series, height = 300 }: AreaChartProps) {
           axisLine={false}
           width={50}
         />
-        <Tooltip content={defaultTooltip} />
+        <Tooltip content={defaultTooltip as any} />
         {keys.map((s) => (
           <Area
             key={s.key}

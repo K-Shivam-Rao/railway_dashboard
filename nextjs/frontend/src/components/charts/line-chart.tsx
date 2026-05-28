@@ -40,7 +40,7 @@ export function LineChart({ data, series, height = 300 }: LineChartProps) {
           width={50}
         />
         <Tooltip
-          content={({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) =>
+          content={(({ active, payload, label }: { active?: boolean; payload?: readonly { name: string; value: number; color: string }[]; label?: string }) =>
             active && payload?.length ? (
               <div className="rounded-lg border border-border-default bg-bg-surface px-3 py-2 shadow-lg">
                 <p className="text-xs text-text-muted mb-1">{label}</p>
@@ -51,7 +51,7 @@ export function LineChart({ data, series, height = 300 }: LineChartProps) {
                 ))}
               </div>
             ) : null
-          }
+          ) as any}
         />
         {series.map((s) => (
           <Line

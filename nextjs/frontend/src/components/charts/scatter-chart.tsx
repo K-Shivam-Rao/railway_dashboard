@@ -46,7 +46,7 @@ export function ScatterChart({
         />
         <ZAxis dataKey="z" range={[40, 200]} />
           <Tooltip
-            content={({ active, payload }: { active?: boolean; payload?: { payload: { x: number; y: number; name?: string } }[] }) =>
+            content={(({ active, payload }: { active?: boolean; payload?: readonly { payload: { x: number; y: number; name?: string } }[] }) =>
               active && payload?.length ? (
                 <div className="rounded-lg border border-border-default bg-bg-surface px-3 py-2 shadow-lg">
                   <p className="text-sm text-text-primary">
@@ -60,7 +60,7 @@ export function ScatterChart({
                   )}
                 </div>
               ) : null
-            }
+            ) as any}
           />
         <Scatter data={data} fill={color} opacity={0.7} />
       </RechartsScatter>
