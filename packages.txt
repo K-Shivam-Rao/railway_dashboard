@@ -1,5 +1,3 @@
-# System dependencies for Streamlit Community Cloud
-# Required for compiling Python packages with native extensions
 build-essential
 python3-dev
 gcc
