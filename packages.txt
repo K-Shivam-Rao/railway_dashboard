@@ -1,0 +1,7 @@
+build-essential
+python3-dev
+gcc
+g++
+make
+libffi-dev
+libssl-dev
