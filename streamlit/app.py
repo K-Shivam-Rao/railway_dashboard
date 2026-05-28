@@ -143,7 +143,8 @@ css_files = [
     "assets/css/totalvision.css",
 ]
 for css_file in css_files:
-    with open(css_file, encoding="utf-8") as f:
+    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), css_file)
+    with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
