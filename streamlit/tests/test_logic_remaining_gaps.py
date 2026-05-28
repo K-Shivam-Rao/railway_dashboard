@@ -2,6 +2,11 @@
 Covers: wrapper classes, SimulationSession lifecycle, anomaly detection,
 time series, network summary branches, run_simulation edge cases."""
 
+import matplotlib
+try:
+    matplotlib.use("Agg")
+except Exception:
+    pass
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
